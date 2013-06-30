@@ -20,9 +20,15 @@
 		65B9308D17806B4500312B88 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 65B9308C17806B4500312B88 /* Default-568h@2x.png */; };
 		65B9309017806B4500312B88 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65B9308E17806B4500312B88 /* MainStoryboard_iPhone.storyboard */; };
 		65B9309317806B4500312B88 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65B9309117806B4500312B88 /* MainStoryboard_iPad.storyboard */; };
-		65B9309517806B4500312B88 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 65B9309417806B4500312B88 /* Shader.fsh */; };
-		65B9309717806B4500312B88 /* Shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 65B9309617806B4500312B88 /* Shader.vsh */; };
 		65B9309A17806B4500312B88 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B9309917806B4500312B88 /* ViewController.m */; };
+		65B930A717806B9900312B88 /* Board.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B930A117806B9900312B88 /* Board.m */; };
+		65B930A817806B9900312B88 /* Quads.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B930A417806B9900312B88 /* Quads.m */; };
+		65B930A917806B9900312B88 /* Textures.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B930A617806B9900312B88 /* Textures.m */; };
+		65B930AF17806BE800312B88 /* test.png in Resources */ = {isa = PBXBuildFile; fileRef = 65B930AE17806BE800312B88 /* test.png */; };
+		65B930B217806C5500312B88 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B117806C5500312B88 /* AVFoundation.framework */; };
+		65B930B417806C6400312B88 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B317806C6400312B88 /* CoreMedia.framework */; };
+		65B930B617806CB400312B88 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B517806CB400312B88 /* opencv2.framework */; };
+		65B930B817806D1400312B88 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B717806D1400312B88 /* CoreVideo.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,10 +49,20 @@
 		65B9308C17806B4500312B88 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		65B9308F17806B4500312B88 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		65B9309217806B4500312B88 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
-		65B9309417806B4500312B88 /* Shader.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = Shader.fsh; path = Shaders/Shader.fsh; sourceTree = "<group>"; };
-		65B9309617806B4500312B88 /* Shader.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = Shader.vsh; path = Shaders/Shader.vsh; sourceTree = "<group>"; };
 		65B9309817806B4500312B88 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		65B9309917806B4500312B88 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		65B930A017806B9900312B88 /* Board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Board.h; sourceTree = "<group>"; };
+		65B930A117806B9900312B88 /* Board.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Board.m; sourceTree = "<group>"; };
+		65B930A217806B9900312B88 /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = "<group>"; };
+		65B930A317806B9900312B88 /* Quads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Quads.h; sourceTree = "<group>"; };
+		65B930A417806B9900312B88 /* Quads.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Quads.m; sourceTree = "<group>"; };
+		65B930A517806B9900312B88 /* Textures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Textures.h; sourceTree = "<group>"; };
+		65B930A617806B9900312B88 /* Textures.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Textures.m; sourceTree = "<group>"; };
+		65B930AE17806BE800312B88 /* test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test.png; sourceTree = "<group>"; };
+		65B930B117806C5500312B88 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		65B930B317806C6400312B88 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		65B930B517806CB400312B88 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
+		65B930B717806D1400312B88 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +70,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65B930B817806D1400312B88 /* CoreVideo.framework in Frameworks */,
+				65B930B617806CB400312B88 /* opencv2.framework in Frameworks */,
+				65B930B417806C6400312B88 /* CoreMedia.framework in Frameworks */,
+				65B930B217806C5500312B88 /* AVFoundation.framework in Frameworks */,
 				65B9307317806B4500312B88 /* UIKit.framework in Frameworks */,
 				65B9307517806B4500312B88 /* Foundation.framework in Frameworks */,
 				65B9307717806B4500312B88 /* CoreGraphics.framework in Frameworks */,
@@ -68,9 +88,9 @@
 		65B9306617806B4500312B88 = {
 			isa = PBXGroup;
 			children = (
-				65B9307C17806B4500312B88 /* Dystopia */,
 				65B9307117806B4500312B88 /* Frameworks */,
 				65B9307017806B4500312B88 /* Products */,
+				65B9307C17806B4500312B88 /* Dystopia */,
 			);
 			sourceTree = "<group>";
 		};
@@ -85,6 +105,10 @@
 		65B9307117806B4500312B88 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				65B930B717806D1400312B88 /* CoreVideo.framework */,
+				65B930B517806CB400312B88 /* opencv2.framework */,
+				65B930B317806C6400312B88 /* CoreMedia.framework */,
+				65B930B117806C5500312B88 /* AVFoundation.framework */,
 				65B9307217806B4500312B88 /* UIKit.framework */,
 				65B9307417806B4500312B88 /* Foundation.framework */,
 				65B9307617806B4500312B88 /* CoreGraphics.framework */,
@@ -97,15 +121,15 @@
 		65B9307C17806B4500312B88 /* Dystopia */ = {
 			isa = PBXGroup;
 			children = (
-				65B9308517806B4500312B88 /* AppDelegate.h */,
-				65B9308617806B4500312B88 /* AppDelegate.m */,
-				65B9308E17806B4500312B88 /* MainStoryboard_iPhone.storyboard */,
-				65B9309117806B4500312B88 /* MainStoryboard_iPad.storyboard */,
-				65B9309417806B4500312B88 /* Shader.fsh */,
-				65B9309617806B4500312B88 /* Shader.vsh */,
-				65B9309817806B4500312B88 /* ViewController.h */,
-				65B9309917806B4500312B88 /* ViewController.m */,
+				65B930BB17806D8400312B88 /* Application */,
+				65B930B017806BFB00312B88 /* Storyboards */,
 				65B9307D17806B4500312B88 /* Supporting Files */,
+				65B930AD17806BE800312B88 /* Images */,
+				65B930B917806D4400312B88 /* OpenGL */,
+				65B930BA17806D6600312B88 /* View Controllers */,
+				65B930A017806B9900312B88 /* Board.h */,
+				65B930A117806B9900312B88 /* Board.m */,
+				65B930A217806B9900312B88 /* Globals.h */,
 			);
 			path = Dystopia;
 			sourceTree = "<group>";
@@ -115,13 +139,59 @@
 			children = (
 				65B9307E17806B4500312B88 /* Dystopia-Info.plist */,
 				65B9307F17806B4500312B88 /* InfoPlist.strings */,
-				65B9308217806B4500312B88 /* main.m */,
 				65B9308417806B4500312B88 /* Dystopia-Prefix.pch */,
 				65B9308817806B4500312B88 /* Default.png */,
 				65B9308A17806B4500312B88 /* Default@2x.png */,
 				65B9308C17806B4500312B88 /* Default-568h@2x.png */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		65B930AD17806BE800312B88 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				65B930AE17806BE800312B88 /* test.png */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
+		65B930B017806BFB00312B88 /* Storyboards */ = {
+			isa = PBXGroup;
+			children = (
+				65B9308E17806B4500312B88 /* MainStoryboard_iPhone.storyboard */,
+				65B9309117806B4500312B88 /* MainStoryboard_iPad.storyboard */,
+			);
+			name = Storyboards;
+			sourceTree = "<group>";
+		};
+		65B930B917806D4400312B88 /* OpenGL */ = {
+			isa = PBXGroup;
+			children = (
+				65B930A317806B9900312B88 /* Quads.h */,
+				65B930A417806B9900312B88 /* Quads.m */,
+				65B930A517806B9900312B88 /* Textures.h */,
+				65B930A617806B9900312B88 /* Textures.m */,
+			);
+			name = OpenGL;
+			sourceTree = "<group>";
+		};
+		65B930BA17806D6600312B88 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				65B9309817806B4500312B88 /* ViewController.h */,
+				65B9309917806B4500312B88 /* ViewController.m */,
+			);
+			name = "View Controllers";
+			sourceTree = "<group>";
+		};
+		65B930BB17806D8400312B88 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				65B9308517806B4500312B88 /* AppDelegate.h */,
+				65B9308617806B4500312B88 /* AppDelegate.m */,
+				65B9308217806B4500312B88 /* main.m */,
+			);
+			name = Application;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -181,8 +251,7 @@
 				65B9308D17806B4500312B88 /* Default-568h@2x.png in Resources */,
 				65B9309017806B4500312B88 /* MainStoryboard_iPhone.storyboard in Resources */,
 				65B9309317806B4500312B88 /* MainStoryboard_iPad.storyboard in Resources */,
-				65B9309517806B4500312B88 /* Shader.fsh in Resources */,
-				65B9309717806B4500312B88 /* Shader.vsh in Resources */,
+				65B930AF17806BE800312B88 /* test.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,6 +265,9 @@
 				65B9308317806B4500312B88 /* main.m in Sources */,
 				65B9308717806B4500312B88 /* AppDelegate.m in Sources */,
 				65B9309A17806B4500312B88 /* ViewController.m in Sources */,
+				65B930A717806B9900312B88 /* Board.m in Sources */,
+				65B930A817806B9900312B88 /* Quads.m in Sources */,
+				65B930A917806B9900312B88 /* Textures.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,6 +362,10 @@
 		65B9309E17806B4500312B88 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Dystopia/Dystopia-Prefix.pch";
 				INFOPLIST_FILE = "Dystopia/Dystopia-Info.plist";
@@ -301,6 +377,10 @@
 		65B9309F17806B4500312B88 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Dystopia/Dystopia-Prefix.pch";
 				INFOPLIST_FILE = "Dystopia/Dystopia-Info.plist";
