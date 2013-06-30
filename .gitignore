@@ -1,0 +1,10 @@
+*.log
+*.db
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+.idea
+opencv2.framework
