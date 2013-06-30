@@ -1,8 +1,8 @@
 //
 //  main.m
-//  Dystopia
+//  Gloomies
 //
-//  Created by Daniel Andersen on 6/30/13.
+//  Created by Daniel Andersen on 6/3/13.
 //  Copyright (c) 2013 Daniel Andersen. All rights reserved.
 //
 

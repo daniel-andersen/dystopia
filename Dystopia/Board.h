@@ -23,16 +23,28 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <UIKit/UIKit.h>
-#import <GLKit/GLKit.h>
+#import <AVFoundation/AVFoundation.h>
+#import "Quads.h"
 
-#define FRAME_RATE ((1000.0f / 60.0f) / 1000.0f)
+@interface Board : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate> {
+    Quads *photoOverlay;
+    Texture photoTexture;
+    
+    AVCaptureSession *captureSession;
+    CVOpenGLESTextureCacheRef coreVideoTextureCache;
+    GLuint outputTexture;
+}
 
-#define START_DELAY 1.0f
+- (id) init;
 
-@interface ViewController : GLKViewController
+- (void) createBoard;
 
-- (void) didBecomeInactive;
-- (void) didBecomeActive;
+- (void) inactivate;
+- (void) reactivate;
+
+- (void) tap:(GLKVector2)p;
+
+- (void) update;
+- (void) render;
 
 @end

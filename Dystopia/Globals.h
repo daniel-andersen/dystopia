@@ -23,16 +23,45 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <UIKit/UIKit.h>
+#ifndef Demoteket_Globals_h
+#define Demoteket_Globals_h
+
 #import <GLKit/GLKit.h>
 
-#define FRAME_RATE ((1000.0f / 60.0f) / 1000.0f)
+#import "Textures.h"
 
-#define START_DELAY 1.0f
+#define BUFFER_OFFSET(i) ((char *)NULL + (i * sizeof(GLfloat)))
 
-@interface ViewController : GLKViewController
+Textures *textures;
+GLKBaseEffect *glkEffectNormal;
 
-- (void) didBecomeInactive;
-- (void) didBecomeActive;
+GLKVector3 worldPosition;
 
-@end
+GLKMatrix4 sceneModelViewMatrix;
+GLKMatrix4 sceneProjectionMatrix;
+
+GLKMatrix4 orthoProjectionMatrix;
+GLKMatrix4 orthoModelViewMatrix;
+
+EAGLContext *openglContext;
+
+float screenWidth;
+float screenHeight;
+float screenWidthNoScale;
+float screenHeightNoScale;
+float aspectRatio;
+
+GLuint uniformModelViewProjectionMatrix;
+GLuint uniformSampler1;
+GLuint uniformSampler2;
+GLuint uniformScreenSizeInv;
+GLuint uniformOffscreenSizeInv;
+GLuint uniformRefractionConstant;
+
+GLfloat screenSizeInv[2];
+GLfloat offscreenSizeInv[2];
+GLfloat refractionConstant;
+
+GLKTextureLoader *textureLoader;
+
+#endif
