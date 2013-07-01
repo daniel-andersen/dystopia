@@ -25,11 +25,10 @@
 
 #import <UIKit/UIKit.h>
 
-#import "AppDelegate.h"
+@interface BoardRecognizer : NSObject
 
-int main(int argc, char *argv[])
-{
-    @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-    }
-}
+- (NSArray *)findBoardFromImage:(UIImage *)image;
+
+- (UIImage *)filterAndThresholdUIImage:(UIImage *)image;
+
+@end

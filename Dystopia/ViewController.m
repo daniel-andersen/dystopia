@@ -1,4 +1,4 @@
-// Copyright (c) 2012, Daniel Andersen (dani_ande@yahoo.dk)
+// Copyright (c) 2012, Daniel Andersen (daniel@trollsahead.dk)
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
 #import "ViewController.h"
 #import "Board.h"
 #import "Globals.h"
+#import "BoardRecognizer.h"
 
 enum {
     ATTRIB_VERTEX,
@@ -83,6 +84,14 @@ enum {
     board = [[Board alloc] init];
 	[board createBoard];
     
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 640 * 0.5f, 424 * 0.5f)];
+    imageView.image = [[[BoardRecognizer alloc] init] filterAndThresholdUIImage:[UIImage imageNamed:@"test.png"]];
+    [self.view addSubview:imageView];
+    
+    UIImageView *imageView2 = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 424 * 0.5f, 640 * 0.5f, 424 * 0.5f)];
+    imageView2.image = [UIImage imageNamed:@"test.png"];
+    [self.view addSubview:imageView2];
+
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapFrom:)];
     [self.view addGestureRecognizer:tapRecognizer];
     

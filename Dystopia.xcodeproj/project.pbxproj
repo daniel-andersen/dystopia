@@ -27,8 +27,13 @@
 		65B930AF17806BE800312B88 /* test.png in Resources */ = {isa = PBXBuildFile; fileRef = 65B930AE17806BE800312B88 /* test.png */; };
 		65B930B217806C5500312B88 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B117806C5500312B88 /* AVFoundation.framework */; };
 		65B930B417806C6400312B88 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B317806C6400312B88 /* CoreMedia.framework */; };
-		65B930B617806CB400312B88 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B517806CB400312B88 /* opencv2.framework */; };
 		65B930B817806D1400312B88 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B717806D1400312B88 /* CoreVideo.framework */; };
+		65EA26461780C54B00E84BA4 /* UIImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */; };
+		65EA26481780C6D700E84BA4 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA26471780C6D700E84BA4 /* libz.dylib */; };
+		65EA264A1780C87200E84BA4 /* hand.png in Resources */ = {isa = PBXBuildFile; fileRef = 65EA26491780C87200E84BA4 /* hand.png */; };
+		65EA264E1780C90300E84BA4 /* FingerRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA264D1780C90300E84BA4 /* FingerRecognizer.mm */; };
+		65EA26551781608600E84BA4 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA26541781608600E84BA4 /* opencv2.framework */; };
+		65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA26771782038800E84BA4 /* BoardRecognizer.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,8 +66,16 @@
 		65B930AE17806BE800312B88 /* test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test.png; sourceTree = "<group>"; };
 		65B930B117806C5500312B88 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		65B930B317806C6400312B88 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
-		65B930B517806CB400312B88 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		65B930B717806D1400312B88 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		65EA26441780C54B00E84BA4 /* UIImage+OpenCV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+OpenCV.h"; sourceTree = "<group>"; };
+		65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+OpenCV.mm"; sourceTree = "<group>"; };
+		65EA26471780C6D700E84BA4 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		65EA26491780C87200E84BA4 /* hand.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hand.png; sourceTree = "<group>"; };
+		65EA264C1780C90300E84BA4 /* FingerRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FingerRecognizer.h; sourceTree = "<group>"; };
+		65EA264D1780C90300E84BA4 /* FingerRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FingerRecognizer.mm; sourceTree = "<group>"; };
+		65EA26541781608600E84BA4 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
+		65EA26761782038800E84BA4 /* BoardRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardRecognizer.h; sourceTree = "<group>"; };
+		65EA26771782038800E84BA4 /* BoardRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BoardRecognizer.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,8 +83,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65EA26551781608600E84BA4 /* opencv2.framework in Frameworks */,
+				65EA26481780C6D700E84BA4 /* libz.dylib in Frameworks */,
 				65B930B817806D1400312B88 /* CoreVideo.framework in Frameworks */,
-				65B930B617806CB400312B88 /* opencv2.framework in Frameworks */,
 				65B930B417806C6400312B88 /* CoreMedia.framework in Frameworks */,
 				65B930B217806C5500312B88 /* AVFoundation.framework in Frameworks */,
 				65B9307317806B4500312B88 /* UIKit.framework in Frameworks */,
@@ -105,8 +119,9 @@
 		65B9307117806B4500312B88 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				65EA26471780C6D700E84BA4 /* libz.dylib */,
+				65EA26541781608600E84BA4 /* opencv2.framework */,
 				65B930B717806D1400312B88 /* CoreVideo.framework */,
-				65B930B517806CB400312B88 /* opencv2.framework */,
 				65B930B317806C6400312B88 /* CoreMedia.framework */,
 				65B930B117806C5500312B88 /* AVFoundation.framework */,
 				65B9307217806B4500312B88 /* UIKit.framework */,
@@ -121,10 +136,12 @@
 		65B9307C17806B4500312B88 /* Dystopia */ = {
 			isa = PBXGroup;
 			children = (
-				65B930BB17806D8400312B88 /* Application */,
+				65B930AD17806BE800312B88 /* Images */,
 				65B930B017806BFB00312B88 /* Storyboards */,
 				65B9307D17806B4500312B88 /* Supporting Files */,
-				65B930AD17806BE800312B88 /* Images */,
+				65B930BB17806D8400312B88 /* Application */,
+				65EA26431780C4C800E84BA4 /* OpenCV Wrappers */,
+				65EA264B1780C89500E84BA4 /* Recognizers */,
 				65B930B917806D4400312B88 /* OpenGL */,
 				65B930BA17806D6600312B88 /* View Controllers */,
 				65B930A017806B9900312B88 /* Board.h */,
@@ -151,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				65B930AE17806BE800312B88 /* test.png */,
+				65EA26491780C87200E84BA4 /* hand.png */,
 			);
 			path = Images;
 			sourceTree = "<group>";
@@ -192,6 +210,26 @@
 				65B9308217806B4500312B88 /* main.m */,
 			);
 			name = Application;
+			sourceTree = "<group>";
+		};
+		65EA26431780C4C800E84BA4 /* OpenCV Wrappers */ = {
+			isa = PBXGroup;
+			children = (
+				65EA26441780C54B00E84BA4 /* UIImage+OpenCV.h */,
+				65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */,
+			);
+			name = "OpenCV Wrappers";
+			sourceTree = "<group>";
+		};
+		65EA264B1780C89500E84BA4 /* Recognizers */ = {
+			isa = PBXGroup;
+			children = (
+				65EA26761782038800E84BA4 /* BoardRecognizer.h */,
+				65EA26771782038800E84BA4 /* BoardRecognizer.mm */,
+				65EA264C1780C90300E84BA4 /* FingerRecognizer.h */,
+				65EA264D1780C90300E84BA4 /* FingerRecognizer.mm */,
+			);
+			name = Recognizers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -252,6 +290,7 @@
 				65B9309017806B4500312B88 /* MainStoryboard_iPhone.storyboard in Resources */,
 				65B9309317806B4500312B88 /* MainStoryboard_iPad.storyboard in Resources */,
 				65B930AF17806BE800312B88 /* test.png in Resources */,
+				65EA264A1780C87200E84BA4 /* hand.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,6 +307,9 @@
 				65B930A717806B9900312B88 /* Board.m in Sources */,
 				65B930A817806B9900312B88 /* Quads.m in Sources */,
 				65B930A917806B9900312B88 /* Textures.m in Sources */,
+				65EA26461780C54B00E84BA4 /* UIImage+OpenCV.mm in Sources */,
+				65EA264E1780C90300E84BA4 /* FingerRecognizer.mm in Sources */,
+				65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,6 +450,7 @@
 				65B9309F17806B4500312B88 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

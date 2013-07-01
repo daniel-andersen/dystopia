@@ -25,11 +25,10 @@
 
 #import <UIKit/UIKit.h>
 
-#import "AppDelegate.h"
+@interface FingerRecognizer : NSObject
 
-int main(int argc, char *argv[])
-{
-    @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-    }
-}
+- (NSArray *)findFingersInImage:(UIImage *)image;
+
+- (UIImage *)filterAndThresholdUIImage:(UIImage *)image;
+
+@end

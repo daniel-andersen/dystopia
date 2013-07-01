@@ -1,4 +1,4 @@
-// Copyright (c) 2012, Daniel Andersen (dani_ande@yahoo.dk)
+// Copyright (c) 2012, Daniel Andersen (daniel@trollsahead.dk)
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -48,9 +48,9 @@
                          x4:0.0f y4:1.0f z4:0.0f];
     [photoOverlay end];
     
-    [self setupTextureCache];
-    [self setupCamera:AVCaptureSessionPreset640x480];
-    [self startCapture];
+    //[self setupTextureCache];
+    //[self setupCamera:AVCaptureSessionPreset640x480];
+    //[self startCapture];
 }
 
 - (void) createBoard {
@@ -71,7 +71,7 @@
 
 - (void) render {
     [self setupPosition];
-    [photoOverlay render];
+    //[photoOverlay render];
 }
 
 - (void) setupPosition {

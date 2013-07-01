@@ -23,13 +23,45 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <UIKit/UIKit.h>
+#import "FingerRecognizer.h"
+#import "UIImage+OpenCV.h"
 
-#import "AppDelegate.h"
+@implementation FingerRecognizer
 
-int main(int argc, char *argv[])
-{
-    @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-    }
+- (NSArray *)findFingersInImage:(UIImage *)image {
+    cv::Mat matImage = [image CVMat];
+    cv::Mat smoothedImage = cvCreateImage(cv::Size(image.size.width, image.size.height), 8, 3);
+
+    cv::GaussianBlur(matImage, smoothedImage, cv::Size(5,5), 1.5f);
+
+    return NULL;
 }
+
+- (UIImage *)filterAndThresholdUIImage:(UIImage *)image {
+    return [UIImage imageWithCVMat:[self filterAndThreshold:[image CVMat]]];
+}
+
+- (cv::Mat)filterAndThreshold:(cv::Mat)image {
+    //image = [self smooth:image];
+    image = [self convertToHsv:image];
+    //image = [self applyThreshold:image];
+    return image;
+}
+
+- (cv::Mat)smooth:(cv::Mat)image {
+    cv::GaussianBlur(image, image, cv::Size(11.0f, 11.0f), 1.0f);
+    cv::medianBlur(image, image, 11.0f);
+    return image;
+}
+
+- (cv::Mat)convertToHsv:(cv::Mat)image {
+    cv::cvtColor(image, image, CV_BGR2HSV);
+    return image;
+}
+
+- (cv::Mat)applyThreshold:(cv::Mat)image {
+    cv::inRange(image, cv::Scalar(110, 0, 0, 0), cv::Scalar(125, 255, 255, 255), image);
+    return image;
+}
+
+@end

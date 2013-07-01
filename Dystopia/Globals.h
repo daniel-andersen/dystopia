@@ -1,4 +1,4 @@
-// Copyright (c) 2012, Daniel Andersen (dani_ande@yahoo.dk)
+// Copyright (c) 2012, Daniel Andersen (daniel@trollsahead.dk)
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
