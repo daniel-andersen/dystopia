@@ -23,32 +23,13 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "ViewController.h"
+#import "GameViewController.h"
+#import "ExternalDisplay.h"
 #import "Board.h"
-#import "Globals.h"
 #import "BoardRecognizer.h"
+#import "Globals.h"
 
-enum {
-    ATTRIB_VERTEX,
-    ATTRIB_TEXCOORD,
-};
-
-@interface ViewController () {
-    
-@private
-    
-    Board *board;
-    
-    float frameSeconds;
-    double startTime;
-}
-
-@property (strong, nonatomic) EAGLContext *context;
-@property (strong, nonatomic) GLKBaseEffect *effect;
-
-@end
-
-@implementation ViewController
+@implementation GameViewController
 
 @synthesize context = _context;
 @synthesize effect = _effect;
@@ -61,9 +42,10 @@ enum {
     [board reactivate];
 }
 
-- (void) viewDidLoad {
+- (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    NSLog(@"1");
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     
     if (!self.context) {
@@ -72,9 +54,11 @@ enum {
     
     openglContext = self.context;
     
+    NSLog(@"2");
     GLKView *view = (GLKView *)self.view;
     view.context = self.context;
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
+    view.frame = [ExternalDisplay instance].screen.bounds;
     
     self.preferredFramesPerSecond = 60;
     frameSeconds = FRAME_RATE;
@@ -83,7 +67,8 @@ enum {
     
     board = [[Board alloc] init];
 	[board createBoard];
-    
+
+    /* --- TEST --- */
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 640 * 0.5f, 424 * 0.5f)];
     imageView.image = [[[BoardRecognizer alloc] init] filterAndThresholdUIImage:[UIImage imageNamed:@"test.png"]];
     [self.view addSubview:imageView];
@@ -91,10 +76,8 @@ enum {
     UIImageView *imageView2 = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 424 * 0.5f, 640 * 0.5f, 424 * 0.5f)];
     imageView2.image = [UIImage imageNamed:@"test.png"];
     [self.view addSubview:imageView2];
+    /* ------------ */
 
-    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapFrom:)];
-    [self.view addGestureRecognizer:tapRecognizer];
-    
     startTime = CFAbsoluteTimeGetCurrent();
 }
 
@@ -136,12 +119,12 @@ enum {
     self.effect = nil;
 }
 
-- (void) getScreenSize {
-    screenWidth = [UIScreen mainScreen].bounds.size.width * [UIScreen mainScreen].scale;
-    screenHeight = [UIScreen mainScreen].bounds.size.height * [UIScreen mainScreen].scale;
+- (void)getScreenSize {
+    screenWidth = [ExternalDisplay instance].screen.bounds.size.width * [ExternalDisplay instance].screen.scale;
+    screenHeight = [ExternalDisplay instance].screen.bounds.size.height * [ExternalDisplay instance].screen.scale;
     
-    screenWidthNoScale = [UIScreen mainScreen].bounds.size.width;
-    screenHeightNoScale = [UIScreen mainScreen].bounds.size.height;
+    screenWidthNoScale = [ExternalDisplay instance].screen.bounds.size.width;
+    screenHeightNoScale = [ExternalDisplay instance].screen.bounds.size.height;
     
     aspectRatio = fabsf(screenWidth / screenHeight);
     
@@ -152,13 +135,6 @@ enum {
     
     NSLog(@"Screen size: %i, %i", (int) screenWidth, (int) screenHeight);
 }
-
-- (void) handleTapFrom:(UITapGestureRecognizer*)recognizer {
-    CGPoint touchLocation = [recognizer locationInView:recognizer.view];
-    [board tap:GLKVector2Make(touchLocation.x / screenHeightNoScale, touchLocation.y / screenWidthNoScale)];
-}
-
-#pragma mark - GLKView and GLKViewController delegate methods
 
 - (void)update {
     sceneProjectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0f), aspectRatio, 0.1f, 10.0f);
@@ -177,7 +153,7 @@ enum {
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     [board render];

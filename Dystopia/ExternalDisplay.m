@@ -23,16 +23,41 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <UIKit/UIKit.h>
-#import <GLKit/GLKit.h>
+#import "ExternalDisplay.h"
 
-#define FRAME_RATE ((1000.0f / 60.0f) / 1000.0f)
+ExternalDisplay *externalDisplayInstance = nil;
 
-#define START_DELAY 1.0f
+@implementation ExternalDisplay
 
-@interface ViewController : GLKViewController
+@synthesize window;
+@synthesize screen;
 
-- (void) didBecomeInactive;
-- (void) didBecomeActive;
++ (ExternalDisplay *)instance {
+    if (externalDisplayInstance == nil) {
+        externalDisplayInstance = [[ExternalDisplay alloc] init];
+    }
+    return externalDisplayInstance;
+}
+
+- (void)initialize {
+    if ([UIScreen screens].count > 1) {
+        screen = [[UIScreen screens] objectAtIndex:1];
+        UIScreenMode *bestScreenMode = nil;
+        for (UIScreenMode *screenMode in screen.availableModes) {
+            NSLog(@"Resolution: %f, %f", screenMode.size.width, screenMode.size.height);
+            if (bestScreenMode == nil || screenMode.size.width > bestScreenMode.size.width) {
+                bestScreenMode = screenMode;
+            }
+        }
+        NSLog(@"Choose: %f, %f", bestScreenMode.size.width, bestScreenMode.size.height);
+        screen.currentMode = bestScreenMode;
+    } else {
+        NSLog(@"No external displays found!");
+        screen = [UIScreen mainScreen];
+    }
+    window = [[UIWindow alloc] initWithFrame:screen.bounds];
+    window.backgroundColor = [UIColor redColor];
+    window.screen = screen;
+}
 
 @end

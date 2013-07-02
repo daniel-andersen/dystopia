@@ -20,7 +20,7 @@
 		65B9308D17806B4500312B88 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 65B9308C17806B4500312B88 /* Default-568h@2x.png */; };
 		65B9309017806B4500312B88 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65B9308E17806B4500312B88 /* MainStoryboard_iPhone.storyboard */; };
 		65B9309317806B4500312B88 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65B9309117806B4500312B88 /* MainStoryboard_iPad.storyboard */; };
-		65B9309A17806B4500312B88 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B9309917806B4500312B88 /* ViewController.m */; };
+		65B9309A17806B4500312B88 /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B9309917806B4500312B88 /* GameViewController.m */; };
 		65B930A717806B9900312B88 /* Board.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B930A117806B9900312B88 /* Board.m */; };
 		65B930A817806B9900312B88 /* Quads.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B930A417806B9900312B88 /* Quads.m */; };
 		65B930A917806B9900312B88 /* Textures.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B930A617806B9900312B88 /* Textures.m */; };
@@ -34,6 +34,8 @@
 		65EA264E1780C90300E84BA4 /* FingerRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA264D1780C90300E84BA4 /* FingerRecognizer.mm */; };
 		65EA26551781608600E84BA4 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA26541781608600E84BA4 /* opencv2.framework */; };
 		65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA26771782038800E84BA4 /* BoardRecognizer.mm */; };
+		65EA267F1783520900E84BA4 /* ExternalDisplay.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA267E1783520900E84BA4 /* ExternalDisplay.m */; };
+		65EA2684178361E300E84BA4 /* InitalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA2683178361E300E84BA4 /* InitalViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,8 +56,8 @@
 		65B9308C17806B4500312B88 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		65B9308F17806B4500312B88 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		65B9309217806B4500312B88 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
-		65B9309817806B4500312B88 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		65B9309917806B4500312B88 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		65B9309817806B4500312B88 /* GameViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameViewController.h; sourceTree = "<group>"; };
+		65B9309917806B4500312B88 /* GameViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameViewController.m; sourceTree = "<group>"; };
 		65B930A017806B9900312B88 /* Board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Board.h; sourceTree = "<group>"; };
 		65B930A117806B9900312B88 /* Board.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Board.m; sourceTree = "<group>"; };
 		65B930A217806B9900312B88 /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = "<group>"; };
@@ -76,6 +78,10 @@
 		65EA26541781608600E84BA4 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		65EA26761782038800E84BA4 /* BoardRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardRecognizer.h; sourceTree = "<group>"; };
 		65EA26771782038800E84BA4 /* BoardRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BoardRecognizer.mm; sourceTree = "<group>"; };
+		65EA267D1783520900E84BA4 /* ExternalDisplay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExternalDisplay.h; sourceTree = "<group>"; };
+		65EA267E1783520900E84BA4 /* ExternalDisplay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExternalDisplay.m; sourceTree = "<group>"; };
+		65EA2682178361E200E84BA4 /* InitalViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InitalViewController.h; sourceTree = "<group>"; };
+		65EA2683178361E300E84BA4 /* InitalViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InitalViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,13 +146,11 @@
 				65B930B017806BFB00312B88 /* Storyboards */,
 				65B9307D17806B4500312B88 /* Supporting Files */,
 				65B930BB17806D8400312B88 /* Application */,
-				65EA26431780C4C800E84BA4 /* OpenCV Wrappers */,
+				65EA26811783531C00E84BA4 /* Util */,
 				65EA264B1780C89500E84BA4 /* Recognizers */,
 				65B930B917806D4400312B88 /* OpenGL */,
 				65B930BA17806D6600312B88 /* View Controllers */,
-				65B930A017806B9900312B88 /* Board.h */,
-				65B930A117806B9900312B88 /* Board.m */,
-				65B930A217806B9900312B88 /* Globals.h */,
+				65EA26801783530D00E84BA4 /* Board */,
 			);
 			path = Dystopia;
 			sourceTree = "<group>";
@@ -196,8 +200,10 @@
 		65B930BA17806D6600312B88 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				65B9309817806B4500312B88 /* ViewController.h */,
-				65B9309917806B4500312B88 /* ViewController.m */,
+				65B9309817806B4500312B88 /* GameViewController.h */,
+				65B9309917806B4500312B88 /* GameViewController.m */,
+				65EA2682178361E200E84BA4 /* InitalViewController.h */,
+				65EA2683178361E300E84BA4 /* InitalViewController.m */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -212,15 +218,6 @@
 			name = Application;
 			sourceTree = "<group>";
 		};
-		65EA26431780C4C800E84BA4 /* OpenCV Wrappers */ = {
-			isa = PBXGroup;
-			children = (
-				65EA26441780C54B00E84BA4 /* UIImage+OpenCV.h */,
-				65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */,
-			);
-			name = "OpenCV Wrappers";
-			sourceTree = "<group>";
-		};
 		65EA264B1780C89500E84BA4 /* Recognizers */ = {
 			isa = PBXGroup;
 			children = (
@@ -230,6 +227,27 @@
 				65EA264D1780C90300E84BA4 /* FingerRecognizer.mm */,
 			);
 			name = Recognizers;
+			sourceTree = "<group>";
+		};
+		65EA26801783530D00E84BA4 /* Board */ = {
+			isa = PBXGroup;
+			children = (
+				65B930A017806B9900312B88 /* Board.h */,
+				65B930A117806B9900312B88 /* Board.m */,
+			);
+			name = Board;
+			sourceTree = "<group>";
+		};
+		65EA26811783531C00E84BA4 /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				65EA267D1783520900E84BA4 /* ExternalDisplay.h */,
+				65EA267E1783520900E84BA4 /* ExternalDisplay.m */,
+				65EA26441780C54B00E84BA4 /* UIImage+OpenCV.h */,
+				65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */,
+				65B930A217806B9900312B88 /* Globals.h */,
+			);
+			name = Util;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -303,13 +321,15 @@
 			files = (
 				65B9308317806B4500312B88 /* main.m in Sources */,
 				65B9308717806B4500312B88 /* AppDelegate.m in Sources */,
-				65B9309A17806B4500312B88 /* ViewController.m in Sources */,
+				65B9309A17806B4500312B88 /* GameViewController.m in Sources */,
 				65B930A717806B9900312B88 /* Board.m in Sources */,
 				65B930A817806B9900312B88 /* Quads.m in Sources */,
 				65B930A917806B9900312B88 /* Textures.m in Sources */,
 				65EA26461780C54B00E84BA4 /* UIImage+OpenCV.mm in Sources */,
 				65EA264E1780C90300E84BA4 /* FingerRecognizer.mm in Sources */,
 				65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */,
+				65EA267F1783520900E84BA4 /* ExternalDisplay.m in Sources */,
+				65EA2684178361E300E84BA4 /* InitalViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
