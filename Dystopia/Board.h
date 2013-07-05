@@ -24,12 +24,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import <AVFoundation/AVFoundation.h>
-#import "Quads.h"
 
 @interface Board : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate> {
-    Quads *photoOverlay;
-    Texture photoTexture;
-    
     AVCaptureSession *captureSession;
     CVOpenGLESTextureCacheRef coreVideoTextureCache;
     GLuint outputTexture;
@@ -39,12 +35,6 @@
 
 - (void) createBoard;
 
-- (void) inactivate;
-- (void) reactivate;
-
-- (void) tap:(GLKVector2)p;
-
 - (void) update;
-- (void) render;
 
 @end

@@ -27,136 +27,23 @@
 #import "ExternalDisplay.h"
 #import "Board.h"
 #import "BoardRecognizer.h"
-#import "Globals.h"
 
 @implementation GameViewController
 
-@synthesize context = _context;
-@synthesize effect = _effect;
-
-- (void) didBecomeInactive {
-    [board inactivate];
-}
-
-- (void) didBecomeActive {
-    [board reactivate];
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    NSLog(@"1");
-    self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    
-    if (!self.context) {
-        NSLog(@"Failed to create ES context");
-    }
-    
-    openglContext = self.context;
-    
-    NSLog(@"2");
-    GLKView *view = (GLKView *)self.view;
-    view.context = self.context;
-    view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
-    view.frame = [ExternalDisplay instance].screen.bounds;
-    
-    self.preferredFramesPerSecond = 60;
-    frameSeconds = FRAME_RATE;
-    
-    [self setupGL];
-    
-    board = [[Board alloc] init];
-	[board createBoard];
-
-    /* --- TEST --- */
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 640 * 0.5f, 424 * 0.5f)];
-    imageView.image = [[[BoardRecognizer alloc] init] filterAndThresholdUIImage:[UIImage imageNamed:@"test.png"]];
-    [self.view addSubview:imageView];
-    
-    UIImageView *imageView2 = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 424 * 0.5f, 640 * 0.5f, 424 * 0.5f)];
-    imageView2.image = [UIImage imageNamed:@"test.png"];
-    [self.view addSubview:imageView2];
-    /* ------------ */
-
-    startTime = CFAbsoluteTimeGetCurrent();
 }
 
-- (void)viewDidUnload {
-    [super viewDidUnload];
-    
-    [self tearDownGL];
-    
-    if ([EAGLContext currentContext] == self.context) {
-        [EAGLContext setCurrentContext:nil];
-    }
-	self.context = nil;
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    NSLog(@"Warning: Low memory!");
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskLandscape;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	return interfaceOrientation == UIInterfaceOrientationLandscapeLeft || interfaceOrientation == UIInterfaceOrientationLandscapeRight;
+    return UIInterfaceOrientationIsLandscape(interfaceOrientation);
 }
 
-- (void)setupGL {
-    [EAGLContext setCurrentContext:self.context];
-    textureLoader = [[GLKTextureLoader alloc] initWithSharegroup:self.context.sharegroup];
-    
-    glkEffectNormal = [[GLKBaseEffect alloc] init];
-    self.effect = glkEffectNormal;
-    
-    glEnable(GL_DEPTH_TEST);
-    
-    [self getScreenSize];
-}
-
-- (void)tearDownGL {
-    [EAGLContext setCurrentContext:self.context];
-    
-    self.effect = nil;
-}
-
-- (void)getScreenSize {
-    screenWidth = [ExternalDisplay instance].screen.bounds.size.width * [ExternalDisplay instance].screen.scale;
-    screenHeight = [ExternalDisplay instance].screen.bounds.size.height * [ExternalDisplay instance].screen.scale;
-    
-    screenWidthNoScale = [ExternalDisplay instance].screen.bounds.size.width;
-    screenHeightNoScale = [ExternalDisplay instance].screen.bounds.size.height;
-    
-    aspectRatio = fabsf(screenWidth / screenHeight);
-    
-    screenSizeInv[0] = 1.0f / (float) screenWidth;
-    screenSizeInv[1] = 1.0f / (float) screenHeight;
-    
-    refractionConstant = 0.005 * (480.0f / (float) screenHeight);
-    
-    NSLog(@"Screen size: %i, %i", (int) screenWidth, (int) screenHeight);
-}
-
-- (void)update {
-    sceneProjectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0f), aspectRatio, 0.1f, 10.0f);
-    
-    orthoProjectionMatrix = GLKMatrix4MakeOrtho(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
-    orthoModelViewMatrix = GLKMatrix4Identity;
-    
-    frameSeconds += self.timeSinceLastUpdate;
-    if (frameSeconds / FRAME_RATE > 2.0f) {
-        frameSeconds = FRAME_RATE * 2.0f;
-    }
-    while (frameSeconds >= FRAME_RATE) {
-        [board update];
-        frameSeconds -= FRAME_RATE;
-    }
-}
-
-- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect {
-    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    [board render];
+- (BOOL)shouldAutorotate {
+    return YES;
 }
 
 @end

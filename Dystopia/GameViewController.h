@@ -23,26 +23,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <UIKit/UIKit.h>
-#import <GLKit/GLKit.h>
-
 #import "Board.h"
 
-#define FRAME_RATE ((1000.0f / 60.0f) / 1000.0f)
-
-#define START_DELAY 1.0f
-
-@interface GameViewController : GLKViewController {
+@interface GameViewController : UIViewController {
     Board *board;
-    
-    float frameSeconds;
-    double startTime;
 }
-
-- (void) didBecomeInactive;
-- (void) didBecomeActive;
-
-@property (strong, nonatomic) EAGLContext *context;
-@property (strong, nonatomic) GLKBaseEffect *effect;
 
 @end

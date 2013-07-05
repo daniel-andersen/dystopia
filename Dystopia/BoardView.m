@@ -23,34 +23,14 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <GLKit/GLKit.h>
+#import "BoardView.h"
 
-typedef struct {
-    GLuint id;
-    int width, height;
-    int imageWidth, imageHeight;
-    float texCoordX1, texCoordY1, texCoordX2, texCoordY2;
-    bool blendEnabled;
-    GLenum blendSrc, blendDst;
-    bool released;
-} Texture;
+@implementation BoardView
 
-extern Texture textureMake(GLuint id);
-extern Texture textureCopy(Texture texture, float texCoordX1, float texCoordY1, float texCoordX2, float texCoordY2);
-extern void textureRelease(Texture *texture);
-extern void textureSetTexCoords(Texture *texture, float texCoordX1, float texCoordY1, float texCoordX2, float texCoordY2);
-extern void textureSetBlend(Texture *texture, GLenum blendSrc, GLenum blendDst);
-
-extern Texture wallTexture;
-
-extern void loadTextures();
-
-@interface Textures : NSObject
-
-- (void) load;
-
-- (Texture) loadTextureFromData:(NSData*)data;
-- (Texture) loadTexture:(NSString*)filename;
-- (Texture) loadTexture:(NSString*)filename repeat:(bool)repeat;
+- (id)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+    }
+    return self;
+}
 
 @end

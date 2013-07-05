@@ -23,45 +23,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef Demoteket_Globals_h
-#define Demoteket_Globals_h
+#import <UIKit/UIKit.h>
 
-#import <GLKit/GLKit.h>
+@interface BoardView : UIView
 
-#import "Textures.h"
-
-#define BUFFER_OFFSET(i) ((char *)NULL + (i * sizeof(GLfloat)))
-
-Textures *textures;
-GLKBaseEffect *glkEffectNormal;
-
-GLKVector3 worldPosition;
-
-GLKMatrix4 sceneModelViewMatrix;
-GLKMatrix4 sceneProjectionMatrix;
-
-GLKMatrix4 orthoProjectionMatrix;
-GLKMatrix4 orthoModelViewMatrix;
-
-EAGLContext *openglContext;
-
-float screenWidth;
-float screenHeight;
-float screenWidthNoScale;
-float screenHeightNoScale;
-float aspectRatio;
-
-GLuint uniformModelViewProjectionMatrix;
-GLuint uniformSampler1;
-GLuint uniformSampler2;
-GLuint uniformScreenSizeInv;
-GLuint uniformOffscreenSizeInv;
-GLuint uniformRefractionConstant;
-
-GLfloat screenSizeInv[2];
-GLfloat offscreenSizeInv[2];
-GLfloat refractionConstant;
-
-GLKTextureLoader *textureLoader;
-
-#endif
+@end

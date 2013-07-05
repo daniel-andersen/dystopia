@@ -40,9 +40,6 @@
                             <constraint firstItem="wJT-DW-JhL" firstAttribute="leading" secondItem="gBZ-vE-QzW" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="cq1-0K-Sts"/>
                         </constraints>
                     </view>
-                    <connections>
-                        <segue destination="2" kind="modal" id="aXb-8G-MP2"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cXn-YW-xXL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -64,7 +61,7 @@
         </scene>
     </scenes>
     <classes>
-        <class className="GameViewController" superclassName="GLKViewController">
+        <class className="GameViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/GameViewController.h"/>
         </class>
         <class className="InitalViewController" superclassName="UIViewController">

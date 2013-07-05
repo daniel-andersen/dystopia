@@ -56,7 +56,7 @@ ExternalDisplay *externalDisplayInstance = nil;
         screen = [UIScreen mainScreen];
     }
     window = [[UIWindow alloc] initWithFrame:screen.bounds];
-    window.backgroundColor = [UIColor redColor];
+    window.backgroundColor = [UIColor blackColor];
     window.screen = screen;
 }
 
