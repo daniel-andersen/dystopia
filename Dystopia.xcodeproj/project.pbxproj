@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		650D420317874D0500D89CEB /* BoardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D420217874D0500D89CEB /* BoardView.m */; };
+		650D42071787539600D89CEB /* Board.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D42061787539600D89CEB /* Board.m */; };
 		65B9307317806B4500312B88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307217806B4500312B88 /* UIKit.framework */; };
 		65B9307517806B4500312B88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307417806B4500312B88 /* Foundation.framework */; };
 		65B9307717806B4500312B88 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307617806B4500312B88 /* CoreGraphics.framework */; };
@@ -22,7 +23,7 @@
 		65B9309017806B4500312B88 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65B9308E17806B4500312B88 /* MainStoryboard_iPhone.storyboard */; };
 		65B9309317806B4500312B88 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65B9309117806B4500312B88 /* MainStoryboard_iPad.storyboard */; };
 		65B9309A17806B4500312B88 /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B9309917806B4500312B88 /* GameViewController.m */; };
-		65B930A717806B9900312B88 /* Board.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B930A117806B9900312B88 /* Board.m */; };
+		65B930A717806B9900312B88 /* BoardGame.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B930A117806B9900312B88 /* BoardGame.m */; };
 		65B930AF17806BE800312B88 /* test.png in Resources */ = {isa = PBXBuildFile; fileRef = 65B930AE17806BE800312B88 /* test.png */; };
 		65B930B217806C5500312B88 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B117806C5500312B88 /* AVFoundation.framework */; };
 		65B930B417806C6400312B88 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B317806C6400312B88 /* CoreMedia.framework */; };
@@ -40,6 +41,8 @@
 /* Begin PBXFileReference section */
 		650D420117874D0500D89CEB /* BoardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardView.h; sourceTree = "<group>"; };
 		650D420217874D0500D89CEB /* BoardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardView.m; sourceTree = "<group>"; };
+		650D42051787539600D89CEB /* Board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Board.h; sourceTree = "<group>"; };
+		650D42061787539600D89CEB /* Board.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Board.m; sourceTree = "<group>"; };
 		65B9306F17806B4500312B88 /* Dystopia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dystopia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B9307217806B4500312B88 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		65B9307417806B4500312B88 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -59,8 +62,8 @@
 		65B9309217806B4500312B88 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
 		65B9309817806B4500312B88 /* GameViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameViewController.h; sourceTree = "<group>"; };
 		65B9309917806B4500312B88 /* GameViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameViewController.m; sourceTree = "<group>"; };
-		65B930A017806B9900312B88 /* Board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Board.h; sourceTree = "<group>"; };
-		65B930A117806B9900312B88 /* Board.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Board.m; sourceTree = "<group>"; };
+		65B930A017806B9900312B88 /* BoardGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardGame.h; sourceTree = "<group>"; };
+		65B930A117806B9900312B88 /* BoardGame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardGame.m; sourceTree = "<group>"; };
 		65B930AE17806BE800312B88 /* test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test.png; sourceTree = "<group>"; };
 		65B930B117806C5500312B88 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		65B930B317806C6400312B88 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -226,8 +229,10 @@
 		65EA26801783530D00E84BA4 /* Board */ = {
 			isa = PBXGroup;
 			children = (
-				65B930A017806B9900312B88 /* Board.h */,
-				65B930A117806B9900312B88 /* Board.m */,
+				65B930A017806B9900312B88 /* BoardGame.h */,
+				65B930A117806B9900312B88 /* BoardGame.m */,
+				650D42051787539600D89CEB /* Board.h */,
+				650D42061787539600D89CEB /* Board.m */,
 			);
 			name = Board;
 			sourceTree = "<group>";
@@ -315,13 +320,14 @@
 				65B9308317806B4500312B88 /* main.m in Sources */,
 				65B9308717806B4500312B88 /* AppDelegate.m in Sources */,
 				65B9309A17806B4500312B88 /* GameViewController.m in Sources */,
-				65B930A717806B9900312B88 /* Board.m in Sources */,
+				65B930A717806B9900312B88 /* BoardGame.m in Sources */,
 				65EA26461780C54B00E84BA4 /* UIImage+OpenCV.mm in Sources */,
 				65EA264E1780C90300E84BA4 /* FingerRecognizer.mm in Sources */,
 				65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */,
 				65EA267F1783520900E84BA4 /* ExternalDisplay.m in Sources */,
 				65EA2684178361E300E84BA4 /* InitalViewController.m in Sources */,
 				650D420317874D0500D89CEB /* BoardView.m in Sources */,
+				650D42071787539600D89CEB /* Board.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

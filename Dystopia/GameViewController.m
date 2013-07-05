@@ -25,13 +25,22 @@
 
 #import "GameViewController.h"
 #import "ExternalDisplay.h"
-#import "Board.h"
 #import "BoardRecognizer.h"
 
 @implementation GameViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self initialize];
+    [self initializeGui];
+}
+
+- (void)initialize {
+    board = [[BoardGame alloc] initWithLevel:0];
+}
+
+- (void)initializeGui {
+    boardView = [[BoardView alloc] initWithFrame:[ExternalDisplay instance].widescreenBounds];
 }
 
 - (NSUInteger)supportedInterfaceOrientations {

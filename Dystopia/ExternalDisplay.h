@@ -33,4 +33,6 @@
 @property (readonly) UIWindow *window;
 @property (readonly) UIScreen *screen;
 
+@property (readonly) CGRect widescreenBounds;
+
 @end
