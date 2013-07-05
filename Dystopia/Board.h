@@ -25,6 +25,13 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Board : NSObject
+#ifndef __BOARD_SIZE__
+#define BOARD_WIDTH 50
+#define BOARD_HEIGHT 50
+#endif
+
+@interface Board : NSObject {
+    int bricks[BOARD_WIDTH][BOARD_HEIGHT];
+}
 
 @end
