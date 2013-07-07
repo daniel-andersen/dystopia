@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		650D420317874D0500D89CEB /* BoardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D420217874D0500D89CEB /* BoardView.m */; };
 		650D42071787539600D89CEB /* Board.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D42061787539600D89CEB /* Board.m */; };
+		650D420A1789A8FE00D89CEB /* CalibrationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D42091789A8FE00D89CEB /* CalibrationView.m */; };
+		650D420C1789AC2700D89CEB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 650D420B1789AC2700D89CEB /* QuartzCore.framework */; };
 		65B9307317806B4500312B88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307217806B4500312B88 /* UIKit.framework */; };
 		65B9307517806B4500312B88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307417806B4500312B88 /* Foundation.framework */; };
 		65B9307717806B4500312B88 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307617806B4500312B88 /* CoreGraphics.framework */; };
@@ -43,6 +45,9 @@
 		650D420217874D0500D89CEB /* BoardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardView.m; sourceTree = "<group>"; };
 		650D42051787539600D89CEB /* Board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Board.h; sourceTree = "<group>"; };
 		650D42061787539600D89CEB /* Board.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Board.m; sourceTree = "<group>"; };
+		650D42081789A8FE00D89CEB /* CalibrationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CalibrationView.h; sourceTree = "<group>"; };
+		650D42091789A8FE00D89CEB /* CalibrationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CalibrationView.m; sourceTree = "<group>"; };
+		650D420B1789AC2700D89CEB /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		65B9306F17806B4500312B88 /* Dystopia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dystopia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B9307217806B4500312B88 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		65B9307417806B4500312B88 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -88,6 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				650D420C1789AC2700D89CEB /* QuartzCore.framework in Frameworks */,
 				65EA26551781608600E84BA4 /* opencv2.framework in Frameworks */,
 				65EA26481780C6D700E84BA4 /* libz.dylib in Frameworks */,
 				65B930B817806D1400312B88 /* CoreVideo.framework in Frameworks */,
@@ -109,6 +115,8 @@
 			children = (
 				650D420117874D0500D89CEB /* BoardView.h */,
 				650D420217874D0500D89CEB /* BoardView.m */,
+				650D42081789A8FE00D89CEB /* CalibrationView.h */,
+				650D42091789A8FE00D89CEB /* CalibrationView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -133,6 +141,7 @@
 		65B9307117806B4500312B88 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				650D420B1789AC2700D89CEB /* QuartzCore.framework */,
 				65EA26471780C6D700E84BA4 /* libz.dylib */,
 				65EA26541781608600E84BA4 /* opencv2.framework */,
 				65B930B717806D1400312B88 /* CoreVideo.framework */,
@@ -328,6 +337,7 @@
 				65EA2684178361E300E84BA4 /* InitalViewController.m in Sources */,
 				650D420317874D0500D89CEB /* BoardView.m in Sources */,
 				650D42071787539600D89CEB /* Board.m in Sources */,
+				650D420A1789A8FE00D89CEB /* CalibrationView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

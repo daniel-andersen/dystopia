@@ -23,10 +23,12 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#import "CalibrationView.h"
 #import "BoardView.h"
 #import "BoardGame.h"
 
 @interface GameViewController : UIViewController {
+    CalibrationView *calibrationView;
     BoardView *boardView;
     BoardGame *board;
 }

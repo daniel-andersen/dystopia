@@ -23,40 +23,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "GameViewController.h"
-#import "ExternalDisplay.h"
-#import "BoardRecognizer.h"
+#import <UIKit/UIKit.h>
 
-@implementation GameViewController
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    [self initialize];
-    [self initializeGui];
-}
-
-- (void)initialize {
-    board = [[BoardGame alloc] initWithLevel:0];
-}
-
-- (void)initializeGui {
-    boardView = [[BoardView alloc] initWithFrame:[ExternalDisplay instance].widescreenBounds];
-    [self.view addSubview:boardView];
-
-    calibrationView = [[CalibrationView alloc] initWithFrame:[ExternalDisplay instance].widescreenBounds];
-    [self.view addSubview:calibrationView];
-}
-
-- (NSUInteger)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskLandscape;
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    return UIInterfaceOrientationIsLandscape(interfaceOrientation);
-}
-
-- (BOOL)shouldAutorotate {
-    return YES;
-}
+@interface CalibrationView : UIView
 
 @end
