@@ -49,28 +49,28 @@ const UIColor *calibrationBorderColor;
     UIBezierPath *path = [UIBezierPath bezierPath];
 
     // Top
-    [path moveToPoint:CGPointMake(0.0f,                  0.0f)];
+    [path moveToPoint:CGPointMake(0.0f,                     0.0f)];
     [path addLineToPoint:CGPointMake(self.frame.size.width, 0.0f)];
     [path addLineToPoint:CGPointMake(self.frame.size.width, borderHeight)];
     [path addLineToPoint:CGPointMake(0.0f,                  borderHeight)];
     [path closePath];
     
     // Bottom
-    [path moveToPoint:CGPointMake(0.0f,                  self.frame.size.height - borderHeight)];
+    [path moveToPoint:CGPointMake(0.0f,                     self.frame.size.height - borderHeight)];
     [path addLineToPoint:CGPointMake(self.frame.size.width, self.frame.size.height - borderHeight)];
     [path addLineToPoint:CGPointMake(self.frame.size.width, self.frame.size.height)];
     [path addLineToPoint:CGPointMake(0.0f,                  self.frame.size.height)];
     [path closePath];
 
     // Left
-    [path moveToPoint:CGPointMake(0.0f,        borderHeight)];
+    [path moveToPoint:CGPointMake(0.0f,           borderHeight)];
     [path addLineToPoint:CGPointMake(borderWidth, borderHeight)];
     [path addLineToPoint:CGPointMake(borderWidth, self.frame.size.height - borderHeight)];
     [path addLineToPoint:CGPointMake(0.0f,        self.frame.size.height - borderHeight)];
     [path closePath];
 
     // Right
-    [path moveToPoint:CGPointMake(self.frame.size.width - borderWidth, borderHeight)];
+    [path moveToPoint:CGPointMake(self.frame.size.width - borderWidth,    borderHeight)];
     [path addLineToPoint:CGPointMake(self.frame.size.width,               borderHeight)];
     [path addLineToPoint:CGPointMake(self.frame.size.width,               self.frame.size.height - borderHeight)];
     [path addLineToPoint:CGPointMake(self.frame.size.width - borderWidth, self.frame.size.height - borderHeight)];
