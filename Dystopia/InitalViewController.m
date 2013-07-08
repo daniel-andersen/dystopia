@@ -51,6 +51,16 @@
 
 - (void)setupExternalDisplay {
     [[ExternalDisplay instance] initialize];
+    if ([ExternalDisplay instance].externalDisplayFound) {
+        [self redirectLoggerToFile];
+    }
+}
+
+- (void)redirectLoggerToFile {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *logPath = [documentsDirectory stringByAppendingPathComponent:@"console.log"];
+    freopen([logPath cStringUsingEncoding:NSASCIIStringEncoding],"a+",stderr);
 }
 
 - (void)transitionToGame {

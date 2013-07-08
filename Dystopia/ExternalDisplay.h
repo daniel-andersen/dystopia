@@ -33,6 +33,8 @@
 @property (readonly) UIWindow *window;
 @property (readonly) UIScreen *screen;
 
+@property (readonly) bool externalDisplayFound;
+
 @property (readonly) CGRect widescreenBounds;
 
 @end

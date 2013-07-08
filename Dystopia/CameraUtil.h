@@ -25,10 +25,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface FingerRecognizer : NSObject
+@interface CameraUtil : NSObject
 
-- (NSArray *)findFingersInImage:(UIImage *)image;
-
-- (UIImage *)filterAndThresholdUIImage:(UIImage *)image;
++ (UIImage *)imageFromPixelBuffer:(CVImageBufferRef)pixelBuffer;
 
 @end

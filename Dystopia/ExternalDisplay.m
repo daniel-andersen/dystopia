@@ -32,6 +32,7 @@ ExternalDisplay *externalDisplayInstance = nil;
 @synthesize window;
 @synthesize screen;
 @synthesize widescreenBounds;
+@synthesize externalDisplayFound;
 
 + (ExternalDisplay *)instance {
     if (externalDisplayInstance == nil) {
@@ -52,9 +53,11 @@ ExternalDisplay *externalDisplayInstance = nil;
         }
         NSLog(@"Choose: %f, %f", bestScreenMode.size.width, bestScreenMode.size.height);
         screen.currentMode = bestScreenMode;
+        externalDisplayFound = YES;
     } else {
         NSLog(@"No external displays found!");
         screen = [UIScreen mainScreen];
+        externalDisplayFound = NO;
     }
     [self setupWidescreenBounds];
     window = [[UIWindow alloc] initWithFrame:screen.bounds];

@@ -25,7 +25,7 @@
 
 #import "GameViewController.h"
 #import "ExternalDisplay.h"
-#import "BoardRecognizer.h"
+#import "CameraUtil.h"
 
 @implementation GameViewController
 
@@ -36,7 +36,12 @@
 }
 
 - (void)initialize {
-    board = [[BoardGame alloc] initWithLevel:0];
+    cameraSession = [[CameraSession alloc] initWithDelegate:self];
+    
+    boardGame = [[BoardGame alloc] initWithLevel:0];
+    boardRecognizer = [[BoardRecognizer alloc] init];
+    
+    [cameraSession start];
 }
 
 - (void)initializeGui {
@@ -45,6 +50,14 @@
 
     calibrationView = [[CalibrationView alloc] initWithFrame:[ExternalDisplay instance].widescreenBounds];
     [self.view addSubview:calibrationView];
+}
+
+- (void)processFrame:(UIImage *)image {
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:0.0f];
+    self.view.layer.contents = (__bridge_transfer id) image.CGImage;
+    [CATransaction commit];
+    cameraSession.readyToProcessFrame = YES;
 }
 
 - (NSUInteger)supportedInterfaceOrientations {

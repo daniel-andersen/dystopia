@@ -23,14 +23,19 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#import "CameraSession.h"
 #import "CalibrationView.h"
+#import "BoardRecognizer.h"
 #import "BoardView.h"
 #import "BoardGame.h"
 
-@interface GameViewController : UIViewController {
+@interface GameViewController : UIViewController <CameraSessionDelegate> {
+    CameraSession *cameraSession;
     CalibrationView *calibrationView;
+    BoardRecognizer *boardRecognizer;
+    
     BoardView *boardView;
-    BoardGame *board;
+    BoardGame *boardGame;
 }
 
 @end
