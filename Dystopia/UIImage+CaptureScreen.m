@@ -23,31 +23,20 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <Foundation/Foundation.h>
-#import <AVFoundation/AVFoundation.h>
+#import <QuartzCore/QuartzCore.h>
+#import "UIImage+CaptureScreen.h"
 
-@protocol CameraSessionDelegate <NSObject>
+@implementation UIImage (CaptureScreen)
 
-- (void)processFrame:(UIImage *)image;
-- (UIImage *)requestSimulatedImageIfNoCamera;
++ (UIImage *)imageWithView:(UIView *)view {
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, YES, 1.0f);
 
-@end
+    [view.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
 
-@interface CameraSession : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate> {
-    AVCaptureSession *session;
-    id<CameraSessionDelegate> delegate;
-    dispatch_queue_t frameProcessQueue;
-    double lastDeliveredFrameTime;
-    NSTimer *fakeDeliverFrameTimer;
+    UIGraphicsEndImageContext();
+    
+    return image;
 }
-
-- (id)initWithDelegate:(id<CameraSessionDelegate>)d;
-
-- (void)start;
-- (void)stop;
-
-@property (readonly) bool initialized;
-@property (readwrite) bool readyToProcessFrame;
-@property (readwrite) CFTimeInterval delegateProcessFrameInterval;
 
 @end

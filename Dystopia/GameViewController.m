@@ -26,6 +26,7 @@
 #import "GameViewController.h"
 #import "ExternalDisplay.h"
 #import "CameraUtil.h"
+#import "UIImage+CaptureScreen.h"
 
 @implementation GameViewController
 
@@ -35,13 +36,19 @@
     [self initializeGui];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [cameraSession start];
+}
+
+- (void)viewWillLayoutSubviews {
+    cameraPreview.frame = self.view.bounds;
+}
+
 - (void)initialize {
     cameraSession = [[CameraSession alloc] initWithDelegate:self];
     
     boardGame = [[BoardGame alloc] initWithLevel:0];
     boardRecognizer = [[BoardRecognizer alloc] init];
-    
-    [cameraSession start];
 }
 
 - (void)initializeGui {
@@ -50,14 +57,40 @@
 
     calibrationView = [[CalibrationView alloc] initWithFrame:[ExternalDisplay instance].widescreenBounds];
     [self.view addSubview:calibrationView];
+
+    [self setupCameraPreview];
+}
+
+- (void)setupCameraPreview {
+    cameraPreview = [[UIView alloc] initWithFrame:self.view.bounds];
+    cameraPreview.hidden = [ExternalDisplay instance].externalDisplayFound;
+    [self.view addSubview:cameraPreview];
+    
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, 30.0f)];
+    label.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:0.2f];
+    label.textColor = [UIColor yellowColor];
+    label.text = @"CAMERA PREVIEW";
+    [label sizeToFit];
+    [cameraPreview addSubview:label];
 }
 
 - (void)processFrame:(UIImage *)image {
     [CATransaction begin];
     [CATransaction setAnimationDuration:0.0f];
-    self.view.layer.contents = (__bridge_transfer id) image.CGImage;
+    if (cameraSession.initialized) {
+        cameraPreview.layer.contents = (__bridge_transfer id)image.CGImage;
+    } else {
+        cameraPreview.layer.contents = (id)image.CGImage;
+    }
     [CATransaction commit];
     cameraSession.readyToProcessFrame = YES;
+}
+
+- (UIImage *)requestSimulatedImageIfNoCamera {
+    cameraPreview.hidden = YES;
+    UIImage *image = [UIImage imageWithView:self.view];
+    cameraPreview.hidden = NO;
+    return image;
 }
 
 - (NSUInteger)supportedInterfaceOrientations {

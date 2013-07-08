@@ -23,31 +23,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <Foundation/Foundation.h>
-#import <AVFoundation/AVFoundation.h>
+#import <UIKit/UIKit.h>
 
-@protocol CameraSessionDelegate <NSObject>
+@interface UIImage (CaptureScreen)
 
-- (void)processFrame:(UIImage *)image;
-- (UIImage *)requestSimulatedImageIfNoCamera;
-
-@end
-
-@interface CameraSession : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate> {
-    AVCaptureSession *session;
-    id<CameraSessionDelegate> delegate;
-    dispatch_queue_t frameProcessQueue;
-    double lastDeliveredFrameTime;
-    NSTimer *fakeDeliverFrameTimer;
-}
-
-- (id)initWithDelegate:(id<CameraSessionDelegate>)d;
-
-- (void)start;
-- (void)stop;
-
-@property (readonly) bool initialized;
-@property (readwrite) bool readyToProcessFrame;
-@property (readwrite) CFTimeInterval delegateProcessFrameInterval;
++ (UIImage *)imageWithView:(UIView *)view;
 
 @end

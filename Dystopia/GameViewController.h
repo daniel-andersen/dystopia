@@ -23,6 +23,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#import <QuartzCore/QuartzCore.h>
+
 #import "CameraSession.h"
 #import "CalibrationView.h"
 #import "BoardRecognizer.h"
@@ -36,6 +38,8 @@
     
     BoardView *boardView;
     BoardGame *boardGame;
+    
+    UIView *cameraPreview;
 }
 
 @end

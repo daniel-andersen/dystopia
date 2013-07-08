@@ -28,8 +28,11 @@
 
 @implementation CameraSession
 
+const CFTimeInterval cameraSessionDefaultDelegateInterval = 0.5f;
+
 @synthesize initialized;
 @synthesize readyToProcessFrame;
+@synthesize delegateProcessFrameInterval;
 
 - (id)initWithDelegate:(id<CameraSessionDelegate>)d {
     if (self = [super init]) {
@@ -60,7 +63,8 @@
     
     [session commitConfiguration];
     
-    readyToProcessFrame = YES;
+    delegateProcessFrameInterval = cameraSessionDefaultDelegateInterval;
+    
     initialized = YES;
     
     NSLog(@"Camera session initialized");
@@ -115,11 +119,15 @@
 }
 
 - (void)start {
+    lastDeliveredFrameTime = 0.0f;
+    readyToProcessFrame = YES;
     if (initialized) {
         [session startRunning];
         NSLog(@"Camera session started");
     } else {
         NSLog(@"Did not start camera session!");
+        fakeDeliverFrameTimer = [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(deliverFakeFrame) userInfo:nil repeats:YES];
+        NSLog(@"Fake camera session started");
     }
 }
 
@@ -127,12 +135,30 @@
     if (initialized) {
         [session stopRunning];
         NSLog(@"Camera session stopped");
+    } else {
+        [fakeDeliverFrameTimer invalidate];
+        fakeDeliverFrameTimer = nil;
+        NSLog(@"Fake camera session stopped");
+    }
+}
+
+- (void)deliverFakeFrame {
+    if (readyToProcessFrame && CFAbsoluteTimeGetCurrent() > lastDeliveredFrameTime + delegateProcessFrameInterval) {
+        readyToProcessFrame = NO;
+        lastDeliveredFrameTime = CFAbsoluteTimeGetCurrent();
+        @autoreleasepool {
+            UIImage *image = [delegate requestSimulatedImageIfNoCamera];
+            dispatch_async(frameProcessQueue, ^{
+                [delegate processFrame:image];
+            });
+        };
     }
 }
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
-    if (readyToProcessFrame) {
+    if (readyToProcessFrame && CFAbsoluteTimeGetCurrent() > lastDeliveredFrameTime + delegateProcessFrameInterval) {
         readyToProcessFrame = NO;
+        lastDeliveredFrameTime = CFAbsoluteTimeGetCurrent();
         @autoreleasepool {
             CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
             UIImage *image = [CameraUtil imageFromPixelBuffer:pixelBuffer];
