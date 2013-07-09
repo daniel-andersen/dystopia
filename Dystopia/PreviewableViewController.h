@@ -23,8 +23,16 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
-@interface InitalViewController : UIViewController
+@interface PreviewableViewController : UIViewController {
+    UIView *cameraPreview;
+    UIButton *boardButton;
+    UIButton *cameraPreviewButton;
+}
+
+- (void)previewFrame:(UIImage *)image hasCameraSession:(bool)cameraSession;
+
+@property (readonly) UIView *overlayView;
 
 @end

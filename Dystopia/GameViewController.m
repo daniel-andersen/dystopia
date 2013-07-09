@@ -37,11 +37,13 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     [cameraSession start];
 }
 
 - (void)viewWillLayoutSubviews {
-    cameraPreview.frame = self.view.bounds;
+    [super viewWillLayoutSubviews];
+    [self.view bringSubviewToFront:super.overlayView];
 }
 
 - (void)initialize {
@@ -49,6 +51,8 @@
     
     boardGame = [[BoardGame alloc] initWithLevel:0];
     boardRecognizer = [[BoardRecognizer alloc] init];
+    
+    gameState = GAME_STATE_CALIBRATION;
 }
 
 - (void)initializeGui {
@@ -57,40 +61,18 @@
 
     calibrationView = [[CalibrationView alloc] initWithFrame:[ExternalDisplay instance].widescreenBounds];
     [self.view addSubview:calibrationView];
-
-    [self setupCameraPreview];
-}
-
-- (void)setupCameraPreview {
-    cameraPreview = [[UIView alloc] initWithFrame:self.view.bounds];
-    cameraPreview.hidden = [ExternalDisplay instance].externalDisplayFound;
-    [self.view addSubview:cameraPreview];
-    
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, 30.0f)];
-    label.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:0.2f];
-    label.textColor = [UIColor yellowColor];
-    label.text = @"CAMERA PREVIEW";
-    [label sizeToFit];
-    [cameraPreview addSubview:label];
 }
 
 - (void)processFrame:(UIImage *)image {
-    [CATransaction begin];
-    [CATransaction setAnimationDuration:0.0f];
-    if (cameraSession.initialized) {
-        cameraPreview.layer.contents = (__bridge_transfer id)image.CGImage;
-    } else {
-        cameraPreview.layer.contents = (id)image.CGImage;
-    }
-    [CATransaction commit];
+    [super previewFrame:image hasCameraSession:cameraSession.initialized];
     cameraSession.readyToProcessFrame = YES;
 }
 
 - (UIImage *)requestSimulatedImageIfNoCamera {
-    cameraPreview.hidden = YES;
+    super.overlayView.hidden = YES;
     UIImage *image = [UIImage imageWithView:self.view];
     UIImage *transformedImage = [FakeCameraUtil fakePerspectiveOnImage:image];
-    cameraPreview.hidden = NO;
+    super.overlayView.hidden = NO;
     return transformedImage;
 }
 

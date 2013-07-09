@@ -4,10 +4,10 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
     </dependencies>
     <scenes>
-        <!--Inital View Controller-->
+        <!--Phone View Controller-->
         <scene sceneID="n8a-tV-oMt">
             <objects>
-                <viewController id="2YJ-BG-XZW" customClass="InitalViewController" sceneMemberID="viewController">
+                <viewController id="2YJ-BG-XZW" customClass="PhoneViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="gBZ-vE-QzW">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -63,9 +63,6 @@
     <classes>
         <class className="GameViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/GameViewController.h"/>
-        </class>
-        <class className="InitalViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/InitalViewController.h"/>
         </class>
         <class className="NSLayoutConstraint" superclassName="NSObject">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>

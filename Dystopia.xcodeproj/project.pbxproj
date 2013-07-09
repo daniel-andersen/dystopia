@@ -18,6 +18,7 @@
 		650D421B178B335F00D89CEB /* icon_114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D421A178B335F00D89CEB /* icon_114x114.png */; };
 		650D421E178B45A800D89CEB /* UIImage+CaptureScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D421D178B45A700D89CEB /* UIImage+CaptureScreen.m */; };
 		650D4221178C5E4300D89CEB /* FakeCameraUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 650D4220178C5E4200D89CEB /* FakeCameraUtil.mm */; };
+		650D4224178C92B700D89CEB /* PreviewableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D4223178C92B700D89CEB /* PreviewableViewController.m */; };
 		65B9307317806B4500312B88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307217806B4500312B88 /* UIKit.framework */; };
 		65B9307517806B4500312B88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307417806B4500312B88 /* Foundation.framework */; };
 		65B9307717806B4500312B88 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307617806B4500312B88 /* CoreGraphics.framework */; };
@@ -42,7 +43,7 @@
 		65EA26551781608600E84BA4 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA26541781608600E84BA4 /* opencv2.framework */; };
 		65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA26771782038800E84BA4 /* BoardRecognizer.mm */; };
 		65EA267F1783520900E84BA4 /* ExternalDisplay.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA267E1783520900E84BA4 /* ExternalDisplay.m */; };
-		65EA2684178361E300E84BA4 /* InitalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA2683178361E300E84BA4 /* InitalViewController.m */; };
+		65EA2684178361E300E84BA4 /* PhoneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA2683178361E300E84BA4 /* PhoneViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +65,8 @@
 		650D421D178B45A700D89CEB /* UIImage+CaptureScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+CaptureScreen.m"; sourceTree = "<group>"; };
 		650D421F178C5E4100D89CEB /* FakeCameraUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FakeCameraUtil.h; sourceTree = "<group>"; };
 		650D4220178C5E4200D89CEB /* FakeCameraUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FakeCameraUtil.mm; sourceTree = "<group>"; };
+		650D4222178C92B600D89CEB /* PreviewableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviewableViewController.h; sourceTree = "<group>"; };
+		650D4223178C92B700D89CEB /* PreviewableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreviewableViewController.m; sourceTree = "<group>"; };
 		65B9306F17806B4500312B88 /* Dystopia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dystopia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B9307217806B4500312B88 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		65B9307417806B4500312B88 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -98,8 +101,8 @@
 		65EA26771782038800E84BA4 /* BoardRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BoardRecognizer.mm; sourceTree = "<group>"; };
 		65EA267D1783520900E84BA4 /* ExternalDisplay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExternalDisplay.h; sourceTree = "<group>"; };
 		65EA267E1783520900E84BA4 /* ExternalDisplay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExternalDisplay.m; sourceTree = "<group>"; };
-		65EA2682178361E200E84BA4 /* InitalViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InitalViewController.h; sourceTree = "<group>"; };
-		65EA2683178361E300E84BA4 /* InitalViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InitalViewController.m; sourceTree = "<group>"; };
+		65EA2682178361E200E84BA4 /* PhoneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhoneViewController.h; sourceTree = "<group>"; };
+		65EA2683178361E300E84BA4 /* PhoneViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhoneViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -224,8 +227,10 @@
 			children = (
 				65B9309817806B4500312B88 /* GameViewController.h */,
 				65B9309917806B4500312B88 /* GameViewController.m */,
-				65EA2682178361E200E84BA4 /* InitalViewController.h */,
-				65EA2683178361E300E84BA4 /* InitalViewController.m */,
+				65EA2682178361E200E84BA4 /* PhoneViewController.h */,
+				65EA2683178361E300E84BA4 /* PhoneViewController.m */,
+				650D4222178C92B600D89CEB /* PreviewableViewController.h */,
+				650D4223178C92B700D89CEB /* PreviewableViewController.m */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -359,13 +364,14 @@
 				65EA264E1780C90300E84BA4 /* FingerRecognizer.mm in Sources */,
 				65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */,
 				65EA267F1783520900E84BA4 /* ExternalDisplay.m in Sources */,
-				65EA2684178361E300E84BA4 /* InitalViewController.m in Sources */,
+				65EA2684178361E300E84BA4 /* PhoneViewController.m in Sources */,
 				650D420317874D0500D89CEB /* BoardView.m in Sources */,
 				650D42071787539600D89CEB /* Board.m in Sources */,
 				650D420A1789A8FE00D89CEB /* CalibrationView.m in Sources */,
 				650D420F1789F38800D89CEB /* CameraSession.mm in Sources */,
 				650D421E178B45A800D89CEB /* UIImage+CaptureScreen.m in Sources */,
 				650D4221178C5E4300D89CEB /* FakeCameraUtil.mm in Sources */,
+				650D4224178C92B700D89CEB /* PreviewableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

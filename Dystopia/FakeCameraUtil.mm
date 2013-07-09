@@ -31,7 +31,7 @@
 
 + (UIImage *)fakePerspectiveOnImage:(UIImage *)image {
     CGPoint srcPoints[4] = {CGPointMake(0.0f, 0.0f), CGPointMake(image.size.width, 0.0f), CGPointMake(image.size.width, image.size.height), CGPointMake(0.0f, image.size.height)};
-    CGPoint dstPoints[4] = {CGPointMake(50.0f, 50.0f), CGPointMake(image.size.width - 100.0f, 75.0f), CGPointMake(image.size.width - 125.0f, image.size.height - 100.0f), CGPointMake(75.0f, image.size.height - 125.0f)};
+    CGPoint dstPoints[4] = {CGPointMake(50.0f, 50.0f), CGPointMake(image.size.width - 40.0f, 75.0f), CGPointMake(image.size.width - 60.0f, image.size.height - 50.0f), CGPointMake(75.0f, image.size.height - 60.0f)};
     cv::Mat transformation = [CameraUtil findAffineTransformationSrcPoints:srcPoints dstPoints:dstPoints];
     return [CameraUtil affineTransformImage:image withTransformation:transformation];
 }

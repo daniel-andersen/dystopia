@@ -23,24 +23,18 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "InitalViewController.h"
+#import "PhoneViewController.h"
 #import "GameViewController.h"
 #import "ExternalDisplay.h"
 
-@implementation InitalViewController
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        NSLog(@"START!");
-    }
-    return self;
-}
+@implementation PhoneViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     [self setupExternalDisplay];
     [self transitionToGame];
 }
