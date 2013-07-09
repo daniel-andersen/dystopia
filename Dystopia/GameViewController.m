@@ -25,8 +25,8 @@
 
 #import "GameViewController.h"
 #import "ExternalDisplay.h"
-#import "CameraUtil.h"
 #import "UIImage+CaptureScreen.h"
+#import "FakeCameraUtil.h"
 
 @implementation GameViewController
 
@@ -89,8 +89,9 @@
 - (UIImage *)requestSimulatedImageIfNoCamera {
     cameraPreview.hidden = YES;
     UIImage *image = [UIImage imageWithView:self.view];
+    UIImage *transformedImage = [FakeCameraUtil fakePerspectiveOnImage:image];
     cameraPreview.hidden = NO;
-    return image;
+    return transformedImage;
 }
 
 - (NSUInteger)supportedInterfaceOrientations {

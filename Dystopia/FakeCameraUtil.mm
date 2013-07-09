@@ -23,15 +23,17 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <UIKit/UIKit.h>
+#import "FakeCameraUtil.h"
+#import "UIImage+OpenCV.h"
+#import "CameraUtil.h"
 
-@interface CameraUtil : NSObject
+@implementation FakeCameraUtil
 
-+ (UIImage *)imageFromPixelBuffer:(CVImageBufferRef)pixelBuffer;
-
-+ (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation;
-+ (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation;
-
-+ (cv::Mat)findAffineTransformationSrcPoints:(CGPoint[])srcP dstPoints:(CGPoint[])dstP;
++ (UIImage *)fakePerspectiveOnImage:(UIImage *)image {
+    CGPoint srcPoints[4] = {CGPointMake(0.0f, 0.0f), CGPointMake(image.size.width, 0.0f), CGPointMake(image.size.width, image.size.height), CGPointMake(0.0f, image.size.height)};
+    CGPoint dstPoints[4] = {CGPointMake(50.0f, 50.0f), CGPointMake(image.size.width - 100.0f, 75.0f), CGPointMake(image.size.width - 125.0f, image.size.height - 100.0f), CGPointMake(75.0f, image.size.height - 125.0f)};
+    cv::Mat transformation = [CameraUtil findAffineTransformationSrcPoints:srcPoints dstPoints:dstPoints];
+    return [CameraUtil affineTransformImage:image withTransformation:transformation];
+}
 
 @end

@@ -23,15 +23,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
-@interface CameraUtil : NSObject
+@interface FakeCameraUtil : NSObject
 
-+ (UIImage *)imageFromPixelBuffer:(CVImageBufferRef)pixelBuffer;
-
-+ (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation;
-+ (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation;
-
-+ (cv::Mat)findAffineTransformationSrcPoints:(CGPoint[])srcP dstPoints:(CGPoint[])dstP;
++ (UIImage *)fakePerspectiveOnImage:(UIImage *)image;
 
 @end

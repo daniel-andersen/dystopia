@@ -11,12 +11,13 @@
 		650D42071787539600D89CEB /* Board.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D42061787539600D89CEB /* Board.m */; };
 		650D420A1789A8FE00D89CEB /* CalibrationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D42091789A8FE00D89CEB /* CalibrationView.m */; };
 		650D420C1789AC2700D89CEB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 650D420B1789AC2700D89CEB /* QuartzCore.framework */; };
-		650D420F1789F38800D89CEB /* CameraSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D420E1789F38800D89CEB /* CameraSession.m */; };
+		650D420F1789F38800D89CEB /* CameraSession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 650D420E1789F38800D89CEB /* CameraSession.mm */; };
 		650D4212178A057600D89CEB /* CameraUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 650D4211178A057600D89CEB /* CameraUtil.mm */; };
 		650D4214178A961300D89CEB /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 650D4213178A961200D89CEB /* CoreImage.framework */; };
 		650D4219178B335500D89CEB /* icon_57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D4218178B335400D89CEB /* icon_57x57.png */; };
 		650D421B178B335F00D89CEB /* icon_114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D421A178B335F00D89CEB /* icon_114x114.png */; };
 		650D421E178B45A800D89CEB /* UIImage+CaptureScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D421D178B45A700D89CEB /* UIImage+CaptureScreen.m */; };
+		650D4221178C5E4300D89CEB /* FakeCameraUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 650D4220178C5E4200D89CEB /* FakeCameraUtil.mm */; };
 		65B9307317806B4500312B88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307217806B4500312B88 /* UIKit.framework */; };
 		65B9307517806B4500312B88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307417806B4500312B88 /* Foundation.framework */; };
 		65B9307717806B4500312B88 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307617806B4500312B88 /* CoreGraphics.framework */; };
@@ -53,7 +54,7 @@
 		650D42091789A8FE00D89CEB /* CalibrationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CalibrationView.m; sourceTree = "<group>"; };
 		650D420B1789AC2700D89CEB /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		650D420D1789F38800D89CEB /* CameraSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraSession.h; sourceTree = "<group>"; };
-		650D420E1789F38800D89CEB /* CameraSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraSession.m; sourceTree = "<group>"; };
+		650D420E1789F38800D89CEB /* CameraSession.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraSession.mm; sourceTree = "<group>"; };
 		650D4210178A057600D89CEB /* CameraUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraUtil.h; sourceTree = "<group>"; };
 		650D4211178A057600D89CEB /* CameraUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraUtil.mm; sourceTree = "<group>"; };
 		650D4213178A961200D89CEB /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
@@ -61,6 +62,8 @@
 		650D421A178B335F00D89CEB /* icon_114x114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_114x114.png; sourceTree = "<group>"; };
 		650D421C178B45A700D89CEB /* UIImage+CaptureScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+CaptureScreen.h"; sourceTree = "<group>"; };
 		650D421D178B45A700D89CEB /* UIImage+CaptureScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+CaptureScreen.m"; sourceTree = "<group>"; };
+		650D421F178C5E4100D89CEB /* FakeCameraUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FakeCameraUtil.h; sourceTree = "<group>"; };
+		650D4220178C5E4200D89CEB /* FakeCameraUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FakeCameraUtil.mm; sourceTree = "<group>"; };
 		65B9306F17806B4500312B88 /* Dystopia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dystopia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B9307217806B4500312B88 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		65B9307417806B4500312B88 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -269,9 +272,11 @@
 				650D421C178B45A700D89CEB /* UIImage+CaptureScreen.h */,
 				650D421D178B45A700D89CEB /* UIImage+CaptureScreen.m */,
 				650D420D1789F38800D89CEB /* CameraSession.h */,
-				650D420E1789F38800D89CEB /* CameraSession.m */,
+				650D420E1789F38800D89CEB /* CameraSession.mm */,
 				650D4210178A057600D89CEB /* CameraUtil.h */,
 				650D4211178A057600D89CEB /* CameraUtil.mm */,
+				650D421F178C5E4100D89CEB /* FakeCameraUtil.h */,
+				650D4220178C5E4200D89CEB /* FakeCameraUtil.mm */,
 			);
 			name = Util;
 			sourceTree = "<group>";
@@ -345,11 +350,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				650D4212178A057600D89CEB /* CameraUtil.mm in Sources */,
 				65B9308317806B4500312B88 /* main.m in Sources */,
 				65B9308717806B4500312B88 /* AppDelegate.m in Sources */,
+				65EA26461780C54B00E84BA4 /* UIImage+OpenCV.mm in Sources */,
 				65B9309A17806B4500312B88 /* GameViewController.m in Sources */,
 				65B930A717806B9900312B88 /* BoardGame.m in Sources */,
-				65EA26461780C54B00E84BA4 /* UIImage+OpenCV.mm in Sources */,
 				65EA264E1780C90300E84BA4 /* FingerRecognizer.mm in Sources */,
 				65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */,
 				65EA267F1783520900E84BA4 /* ExternalDisplay.m in Sources */,
@@ -357,9 +363,9 @@
 				650D420317874D0500D89CEB /* BoardView.m in Sources */,
 				650D42071787539600D89CEB /* Board.m in Sources */,
 				650D420A1789A8FE00D89CEB /* CalibrationView.m in Sources */,
-				650D420F1789F38800D89CEB /* CameraSession.m in Sources */,
-				650D4212178A057600D89CEB /* CameraUtil.mm in Sources */,
+				650D420F1789F38800D89CEB /* CameraSession.mm in Sources */,
 				650D421E178B45A800D89CEB /* UIImage+CaptureScreen.m in Sources */,
+				650D4221178C5E4300D89CEB /* FakeCameraUtil.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
