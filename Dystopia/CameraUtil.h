@@ -25,6 +25,8 @@
 
 #import <UIKit/UIKit.h>
 
+#import "Util.h"
+
 @interface CameraUtil : NSObject
 
 + (UIImage *)imageFromPixelBuffer:(CVImageBufferRef)pixelBuffer;
@@ -32,6 +34,6 @@
 + (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation;
 + (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation;
 
-+ (cv::Mat)findAffineTransformationSrcPoints:(CGPoint[])srcP dstPoints:(CGPoint[])dstP;
++ (cv::Mat)findAffineTransformationSrcPoints:(FourPoints)srcPoints dstPoints:(FourPoints)dstPoints;
 
 @end

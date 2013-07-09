@@ -25,10 +25,10 @@
 
 #import <UIKit/UIKit.h>
 
+#import "Util.h"
+
 @interface BoardRecognizer : NSObject
 
-- (NSArray *)findBoardFromImage:(UIImage *)image;
-
-- (UIImage *)filterAndThresholdUIImage:(UIImage *)image;
+- (FourPoints)findBoardFromImage:(UIImage *)image;
 
 @end

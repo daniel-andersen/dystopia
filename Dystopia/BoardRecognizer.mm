@@ -28,20 +28,17 @@
 
 @implementation BoardRecognizer
 
-- (NSArray *)findBoardFromImage:(UIImage *)image {
-    return NULL;
-}
-
-- (UIImage *)filterAndThresholdUIImage:(UIImage *)image {
-    return [UIImage imageWithCVMat:[self filterAndThreshold:[image CVMat]]];
+- (FourPoints)findBoardFromImage:(UIImage *)image {
+    cv::Mat matImage = [image CVMat];
+    cv::Mat originalImage = cv::Mat(matImage);
+    cv::Mat filteredAndThresholdedImage = [self filterAndThreshold:matImage];
+    return [self findContours:filteredAndThresholdedImage originalImage:originalImage];
 }
 
 - (cv::Mat)filterAndThreshold:(cv::Mat)image {
-    cv::Mat origImage = cv::Mat(image);
     image = [self smooth:image];
     image = [self convertToHsv:image];
     image = [self applyThreshold:image];
-    image = [self findContours:image originalImage:origImage];
     return image;
 }
 
@@ -60,7 +57,7 @@
     return image;
 }
 
-- (cv::Mat)findContours:(cv::Mat)image originalImage:(cv::Mat)origImage {
+- (FourPoints)findContours:(cv::Mat)image originalImage:(cv::Mat)origImage {
     cv::vector<cv::vector<cv::Point>> contours;
     cv::vector<cv::Vec4i> hierarchy;
 
@@ -69,21 +66,30 @@
     cv::vector<cv::vector<cv::Point>> polys(contours.size());
     
     for (int i = 0; i < polys.size(); i++) {
-        cv::approxPolyDP(cv::Mat(contours[i]), polys[i], 3, true);
-    }
-    
-    for (int i = 0; i < polys.size(); i++) {
-        cv::Scalar color = cv::Scalar(rand() & 255, rand() & 255, rand() & 255);
-        cv::drawContours(origImage, polys, i, color, 2, 8, cv::vector<cv::Vec4i>(), 0, cv::Point());
-    }
-
-    for (int i = 0; i < polys.size(); i++) {
-        for (int j = 0; j < polys[i].size(); j++) {
-            NSLog(@"Poly %i: %i, %i", i, polys[i][j].x, polys[i][j].y);
+        int parent = hierarchy[i][3];
+        int firstChild = hierarchy[i][2];
+        if (parent == -1 && firstChild != -1) {
+            int nextChild = hierarchy[firstChild][2];
+            if (nextChild == -1) {
+                cv::approxPolyDP(cv::Mat(contours[i]), polys[i], 3, true);
+                if (polys[i].size() == 4) {
+                    /*for (int j = 0; j < polys[i].size(); j++) {
+                     NSLog(@"Poly %i: %i, %i", i, polys[i][j].x, polys[i][j].y);
+                     }*/
+                    FourPoints boardPoints = {
+                        .defined = YES,
+                        .p1 = CGPointMake(polys[i][0].x, polys[i][0].y),
+                        .p2 = CGPointMake(polys[i][1].x, polys[i][1].y),
+                        .p3 = CGPointMake(polys[i][2].x, polys[i][2].y),
+                        .p4 = CGPointMake(polys[i][3].x, polys[i][3].y),
+                    };
+                    return boardPoints;
+                }
+            }
         }
     }
-
-    return origImage;
+    FourPoints boardPoints = {.defined = NO};
+    return boardPoints;
 }
 
 @end

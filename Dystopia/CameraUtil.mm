@@ -50,26 +50,24 @@
 
 + (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation {
     cv::Mat dst;
-    //cv::warpPerspective(src, dst, transformation, src.size());
     warpAffine(src, dst, transformation, src.size());
     return dst;
 }
 
-+ (cv::Mat)findAffineTransformationSrcPoints:(CGPoint[])srcP dstPoints:(CGPoint[])dstP {
-    cv::Point2f srcPoints[4];
-    srcPoints[0] = cv::Point2f(srcP[0].x, srcP[0].y);
-    srcPoints[1] = cv::Point2f(srcP[1].x, srcP[1].y);
-    srcPoints[2] = cv::Point2f(srcP[2].x, srcP[2].y);
-    srcPoints[3] = cv::Point2f(srcP[3].x, srcP[3].y);
++ (cv::Mat)findAffineTransformationSrcPoints:(FourPoints)srcPoints dstPoints:(FourPoints)dstPoints {
+    cv::Point2f srcCvPoints[4];
+    srcCvPoints[0] = cv::Point2f(srcPoints.p1.x, srcPoints.p1.y);
+    srcCvPoints[1] = cv::Point2f(srcPoints.p2.x, srcPoints.p2.y);
+    srcCvPoints[2] = cv::Point2f(srcPoints.p3.x, srcPoints.p3.y);
+    srcCvPoints[3] = cv::Point2f(srcPoints.p4.x, srcPoints.p4.y);
 
-    cv::Point2f dstPoints[4];
-    dstPoints[0] = cv::Point2f(dstP[0].x, dstP[0].y);
-    dstPoints[1] = cv::Point2f(dstP[1].x, dstP[1].y);
-    dstPoints[2] = cv::Point2f(dstP[2].x, dstP[2].y);
-    dstPoints[3] = cv::Point2f(dstP[3].x, dstP[3].y);
+    cv::Point2f dstCvPoints[4];
+    dstCvPoints[0] = cv::Point2f(dstPoints.p1.x, dstPoints.p1.y);
+    dstCvPoints[1] = cv::Point2f(dstPoints.p2.x, dstPoints.p2.y);
+    dstCvPoints[2] = cv::Point2f(dstPoints.p3.x, dstPoints.p3.y);
+    dstCvPoints[3] = cv::Point2f(dstPoints.p4.x, dstPoints.p4.y);
     
-    //return cv::getPerspectiveTransform(srcPoints, dstPoints);
-    return cv::getAffineTransform(srcPoints, dstPoints);
+    return cv::getAffineTransform(srcCvPoints, dstCvPoints);
 }
 
 @end

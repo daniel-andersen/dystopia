@@ -23,28 +23,17 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <QuartzCore/QuartzCore.h>
+#ifndef Dystopia_Util_h
+#define Dystopia_Util_h
 
-#import "PreviewableViewController.h"
-#import "CameraSession.h"
-#import "CalibrationView.h"
-#import "BoardRecognizer.h"
-#import "BoardView.h"
-#import "BoardGame.h"
+#import <UIKit/UIKit.h>
 
-#define GAME_STATE_CALIBRATION 0
+typedef struct {
+    CGPoint p1;
+    CGPoint p2;
+    CGPoint p3;
+    CGPoint p4;
+    bool defined;
+} FourPoints;
 
-@interface GameViewController : PreviewableViewController <CameraSessionDelegate> {
-    CameraSession *cameraSession;
-    CalibrationView *calibrationView;
-    BoardRecognizer *boardRecognizer;
-    
-    BoardView *boardView;
-    BoardGame *boardGame;
-    
-    FourPoints boardPoints;
-    
-    int gameState;
-}
-
-@end
+#endif

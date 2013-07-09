@@ -67,6 +67,7 @@
 		650D4220178C5E4200D89CEB /* FakeCameraUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FakeCameraUtil.mm; sourceTree = "<group>"; };
 		650D4222178C92B600D89CEB /* PreviewableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviewableViewController.h; sourceTree = "<group>"; };
 		650D4223178C92B700D89CEB /* PreviewableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreviewableViewController.m; sourceTree = "<group>"; };
+		650D4225178C9E7000D89CEB /* Util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Util.h; sourceTree = "<group>"; };
 		65B9306F17806B4500312B88 /* Dystopia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dystopia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B9307217806B4500312B88 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		65B9307417806B4500312B88 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -282,6 +283,7 @@
 				650D4211178A057600D89CEB /* CameraUtil.mm */,
 				650D421F178C5E4100D89CEB /* FakeCameraUtil.h */,
 				650D4220178C5E4200D89CEB /* FakeCameraUtil.mm */,
+				650D4225178C9E7000D89CEB /* Util.h */,
 			);
 			name = Util;
 			sourceTree = "<group>";

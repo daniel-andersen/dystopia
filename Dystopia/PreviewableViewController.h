@@ -23,15 +23,20 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <Foundation/Foundation.h>
+#import <QuartzCore/QuartzCore.h>
+
+#import "Util.h"
 
 @interface PreviewableViewController : UIViewController {
     UIView *cameraPreview;
+    CAShapeLayer *boardContourLayer;
+    
     UIButton *boardButton;
     UIButton *cameraPreviewButton;
 }
 
 - (void)previewFrame:(UIImage *)image hasCameraSession:(bool)cameraSession;
+- (void)previewBoardContour:(FourPoints)boardPoints;
 
 @property (readonly) UIView *overlayView;
 

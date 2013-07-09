@@ -23,8 +23,6 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <QuartzCore/QuartzCore.h>
-
 #import "PreviewableViewController.h"
 #import "ExternalDisplay.h"
 
@@ -40,6 +38,8 @@
 - (void)viewWillLayoutSubviews {
     overlayView.frame = self.view.bounds;
     cameraPreview.frame = self.view.bounds;
+    boardContourLayer.frame = self.view.bounds;
+    
     [self setButtonFrame:boardButton x:200.0f];
     [self setButtonFrame:cameraPreviewButton x:(self.view.bounds.size.width - 200.0f)];
 }
@@ -52,6 +52,7 @@
     cameraPreview = [[UIView alloc] initWithFrame:self.view.bounds];
     [overlayView addSubview:cameraPreview];
 
+    [self addBoardContourLayer];
     [self addPreviewLabel];
 
     boardButton = [self addButtonWithText:@"Board"];
@@ -96,6 +97,15 @@
     [cameraPreview addSubview:label];
 }
 
+- (void)addBoardContourLayer {
+    boardContourLayer = [CAShapeLayer layer];
+    boardContourLayer.frame = self.view.bounds;
+    boardContourLayer.fillColor = [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:0.35f].CGColor;
+    boardContourLayer.strokeColor = [UIColor colorWithWhite:1.0f alpha:0.75f].CGColor;
+    boardContourLayer.backgroundColor = [UIColor clearColor].CGColor;
+    [cameraPreview.layer addSublayer:boardContourLayer];
+}
+
 - (void)previewFrame:(UIImage *)image hasCameraSession:(bool)cameraSession {
     if (cameraPreview.hidden) {
         return;
@@ -107,6 +117,21 @@
     } else {
         cameraPreview.layer.contents = (id)image.CGImage;
     }
+    [CATransaction commit];
+}
+
+- (void)previewBoardContour:(FourPoints)boardPoints {
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:0.0f];
+
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:boardPoints.p1];
+    [path addLineToPoint:boardPoints.p2];
+    [path addLineToPoint:boardPoints.p3];
+    [path addLineToPoint:boardPoints.p4];
+    [path closePath];
+
+    boardContourLayer.path = path.CGPath;
     [CATransaction commit];
 }
 
