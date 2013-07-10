@@ -35,17 +35,21 @@ extern PreviewableViewController *previewInstance;
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self initialize];
-    [self initializeGui];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    [cameraSession start];
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self initializeGui];
 }
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
     [self.view bringSubviewToFront:super.overlayView];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [cameraSession start];
 }
 
 - (void)initialize {
@@ -58,10 +62,10 @@ extern PreviewableViewController *previewInstance;
 }
 
 - (void)initializeGui {
-    boardView = [[BoardView alloc] initWithFrame:[ExternalDisplay instance].widescreenBounds];
+    boardView = [[BoardView alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:boardView];
 
-    calibrationView = [[CalibrationView alloc] initWithFrame:[ExternalDisplay instance].widescreenBounds];
+    calibrationView = [[CalibrationView alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:calibrationView];
 }
 
@@ -87,11 +91,11 @@ extern PreviewableViewController *previewInstance;
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskLandscape;
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    return UIInterfaceOrientationIsLandscape(interfaceOrientation);
+    return UIInterfaceOrientationIsPortrait(interfaceOrientation);
 }
 
 - (BOOL)shouldAutorotate {

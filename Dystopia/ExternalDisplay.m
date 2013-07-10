@@ -43,6 +43,7 @@ ExternalDisplay *externalDisplayInstance = nil;
 
 - (void)initialize {
     if ([UIScreen screens].count > 1) {
+        [self redirectLoggerToFile];
         screen = [[UIScreen screens] objectAtIndex:1];
         UIScreenMode *bestScreenMode = nil;
         for (UIScreenMode *screenMode in screen.availableModes) {
@@ -53,6 +54,7 @@ ExternalDisplay *externalDisplayInstance = nil;
         }
         NSLog(@"Choose: %f, %f", bestScreenMode.size.width, bestScreenMode.size.height);
         screen.currentMode = bestScreenMode;
+        screen.overscanCompensation = UIScreenOverscanCompensationScale;
         externalDisplayFound = YES;
     } else {
         NSLog(@"No external displays found!");
@@ -63,6 +65,13 @@ ExternalDisplay *externalDisplayInstance = nil;
     window = [[UIWindow alloc] initWithFrame:screen.bounds];
     window.backgroundColor = [UIColor blackColor];
     window.screen = screen;
+}
+
+- (void)redirectLoggerToFile {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *logPath = [documentsDirectory stringByAppendingPathComponent:@"console.log"];
+    freopen([logPath cStringUsingEncoding:NSASCIIStringEncoding],"a+",stderr);
 }
 
 - (void)setupWidescreenBounds {

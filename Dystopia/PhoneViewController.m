@@ -41,22 +41,16 @@ extern PreviewableViewController *previewInstance;
     [self transitionToGame];
 }
 
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    [self.view bringSubviewToFront:super.overlayView];
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
 
 - (void)setupExternalDisplay {
     [[ExternalDisplay instance] initialize];
-    if ([ExternalDisplay instance].externalDisplayFound) {
-        [self redirectLoggerToFile];
-    }
-}
-
-- (void)redirectLoggerToFile {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *logPath = [documentsDirectory stringByAppendingPathComponent:@"console.log"];
-    freopen([logPath cStringUsingEncoding:NSASCIIStringEncoding],"a+",stderr);
 }
 
 - (void)transitionToGame {
@@ -64,6 +58,18 @@ extern PreviewableViewController *previewInstance;
     [ExternalDisplay instance].window.rootViewController = gameViewController;
     [ExternalDisplay instance].window.hidden = NO;
     previewInstance = [ExternalDisplay instance].externalDisplayFound ? self : gameViewController;
+}
+
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    return UIInterfaceOrientationIsPortrait(interfaceOrientation);
+}
+
+- (BOOL)shouldAutorotate {
+    return YES;
 }
 
 @end

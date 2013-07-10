@@ -42,8 +42,8 @@ PreviewableViewController *previewInstance = nil;
     cameraPreview.frame = self.view.bounds;
     boardContourLayer.frame = self.view.bounds;
     
-    [self setButtonFrame:boardButton x:200.0f];
-    [self setButtonFrame:cameraPreviewButton x:(self.view.bounds.size.width - 200.0f)];
+    [self setButtonFrame:boardButton x:75.0f];
+    [self setButtonFrame:cameraPreviewButton x:(self.view.bounds.size.width - 75.0f)];
 }
 
 - (void)setupCameraPreview {
