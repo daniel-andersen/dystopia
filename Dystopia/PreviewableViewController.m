@@ -26,6 +26,8 @@
 #import "PreviewableViewController.h"
 #import "ExternalDisplay.h"
 
+PreviewableViewController *previewInstance = nil;
+
 @implementation PreviewableViewController
 
 @synthesize overlayView;

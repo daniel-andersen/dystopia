@@ -27,6 +27,8 @@
 #import "GameViewController.h"
 #import "ExternalDisplay.h"
 
+extern PreviewableViewController *previewInstance;
+
 @implementation PhoneViewController
 
 - (void)viewDidLoad {
@@ -61,6 +63,7 @@
     GameViewController *gameViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"gameViewController"];
     [ExternalDisplay instance].window.rootViewController = gameViewController;
     [ExternalDisplay instance].window.hidden = NO;
+    previewInstance = [ExternalDisplay instance].externalDisplayFound ? self : gameViewController;
 }
 
 @end

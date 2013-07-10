@@ -28,6 +28,8 @@
 #import "UIImage+CaptureScreen.h"
 #import "FakeCameraUtil.h"
 
+extern PreviewableViewController *previewInstance;
+
 @implementation GameViewController
 
 - (void)viewDidLoad {
@@ -65,14 +67,14 @@
 
 - (void)processFrame:(UIImage *)image {
     [self calibrateBoard:image];
-    [super previewFrame:image];
+    [previewInstance previewFrame:image];
     cameraSession.readyToProcessFrame = YES;
 }
 
 - (void)calibrateBoard:(UIImage *)image {
     if (gameState == GAME_STATE_CALIBRATION) {
         boardPoints = [boardRecognizer findBoardFromImage:image];
-        [super previewBoardContour:boardPoints];
+        [previewInstance previewBoardContour:boardPoints];
     }
 }
 
