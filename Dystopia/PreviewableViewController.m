@@ -49,6 +49,7 @@ PreviewableViewController *previewInstance = nil;
 - (void)setupCameraPreview {
     overlayView = [[UIView alloc] initWithFrame:self.view.bounds];
     overlayView.hidden = [ExternalDisplay instance].externalDisplayFound;
+    overlayView.backgroundColor = [UIColor clearColor];
     [self.view addSubview:overlayView];
     
     cameraPreview = [[UIImageView alloc] initWithFrame:self.view.bounds];
@@ -115,6 +116,12 @@ PreviewableViewController *previewInstance = nil;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         cameraPreview.image = image;
+    });
+}
+
+- (void)hideBoardContour {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        boardContourLayer.hidden = YES;
     });
 }
 

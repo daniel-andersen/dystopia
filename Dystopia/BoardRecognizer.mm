@@ -61,7 +61,7 @@
 }
 
 - (cv::Mat)applyThreshold:(cv::Mat)image {
-    cv::inRange(image, cv::Scalar(30, 25, 50, 0), cv::Scalar(80, 255, 255, 255), image);
+    cv::inRange(image, cv::Scalar(30, 0, 100, 0), cv::Scalar(80, 255, 255, 255), image);
     return image;
 }
 

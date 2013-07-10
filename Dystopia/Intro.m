@@ -23,14 +23,51 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <AVFoundation/AVFoundation.h>
+#import <QuartzCore/QuartzCore.h>
 
-#import "RotatedView.h"
+#import "Intro.h"
 
-@interface BoardGame : RotatedView
+#define INTRO_FADE_IN_DURATION 5.0f
+#define INTRO_PRESENT_DURATION 10.0f
 
-- (id)initWithFrame:(CGRect)frame;
+@implementation Intro
 
-- (void)update;
+- (id)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        [self initialize];
+    }
+    return self;
+}
+
+- (void)initialize {
+    self.backgroundColor = [UIColor blackColor];
+    [self setupLogoView];
+}
+
+- (void)setupLogoView {
+    logoView = [[UIImageView alloc] initWithFrame:self.bounds];
+    logoView.image = [UIImage imageNamed:@"trollsahead_logo.png"];
+    logoView.transform = CGAffineTransformScale(logoView.transform, 0.5f, 0.5f);
+    logoView.contentMode = UIViewContentModeScaleAspectFit;
+    logoView.hidden = YES;
+    [self addSubview:logoView];
+}
+
+- (void)show {
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:INTRO_FADE_IN_DURATION];
+    logoView.hidden = NO;
+    [CATransaction commit];
+    
+    [NSTimer scheduledTimerWithTimeInterval:(INTRO_PRESENT_DURATION + INTRO_FADE_IN_DURATION) target:self selector:@selector(hide) userInfo:nil repeats:NO];
+}
+
+- (void)hide {
+    NSLog(@"HEY!");
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:INTRO_FADE_IN_DURATION];
+    logoView.hidden = YES;
+    [CATransaction commit];
+}
 
 @end

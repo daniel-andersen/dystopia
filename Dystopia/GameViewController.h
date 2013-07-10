@@ -27,22 +27,19 @@
 
 #import "PreviewableViewController.h"
 #import "CameraSession.h"
-#import "CalibrationView.h"
-#import "BoardRecognizer.h"
-#import "BoardView.h"
+#import "BoardCalibrator.h"
 #import "BoardGame.h"
+#import "Intro.h"
 
-#define GAME_STATE_CALIBRATION 0
+#define GAME_STATE_INITIAL_CALIBRATION 0
+#define GAME_STATE_INTRO               1
 
 @interface GameViewController : PreviewableViewController <CameraSessionDelegate> {
     CameraSession *cameraSession;
-    CalibrationView *calibrationView;
-    BoardRecognizer *boardRecognizer;
     
-    BoardView *boardView;
+    BoardCalibrator *boardCalibrator;
     BoardGame *boardGame;
-    
-    FourPoints boardPoints;
+    Intro *intro;
     
     int gameState;
 }

@@ -23,14 +23,16 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <AVFoundation/AVFoundation.h>
-
 #import "RotatedView.h"
 
-@interface BoardGame : RotatedView
+@implementation RotatedView
 
-- (id)initWithFrame:(CGRect)frame;
-
-- (void)update;
+- (id)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        self.transform = CGAffineTransformMakeRotation(M_PI_2);
+        self.frame = frame;
+    }
+    return self;
+}
 
 @end

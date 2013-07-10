@@ -25,13 +25,15 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-#import "CalibrationView.h"
-#import "ExternalDisplay.h"
+#import "BoardCalibrator.h"
 
-@implementation CalibrationView
+@implementation BoardCalibrator
 
-const float calibrationBorderPct = 0.025f;
+const float calibrationBorderPct = 0.01f;
 const UIColor *calibrationBorderColor;
+
+@synthesize state;
+@synthesize boardPoints;
 
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
@@ -41,13 +43,45 @@ const UIColor *calibrationBorderColor;
 }
 
 - (void)initialize {
+    boardRecognizer = [[BoardRecognizer alloc] init];
+    state = BOARD_CALIBRATION_STATE_UNCALIBRATED;
+    boardPoints.defined = NO;
+    [self setupView];
+}
+
+- (void)start {
+    self.hidden = NO;
+    state = BOARD_CALIBRATION_STATE_CALIBRATING;
+    successCount = 0;
+    boardPoints.defined = NO;
+    NSLog(@"Board calibration started");
+}
+
+- (void)updateWithImage:(UIImage *)image {
+    boardPoints = [boardRecognizer findBoardFromImage:image];
+    if (boardPoints.defined) {
+        successCount++;
+        if (successCount >= BOARD_CALIBRATION_SUCCESS_COUNT) {
+            [self success];
+        }
+    } else {
+        successCount = 0;
+    }
+}
+
+- (void)success {
+    state = BOARD_CALIBRATION_STATE_CALIBRATED;
+    NSLog(@"Board calibrated!");
+}
+
+- (void)setupView {
     calibrationBorderColor = [UIColor greenColor];
     
     float borderWidth = self.frame.size.width * calibrationBorderPct;
     float borderHeight = self.frame.size.height * calibrationBorderPct;
     
     UIBezierPath *path = [UIBezierPath bezierPath];
-
+    
     // Top
     [path moveToPoint:CGPointMake(0.0f,                     0.0f)];
     [path addLineToPoint:CGPointMake(self.frame.size.width, 0.0f)];
@@ -61,27 +95,27 @@ const UIColor *calibrationBorderColor;
     [path addLineToPoint:CGPointMake(self.frame.size.width, self.frame.size.height)];
     [path addLineToPoint:CGPointMake(0.0f,                  self.frame.size.height)];
     [path closePath];
-
+    
     // Left
     [path moveToPoint:CGPointMake(0.0f,           borderHeight)];
     [path addLineToPoint:CGPointMake(borderWidth, borderHeight)];
     [path addLineToPoint:CGPointMake(borderWidth, self.frame.size.height - borderHeight)];
     [path addLineToPoint:CGPointMake(0.0f,        self.frame.size.height - borderHeight)];
     [path closePath];
-
+    
     // Right
     [path moveToPoint:CGPointMake(self.frame.size.width - borderWidth,    borderHeight)];
     [path addLineToPoint:CGPointMake(self.frame.size.width,               borderHeight)];
     [path addLineToPoint:CGPointMake(self.frame.size.width,               self.frame.size.height - borderHeight)];
     [path addLineToPoint:CGPointMake(self.frame.size.width - borderWidth, self.frame.size.height - borderHeight)];
     [path closePath];
-
+    
     CAShapeLayer *borderLayer = [CAShapeLayer layer];
     borderLayer.frame = CGRectMake(0.0f, 0.0f, self.frame.size.width, self.frame.size.height);
     borderLayer.fillColor = calibrationBorderColor.CGColor;
     borderLayer.strokeColor = calibrationBorderColor.CGColor;
     borderLayer.path = path.CGPath;
-
+    
     [self.layer addSublayer:borderLayer];
 }
 

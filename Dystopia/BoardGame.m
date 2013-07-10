@@ -27,17 +27,17 @@
 
 @implementation BoardGame
 
-- (id) initWithLevel:(int)level {
-    if (self = [super init]) {
+- (id)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
         [self initialize];
     }
     return self;
 }
 
-- (void) initialize {
+- (void)initialize {
 }
 
-- (void) update {
+- (void)update {
 }
 
 @end

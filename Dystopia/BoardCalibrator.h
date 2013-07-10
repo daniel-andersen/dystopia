@@ -23,14 +23,29 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "BoardView.h"
+#import <Foundation/Foundation.h>
 
-@implementation BoardView
+#import "BoardRecognizer.h"
+#import "Util.h"
 
-- (id)initWithFrame:(CGRect)frame {
-    if (self = [super initWithFrame:frame]) {
-    }
-    return self;
+#define BOARD_CALIBRATION_STATE_UNCALIBRATED 0
+#define BOARD_CALIBRATION_STATE_CALIBRATING  1
+#define BOARD_CALIBRATION_STATE_CALIBRATED   2
+
+#define BOARD_CALIBRATION_SUCCESS_COUNT 5
+
+@interface BoardCalibrator : UIView {
+    BoardRecognizer *boardRecognizer;
+
+    int successCount;
 }
+
+- (id)initWithFrame:(CGRect)frame;
+
+- (void)start;
+- (void)updateWithImage:(UIImage *)image;
+
+@property (readonly) int state;
+@property (readonly) FourPoints boardPoints;
 
 @end

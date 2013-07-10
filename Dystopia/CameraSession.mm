@@ -45,6 +45,8 @@ const CFTimeInterval cameraSessionDefaultDelegateInterval = 0.5f;
 - (void)initialize {
     initialized = NO;
     
+    delegateProcessFrameInterval = cameraSessionDefaultDelegateInterval;
+
     frameProcessQueue = dispatch_queue_create("dk.trollsahead.dystopia.CameraSession.ProcessFrame", NULL);
 
     session = [[AVCaptureSession alloc] init];
@@ -62,8 +64,6 @@ const CFTimeInterval cameraSessionDefaultDelegateInterval = 0.5f;
     }
     
     [session commitConfiguration];
-    
-    delegateProcessFrameInterval = cameraSessionDefaultDelegateInterval;
     
     initialized = YES;
     

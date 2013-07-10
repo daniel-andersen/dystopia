@@ -36,6 +36,8 @@
 }
 
 - (void)previewFrame:(UIImage *)image;
+
+- (void)hideBoardContour;
 - (void)previewBoardContour:(FourPoints)boardPoints;
 
 @property (readonly) UIView *overlayView;

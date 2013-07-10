@@ -25,6 +25,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CalibrationView : UIView
+@interface RotatedView : UIView
+
+- (id)initWithFrame:(CGRect)frame;
 
 @end

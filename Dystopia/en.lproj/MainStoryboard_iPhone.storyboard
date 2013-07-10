@@ -58,7 +58,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="azo-br-FLo"/>
                     <connections>
-                        <segue destination="2" kind="modal" id="WYI-9e-ahy"/>
+                        <segue destination="2" kind="modal" identifier="phoneViewToGameViewSegue" id="WYI-9e-ahy"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cXn-YW-xXL" userLabel="First Responder" sceneMemberID="firstResponder"/>
