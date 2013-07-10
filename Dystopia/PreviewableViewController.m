@@ -49,7 +49,8 @@
     overlayView.hidden = [ExternalDisplay instance].externalDisplayFound;
     [self.view addSubview:overlayView];
     
-    cameraPreview = [[UIView alloc] initWithFrame:self.view.bounds];
+    cameraPreview = [[UIImageView alloc] initWithFrame:self.view.bounds];
+    cameraPreview.contentMode = UIViewContentModeScaleToFill;
     [overlayView addSubview:cameraPreview];
 
     [self addBoardContourLayer];
@@ -106,33 +107,38 @@
     [cameraPreview.layer addSublayer:boardContourLayer];
 }
 
-- (void)previewFrame:(UIImage *)image hasCameraSession:(bool)cameraSession {
+- (void)previewFrame:(UIImage *)image {
     if (cameraPreview.hidden) {
         return;
     }
-    [CATransaction begin];
-    [CATransaction setAnimationDuration:0.0f];
-    if (cameraSession) {
-        cameraPreview.layer.contents = (__bridge_transfer id)image.CGImage;
-    } else {
-        cameraPreview.layer.contents = (id)image.CGImage;
-    }
-    [CATransaction commit];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        cameraPreview.image = image;
+    });
 }
 
 - (void)previewBoardContour:(FourPoints)boardPoints {
-    [CATransaction begin];
-    [CATransaction setAnimationDuration:0.0f];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!boardPoints.defined) {
+            boardContourLayer.hidden = YES;
+        }
+        boardContourLayer.hidden = NO;
+        [CATransaction begin];
+        [CATransaction setAnimationDuration:0.0f];
 
-    UIBezierPath *path = [UIBezierPath bezierPath];
-    [path moveToPoint:boardPoints.p1];
-    [path addLineToPoint:boardPoints.p2];
-    [path addLineToPoint:boardPoints.p3];
-    [path addLineToPoint:boardPoints.p4];
-    [path closePath];
+        UIBezierPath *path = [UIBezierPath bezierPath];
+        [path moveToPoint:[self scalePointToScreen:boardPoints.p1]];
+        [path addLineToPoint:[self scalePointToScreen:boardPoints.p2]];
+        [path addLineToPoint:[self scalePointToScreen:boardPoints.p3]];
+        [path addLineToPoint:[self scalePointToScreen:boardPoints.p4]];
+        [path closePath];
 
-    boardContourLayer.path = path.CGPath;
-    [CATransaction commit];
+        boardContourLayer.path = path.CGPath;
+        [CATransaction commit];
+    });
+}
+
+- (CGPoint)scalePointToScreen:(CGPoint)p {
+    return CGPointMake(p.x * boardContourLayer.frame.size.width / cameraPreview.image.size.width, p.y * boardContourLayer.frame.size.height / cameraPreview.image.size.height);
 }
 
 @end

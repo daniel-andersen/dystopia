@@ -28,14 +28,14 @@
 #import "Util.h"
 
 @interface PreviewableViewController : UIViewController {
-    UIView *cameraPreview;
+    UIImageView *cameraPreview;
     CAShapeLayer *boardContourLayer;
     
     UIButton *boardButton;
     UIButton *cameraPreviewButton;
 }
 
-- (void)previewFrame:(UIImage *)image hasCameraSession:(bool)cameraSession;
+- (void)previewFrame:(UIImage *)image;
 - (void)previewBoardContour:(FourPoints)boardPoints;
 
 @property (readonly) UIView *overlayView;

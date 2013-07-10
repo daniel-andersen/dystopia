@@ -31,4 +31,6 @@
 
 - (FourPoints)findBoardFromImage:(UIImage *)image;
 
+- (UIImage *)filterAndThresholdUIImage:(UIImage *)image;
+
 @end

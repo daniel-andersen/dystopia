@@ -35,6 +35,14 @@
     return [self findContours:filteredAndThresholdedImage originalImage:originalImage];
 }
 
+- (UIImage *)filterAndThresholdUIImage:(UIImage *)image {
+    cv::Mat img = [image CVMat];
+    img = [self smooth:img];
+    img = [self convertToHsv:img];
+    img = [self applyThreshold:img];
+    return [UIImage imageWithCVMat:img];
+}
+
 - (cv::Mat)filterAndThreshold:(cv::Mat)image {
     image = [self smooth:image];
     image = [self convertToHsv:image];
@@ -53,7 +61,7 @@
 }
 
 - (cv::Mat)applyThreshold:(cv::Mat)image {
-    cv::inRange(image, cv::Scalar(45, 0, 0, 0), cv::Scalar(75, 255, 255, 255), image);
+    cv::inRange(image, cv::Scalar(30, 25, 50, 0), cv::Scalar(80, 255, 255, 255), image);
     return image;
 }
 
@@ -71,11 +79,8 @@
         if (parent == -1 && firstChild != -1) {
             int nextChild = hierarchy[firstChild][2];
             if (nextChild == -1) {
-                cv::approxPolyDP(cv::Mat(contours[i]), polys[i], 3, true);
+                cv::approxPolyDP(cv::Mat(contours[i]), polys[i], 5, true);
                 if (polys[i].size() == 4) {
-                    /*for (int j = 0; j < polys[i].size(); j++) {
-                     NSLog(@"Poly %i: %i, %i", i, polys[i][j].x, polys[i][j].y);
-                     }*/
                     FourPoints boardPoints = {
                         .defined = YES,
                         .p1 = CGPointMake(polys[i][0].x, polys[i][0].y),

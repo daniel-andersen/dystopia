@@ -65,16 +65,14 @@
 
 - (void)processFrame:(UIImage *)image {
     [self calibrateBoard:image];
-    [super previewFrame:image hasCameraSession:cameraSession.initialized];
+    [super previewFrame:image];
     cameraSession.readyToProcessFrame = YES;
 }
 
 - (void)calibrateBoard:(UIImage *)image {
     if (gameState == GAME_STATE_CALIBRATION) {
         boardPoints = [boardRecognizer findBoardFromImage:image];
-        if (boardPoints.defined) {
-            [super previewBoardContour:boardPoints];
-        }
+        [super previewBoardContour:boardPoints];
     }
 }
 
