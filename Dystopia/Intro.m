@@ -28,12 +28,14 @@
 #import "Intro.h"
 
 #define INTRO_FADE_IN_DURATION 5.0f
-#define INTRO_PRESENT_DURATION 10.0f
+#define INTRO_FADE_OUT_DURATION 5.0f
+#define INTRO_PRESENT_DURATION 2.0f
 
 @implementation Intro
 
-- (id)initWithFrame:(CGRect)frame {
+- (id)initWithFrame:(CGRect)frame finishedDelegate:(id<IntroFinishedDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
+        finishedDelegate = delegate;
         [self initialize];
     }
     return self;
@@ -49,25 +51,34 @@
     logoView.image = [UIImage imageNamed:@"trollsahead_logo.png"];
     logoView.transform = CGAffineTransformScale(logoView.transform, 0.5f, 0.5f);
     logoView.contentMode = UIViewContentModeScaleAspectFit;
-    logoView.hidden = YES;
+    logoView.layer.opacity = 0.0f;
     [self addSubview:logoView];
 }
 
 - (void)show {
-    [CATransaction begin];
-    [CATransaction setAnimationDuration:INTRO_FADE_IN_DURATION];
-    logoView.hidden = NO;
-    [CATransaction commit];
-    
-    [NSTimer scheduledTimerWithTimeInterval:(INTRO_PRESENT_DURATION + INTRO_FADE_IN_DURATION) target:self selector:@selector(hide) userInfo:nil repeats:NO];
+    [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(fadeIn) userInfo:nil repeats:NO];
+    NSLog(@"Showing intro");
+}
+
+- (void)fadeIn {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:INTRO_FADE_IN_DURATION animations:^{
+            logoView.layer.opacity = 1.0f;
+        } completion:^(BOOL finished) {
+            [NSTimer scheduledTimerWithTimeInterval:INTRO_PRESENT_DURATION target:self selector:@selector(hide) userInfo:nil repeats:NO];
+        }];
+    });
 }
 
 - (void)hide {
-    NSLog(@"HEY!");
-    [CATransaction begin];
-    [CATransaction setAnimationDuration:INTRO_FADE_IN_DURATION];
-    logoView.hidden = YES;
-    [CATransaction commit];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:INTRO_FADE_OUT_DURATION animations:^{
+            logoView.layer.opacity = 0.0f;
+        } completion:^(BOOL finished) {
+            NSLog(@"Intro ended");
+            [finishedDelegate introFinished];
+        }];
+    });
 }
 
 @end

@@ -32,6 +32,8 @@
 const float calibrationBorderPct = 0.01f;
 const UIColor *calibrationBorderColor;
 
+const float calibrationFadeInterval = 2.0f;
+
 @synthesize state;
 @synthesize boardPoints;
 
@@ -50,7 +52,7 @@ const UIColor *calibrationBorderColor;
 }
 
 - (void)start {
-    self.hidden = NO;
+    [self setCalibrationViewAlpha:1.0f];
     state = BOARD_CALIBRATION_STATE_CALIBRATING;
     successCount = 0;
     boardPoints.defined = NO;
@@ -71,11 +73,30 @@ const UIColor *calibrationBorderColor;
 
 - (void)success {
     state = BOARD_CALIBRATION_STATE_CALIBRATED;
+    [self setCalibrationViewAlpha:0.0f];
     NSLog(@"Board calibrated!");
 }
 
+- (void)setCalibrationViewAlpha:(float)alpha {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (alpha == 1.0f) {
+            self.layer.hidden = NO;
+        }
+        [UIView animateWithDuration:calibrationFadeInterval animations:^{
+            self.layer.opacity = alpha;
+        } completion:^(BOOL finished) {
+            if (alpha == 0.0f) {
+                self.layer.hidden = YES;
+            }
+        }];
+    });
+}
+
 - (void)setupView {
-    calibrationBorderColor = [UIColor greenColor];
+    self.hidden = YES;
+    self.layer.opacity = 0.0f;
+    
+    calibrationBorderColor = [UIColor colorWithRed:0.0f green:0.5f blue:0.0f alpha:1.0f];
     
     float borderWidth = self.frame.size.width * calibrationBorderPct;
     float borderHeight = self.frame.size.height * calibrationBorderPct;

@@ -39,13 +39,13 @@ extern PreviewableViewController *previewInstance;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self initialize];
+    [boardCalibrator start];
 }
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
     [self.view bringSubviewToFront:boardCalibrator];
     [self.view bringSubviewToFront:super.overlayView];
-    [boardCalibrator start];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -66,7 +66,8 @@ extern PreviewableViewController *previewInstance;
 }
 
 - (void)processFrame:(UIImage *)image {
-    [previewInstance previewFrame:[[[BoardRecognizer alloc] init] filterAndThresholdUIImage:image]];
+    //[previewInstance previewFrame:[[[BoardRecognizer alloc] init] filterAndThresholdUIImage:image]];
+    [previewInstance previewFrame:image];
 
     [self calibrateBoard:image];
 
@@ -77,7 +78,6 @@ extern PreviewableViewController *previewInstance;
 
 - (void)updateGameStateAccordingToFrame {
     dispatch_async(dispatch_get_main_queue(), ^{
-        boardCalibrator.hidden = boardCalibrator.state == BOARD_CALIBRATION_STATE_CALIBRATED;
         if (gameState == GAME_STATE_INITIAL_CALIBRATION) {
             if (boardCalibrator.state == BOARD_CALIBRATION_STATE_CALIBRATED) {
                 [self startIntro];
@@ -89,9 +89,13 @@ extern PreviewableViewController *previewInstance;
 
 - (void)startIntro {
     gameState = GAME_STATE_INTRO;
-    intro = [[Intro alloc] initWithFrame:self.view.bounds];
+    intro = [[Intro alloc] initWithFrame:self.view.bounds finishedDelegate:self];
     [self.view insertSubview:intro atIndex:0];
     [intro show];
+}
+
+- (void)introFinished {
+    NSLog(@"FINISHED!");
 }
 
 - (void)calibrateBoard:(UIImage *)image {

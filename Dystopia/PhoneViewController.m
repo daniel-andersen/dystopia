@@ -56,7 +56,7 @@ extern PreviewableViewController *previewInstance;
 - (void)transitionToGame {
     GameViewController *gameViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"gameViewController"];
     [ExternalDisplay instance].window.rootViewController = gameViewController;
-    [ExternalDisplay instance].window.hidden = NO;
+    [[ExternalDisplay instance].window makeKeyAndVisible];
     previewInstance = [ExternalDisplay instance].externalDisplayFound ? self : gameViewController;
 }
 

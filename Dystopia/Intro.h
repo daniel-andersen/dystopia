@@ -27,11 +27,18 @@
 
 #import "RotatedView.h"
 
+@protocol IntroFinishedDelegate <NSObject>
+
+- (void)introFinished;
+
+@end
+
 @interface Intro : RotatedView {
     UIImageView *logoView;
+    id<IntroFinishedDelegate> finishedDelegate;
 }
 
-- (id)initWithFrame:(CGRect)frame;
+- (id)initWithFrame:(CGRect)frame finishedDelegate:(id<IntroFinishedDelegate>)delegate;
 
 - (void)show;
 
