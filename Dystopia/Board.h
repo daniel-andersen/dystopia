@@ -25,13 +25,22 @@
 
 #import <Foundation/Foundation.h>
 
-#ifndef __BOARD_SIZE__
-#define BOARD_WIDTH 50
-#define BOARD_HEIGHT 50
-#endif
+#import "BrickView.h"
+#import "BoardUtil.h"
 
-@interface Board : NSObject {
+#define BOARD_BRICK_VIEWS_COUNT 50
+
+@interface Board : UIView {
     int bricks[BOARD_WIDTH][BOARD_HEIGHT];
+
+    BrickView *brickViews[BOARD_BRICK_VIEWS_COUNT];
+    int brickViewsCount;
+
+    int level;
 }
+
+- (id)initWithFrame:(CGRect)frame;
+
+- (void)loadLevel:(int)l;
 
 @end

@@ -34,7 +34,7 @@
 #define GAME_STATE_INITIAL_CALIBRATION 0
 #define GAME_STATE_INTRO               1
 
-@interface GameViewController : PreviewableViewController <CameraSessionDelegate, IntroFinishedDelegate> {
+@interface GameViewController : PreviewableViewController <CameraSessionDelegate, IntroDelegate, BoardGameProtocol> {
     CameraSession *cameraSession;
     
     BoardCalibrator *boardCalibrator;

@@ -27,4 +27,41 @@
 
 @implementation Board
 
+- (id)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        [self initialize];
+    }
+    return self;
+}
+
+- (void)initialize {
+    self.backgroundColor = [UIColor blackColor];
+    NSLog(@"Board initialized");
+}
+
+- (void)loadLevel:(int)l {
+    level = l;
+    [self loadBoard];
+    [self setupBrickViews];
+    NSLog(@"Level %i loaded", level + 1);
+}
+
+- (void)loadBoard {
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            bricks[i][j] = -1;
+        }
+    }
+}
+
+- (void)setupBrickViews {
+    brickViewsCount = 0;
+    brickViews[brickViewsCount++] = [[BrickView alloc] initWithFrame:[[BoardUtil instance] brickTypeFrame:0 position:CGPointMake(5, 5)] brickType:0];
+    brickViews[brickViewsCount++] = [[BrickView alloc] initWithFrame:[[BoardUtil instance] brickTypeFrame:1 position:CGPointMake(8, 5)] brickType:1];
+    brickViews[brickViewsCount++] = [[BrickView alloc] initWithFrame:[[BoardUtil instance] brickTypeFrame:2 position:CGPointMake(5, 8)] brickType:2];
+    for (int i = 0; i < brickViewsCount; i++) {
+        [self addSubview:brickViews[i]];
+    }
+}
+
 @end

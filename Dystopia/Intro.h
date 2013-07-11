@@ -27,7 +27,7 @@
 
 #import "RotatedView.h"
 
-@protocol IntroFinishedDelegate <NSObject>
+@protocol IntroDelegate <NSObject>
 
 - (void)introFinished;
 
@@ -35,10 +35,10 @@
 
 @interface Intro : RotatedView {
     UIImageView *logoView;
-    id<IntroFinishedDelegate> finishedDelegate;
+    id<IntroDelegate> delegate;
 }
 
-- (id)initWithFrame:(CGRect)frame finishedDelegate:(id<IntroFinishedDelegate>)delegate;
+- (id)initWithFrame:(CGRect)frame delegate:(id<IntroDelegate>)d;
 
 - (void)show;
 

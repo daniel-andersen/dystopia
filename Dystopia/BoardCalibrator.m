@@ -29,7 +29,7 @@
 
 @implementation BoardCalibrator
 
-const float calibrationBorderPct = 0.01f;
+const float calibrationBorderPct = 0.02f;
 const UIColor *calibrationBorderColor;
 
 const float calibrationFadeInterval = 2.0f;

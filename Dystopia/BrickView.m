@@ -23,28 +23,26 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <AVFoundation/AVFoundation.h>
+#import <QuartzCore/QuartzCore.h>
 
-#import "RotatedView.h"
-#import "Board.h"
+#import "BrickView.h"
+#import "BoardUtil.h"
 
-@protocol BoardGameProtocol <NSObject>
+@implementation BrickView
 
-- (void)boardGameFinished;
+@synthesize brickType;
 
-@end
-
-@interface BoardGame : RotatedView {
-    int level;
-    id<BoardGameProtocol> delegate;
-    
-    Board *board;
+- (id)initWithFrame:(CGRect)frame brickType:(int)b {
+    if (self = [super initWithFrame:frame]) {
+        brickType = b;
+        [self initialize];
+    }
+    return self;
 }
 
-- (id)initWithFrame:(CGRect)frame delegate:(id<BoardGameProtocol>)d;
-
-- (void)startWithLevel:(int)l;
-
-- (void)update;
+- (void)initialize {
+    NSLog(@"HERE with %f, %f - %f, %f", self.frame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
+    self.layer.contents = (id)[[BoardUtil instance] brickImageOfType:brickType].CGImage;
+}
 
 @end

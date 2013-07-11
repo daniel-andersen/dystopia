@@ -57,9 +57,8 @@ extern PreviewableViewController *previewInstance;
     self.view.backgroundColor = [UIColor blackColor];
     
     cameraSession = [[CameraSession alloc] initWithDelegate:self];
+
     boardCalibrator = [[BoardCalibrator alloc] initWithFrame:self.view.bounds];
-    boardGame = [[BoardGame alloc] initWithFrame:self.view.bounds];
-    
     [self.view addSubview:boardCalibrator];
 
     gameState = GAME_STATE_INITIAL_CALIBRATION;
@@ -89,13 +88,24 @@ extern PreviewableViewController *previewInstance;
 
 - (void)startIntro {
     gameState = GAME_STATE_INTRO;
-    intro = [[Intro alloc] initWithFrame:self.view.bounds finishedDelegate:self];
+    intro = [[Intro alloc] initWithFrame:self.view.bounds delegate:self];
     [self.view insertSubview:intro atIndex:0];
     [intro show];
 }
 
 - (void)introFinished {
-    NSLog(@"FINISHED!");
+    [intro removeFromSuperview];
+    [self startBoardGame];
+}
+
+- (void)startBoardGame {
+    boardGame = [[BoardGame alloc] initWithFrame:self.view.bounds delegate:self];
+    [self.view insertSubview:boardGame atIndex:0];
+    [boardGame startWithLevel:0];
+}
+
+- (void)boardGameFinished {
+    NSLog(@"Board game finished!");
 }
 
 - (void)calibrateBoard:(UIImage *)image {

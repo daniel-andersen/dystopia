@@ -23,28 +23,34 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <AVFoundation/AVFoundation.h>
+#import <Foundation/Foundation.h>
 
-#import "RotatedView.h"
-#import "Board.h"
+#ifndef __BOARD_UTIL__
+#define __BOARD_UTIL__
 
-@protocol BoardGameProtocol <NSObject>
+    #define BOARD_WIDTH 30
+    #define BOARD_HEIGHT 30
 
-- (void)boardGameFinished;
+    #define BRICK_IMAGES_COUNT 10
 
-@end
+#endif
 
-@interface BoardGame : RotatedView {
-    int level;
-    id<BoardGameProtocol> delegate;
-    
-    Board *board;
+@interface BoardUtil : NSObject {
+    UIImage *brickImages[BRICK_IMAGES_COUNT];
+    CGSize brickSizes[BRICK_IMAGES_COUNT];
 }
 
-- (id)initWithFrame:(CGRect)frame delegate:(id<BoardGameProtocol>)d;
++ (BoardUtil *)instance;
 
-- (void)startWithLevel:(int)l;
+- (id)init;
 
-- (void)update;
+- (UIImage *)brickImageOfType:(int)type;
+
+- (float)singleBrickScreenSize;
+- (CGSize)brickTypeBoardSize:(int)type;
+- (CGSize)brickTypeScreenSize:(int)type;
+
+- (CGPoint)brickScreenPosition:(CGPoint)brickBoardPosition;
+- (CGRect)brickTypeFrame:(int)brickType position:(CGPoint)position;
 
 @end

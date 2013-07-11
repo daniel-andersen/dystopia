@@ -27,14 +27,23 @@
 
 @implementation BoardGame
 
-- (id)initWithFrame:(CGRect)frame {
+- (id)initWithFrame:(CGRect)frame delegate:(id<BoardGameProtocol>)d {
     if (self = [super initWithFrame:frame]) {
+        delegate = d;
         [self initialize];
     }
     return self;
 }
 
 - (void)initialize {
+    board = [[Board alloc] initWithFrame:self.bounds];
+    [self addSubview:board];
+}
+
+- (void)startWithLevel:(int)l {
+    level = l;
+    [board loadLevel:level];
+    NSLog(@"Level %i started", level + 1);
 }
 
 - (void)update {

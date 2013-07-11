@@ -33,9 +33,9 @@
 
 @implementation Intro
 
-- (id)initWithFrame:(CGRect)frame finishedDelegate:(id<IntroFinishedDelegate>)delegate {
+- (id)initWithFrame:(CGRect)frame delegate:(id<IntroDelegate>)d {
     if (self = [super initWithFrame:frame]) {
-        finishedDelegate = delegate;
+        delegate = d;
         [self initialize];
     }
     return self;
@@ -57,6 +57,7 @@
 
 - (void)show {
     [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(fadeIn) userInfo:nil repeats:NO];
+    //[delegate introFinished];
     NSLog(@"Showing intro");
 }
 
@@ -76,7 +77,7 @@
             logoView.layer.opacity = 0.0f;
         } completion:^(BOOL finished) {
             NSLog(@"Intro ended");
-            [finishedDelegate introFinished];
+            [delegate introFinished];
         }];
     });
 }

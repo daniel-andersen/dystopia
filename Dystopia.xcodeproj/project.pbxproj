@@ -21,6 +21,18 @@
 		650D423D178DE8C100D89CEB /* Intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D423C178DE8BD00D89CEB /* Intro.m */; };
 		650D4240178DEDAE00D89CEB /* trollsahead_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D423F178DEDAE00D89CEB /* trollsahead_logo.png */; };
 		650D4243178DF27800D89CEB /* RotatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D4242178DF27700D89CEB /* RotatedView.m */; };
+		650D428E178F365F00D89CEB /* bricks1.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D4284178F365F00D89CEB /* bricks1.png */; };
+		650D428F178F365F00D89CEB /* bricks2.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D4285178F365F00D89CEB /* bricks2.png */; };
+		650D4290178F365F00D89CEB /* bricks3.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D4286178F365F00D89CEB /* bricks3.png */; };
+		650D4291178F365F00D89CEB /* bricks4.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D4287178F365F00D89CEB /* bricks4.png */; };
+		650D4292178F365F00D89CEB /* bricks5.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D4288178F365F00D89CEB /* bricks5.png */; };
+		650D4293178F365F00D89CEB /* bricks6.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D4289178F365F00D89CEB /* bricks6.png */; };
+		650D4294178F365F00D89CEB /* bricks7.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D428A178F365F00D89CEB /* bricks7.png */; };
+		650D4295178F365F00D89CEB /* bricks8.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D428B178F365F00D89CEB /* bricks8.png */; };
+		650D4296178F365F00D89CEB /* exit.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D428C178F365F00D89CEB /* exit.png */; };
+		650D4297178F365F00D89CEB /* trap.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D428D178F365F00D89CEB /* trap.png */; };
+		650D429B178F40DE00D89CEB /* BrickView.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D429A178F40DD00D89CEB /* BrickView.m */; };
+		650D429E178F41B400D89CEB /* BoardUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D429D178F41B300D89CEB /* BoardUtil.m */; };
 		65B9307317806B4500312B88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307217806B4500312B88 /* UIKit.framework */; };
 		65B9307517806B4500312B88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307417806B4500312B88 /* Foundation.framework */; };
 		65B9307717806B4500312B88 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307617806B4500312B88 /* CoreGraphics.framework */; };
@@ -73,6 +85,20 @@
 		650D423F178DEDAE00D89CEB /* trollsahead_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = trollsahead_logo.png; path = intro/trollsahead_logo.png; sourceTree = "<group>"; };
 		650D4241178DF27600D89CEB /* RotatedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RotatedView.h; sourceTree = "<group>"; };
 		650D4242178DF27700D89CEB /* RotatedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RotatedView.m; sourceTree = "<group>"; };
+		650D4284178F365F00D89CEB /* bricks1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bricks1.png; path = bricks/bricks1.png; sourceTree = "<group>"; };
+		650D4285178F365F00D89CEB /* bricks2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bricks2.png; path = bricks/bricks2.png; sourceTree = "<group>"; };
+		650D4286178F365F00D89CEB /* bricks3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bricks3.png; path = bricks/bricks3.png; sourceTree = "<group>"; };
+		650D4287178F365F00D89CEB /* bricks4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bricks4.png; path = bricks/bricks4.png; sourceTree = "<group>"; };
+		650D4288178F365F00D89CEB /* bricks5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bricks5.png; path = bricks/bricks5.png; sourceTree = "<group>"; };
+		650D4289178F365F00D89CEB /* bricks6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bricks6.png; path = bricks/bricks6.png; sourceTree = "<group>"; };
+		650D428A178F365F00D89CEB /* bricks7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bricks7.png; path = bricks/bricks7.png; sourceTree = "<group>"; };
+		650D428B178F365F00D89CEB /* bricks8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bricks8.png; path = bricks/bricks8.png; sourceTree = "<group>"; };
+		650D428C178F365F00D89CEB /* exit.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = exit.png; path = bricks/exit.png; sourceTree = "<group>"; };
+		650D428D178F365F00D89CEB /* trap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = trap.png; path = bricks/trap.png; sourceTree = "<group>"; };
+		650D4299178F40DC00D89CEB /* BrickView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrickView.h; sourceTree = "<group>"; };
+		650D429A178F40DD00D89CEB /* BrickView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrickView.m; sourceTree = "<group>"; };
+		650D429C178F41B100D89CEB /* BoardUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardUtil.h; sourceTree = "<group>"; };
+		650D429D178F41B300D89CEB /* BoardUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardUtil.m; sourceTree = "<group>"; };
 		65B9306F17806B4500312B88 /* Dystopia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dystopia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B9307217806B4500312B88 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		65B9307417806B4500312B88 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -143,8 +169,35 @@
 				65B930A117806B9900312B88 /* BoardGame.m */,
 				650D42051787539600D89CEB /* Board.h */,
 				650D42061787539600D89CEB /* Board.m */,
+				650D4299178F40DC00D89CEB /* BrickView.h */,
+				650D429A178F40DD00D89CEB /* BrickView.m */,
 			);
 			name = "Game Engine";
+			sourceTree = "<group>";
+		};
+		650D4283178F365200D89CEB /* Intro */ = {
+			isa = PBXGroup;
+			children = (
+				650D423F178DEDAE00D89CEB /* trollsahead_logo.png */,
+			);
+			name = Intro;
+			sourceTree = "<group>";
+		};
+		650D4298178F366700D89CEB /* Bricks */ = {
+			isa = PBXGroup;
+			children = (
+				650D4284178F365F00D89CEB /* bricks1.png */,
+				650D4285178F365F00D89CEB /* bricks2.png */,
+				650D4286178F365F00D89CEB /* bricks3.png */,
+				650D4287178F365F00D89CEB /* bricks4.png */,
+				650D4288178F365F00D89CEB /* bricks5.png */,
+				650D4289178F365F00D89CEB /* bricks6.png */,
+				650D428A178F365F00D89CEB /* bricks7.png */,
+				650D428B178F365F00D89CEB /* bricks8.png */,
+				650D428C178F365F00D89CEB /* exit.png */,
+				650D428D178F365F00D89CEB /* trap.png */,
+			);
+			name = Bricks;
 			sourceTree = "<group>";
 		};
 		65B9306617806B4500312B88 = {
@@ -216,7 +269,8 @@
 		65B930AD17806BE800312B88 /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				650D423F178DEDAE00D89CEB /* trollsahead_logo.png */,
+				650D4298178F366700D89CEB /* Bricks */,
+				650D4283178F365200D89CEB /* Intro */,
 			);
 			path = Images;
 			sourceTree = "<group>";
@@ -284,6 +338,8 @@
 				650D4241178DF27600D89CEB /* RotatedView.h */,
 				650D4242178DF27700D89CEB /* RotatedView.m */,
 				650D4225178C9E7000D89CEB /* Util.h */,
+				650D429C178F41B100D89CEB /* BoardUtil.h */,
+				650D429D178F41B300D89CEB /* BoardUtil.m */,
 			);
 			name = Util;
 			sourceTree = "<group>";
@@ -348,6 +404,16 @@
 				650D4219178B335500D89CEB /* icon_57x57.png in Resources */,
 				650D421B178B335F00D89CEB /* icon_114x114.png in Resources */,
 				650D4240178DEDAE00D89CEB /* trollsahead_logo.png in Resources */,
+				650D428E178F365F00D89CEB /* bricks1.png in Resources */,
+				650D428F178F365F00D89CEB /* bricks2.png in Resources */,
+				650D4290178F365F00D89CEB /* bricks3.png in Resources */,
+				650D4291178F365F00D89CEB /* bricks4.png in Resources */,
+				650D4292178F365F00D89CEB /* bricks5.png in Resources */,
+				650D4293178F365F00D89CEB /* bricks6.png in Resources */,
+				650D4294178F365F00D89CEB /* bricks7.png in Resources */,
+				650D4295178F365F00D89CEB /* bricks8.png in Resources */,
+				650D4296178F365F00D89CEB /* exit.png in Resources */,
+				650D4297178F365F00D89CEB /* trap.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -376,6 +442,8 @@
 				650D423A178DDF6700D89CEB /* BoardCalibrator.m in Sources */,
 				650D423D178DE8C100D89CEB /* Intro.m in Sources */,
 				650D4243178DF27800D89CEB /* RotatedView.m in Sources */,
+				650D429B178F40DE00D89CEB /* BrickView.m in Sources */,
+				650D429E178F41B400D89CEB /* BoardUtil.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

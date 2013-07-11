@@ -23,28 +23,12 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <AVFoundation/AVFoundation.h>
+#import <Foundation/Foundation.h>
 
-#import "RotatedView.h"
-#import "Board.h"
+@interface BrickView : UIView
 
-@protocol BoardGameProtocol <NSObject>
+- (id)initWithFrame:(CGRect)frame brickType:(int)b;
 
-- (void)boardGameFinished;
-
-@end
-
-@interface BoardGame : RotatedView {
-    int level;
-    id<BoardGameProtocol> delegate;
-    
-    Board *board;
-}
-
-- (id)initWithFrame:(CGRect)frame delegate:(id<BoardGameProtocol>)d;
-
-- (void)startWithLevel:(int)l;
-
-- (void)update;
+@property (readonly) int brickType;
 
 @end
