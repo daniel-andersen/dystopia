@@ -41,8 +41,13 @@
 }
 
 - (void)initialize {
-    NSLog(@"HERE with %f, %f - %f, %f", self.frame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
     self.layer.contents = (id)[[BoardUtil instance] brickImageOfType:brickType].CGImage;
+    
+    if (brickType == 0) {
+        UIView *view = [[UIView alloc] initWithFrame:CGRectMake([[BoardUtil instance] singleBrickScreenSize], [[BoardUtil instance] singleBrickScreenSize], [[BoardUtil instance] singleBrickScreenSize], [[BoardUtil instance] singleBrickScreenSize])];
+        view.backgroundColor = [UIColor blackColor];
+        [self addSubview:view];
+    }
 }
 
 @end
