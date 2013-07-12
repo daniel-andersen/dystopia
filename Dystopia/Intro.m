@@ -26,6 +26,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 #import "Intro.h"
+#import "ExternalDisplay.h"
 
 #define INTRO_FADE_IN_DURATION 5.0f
 #define INTRO_FADE_OUT_DURATION 5.0f
@@ -56,8 +57,11 @@
 }
 
 - (void)show {
-    [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(fadeIn) userInfo:nil repeats:NO];
-    //[delegate introFinished];
+    if ([ExternalDisplay instance].externalDisplayFound) {
+        [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(fadeIn) userInfo:nil repeats:NO];
+    } else {
+        [delegate introFinished];
+    }
     NSLog(@"Showing intro");
 }
 

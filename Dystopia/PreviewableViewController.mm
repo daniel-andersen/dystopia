@@ -25,6 +25,8 @@
 
 #import "PreviewableViewController.h"
 #import "ExternalDisplay.h"
+#import "BoardUtil.h"
+#import "CameraUtil.h"
 
 PreviewableViewController *previewInstance = nil;
 
@@ -34,19 +36,21 @@ PreviewableViewController *previewInstance = nil;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setupCameraPreview];
+    [self setupPreview];
 }
 
 - (void)viewWillLayoutSubviews {
     overlayView.frame = self.view.bounds;
+    boardPreview.frame = self.view.bounds;
     cameraPreview.frame = self.view.bounds;
+    boardGridLayer.frame = self.view.bounds;
     boardContourLayer.frame = self.view.bounds;
     
     [self setButtonFrame:boardButton x:75.0f];
     [self setButtonFrame:cameraPreviewButton x:(self.view.bounds.size.width - 75.0f)];
 }
 
-- (void)setupCameraPreview {
+- (void)setupPreview {
     overlayView = [[UIView alloc] initWithFrame:self.view.bounds];
     overlayView.hidden = [ExternalDisplay instance].externalDisplayFound;
     overlayView.backgroundColor = [UIColor clearColor];
@@ -54,26 +58,36 @@ PreviewableViewController *previewInstance = nil;
     
     cameraPreview = [[UIImageView alloc] initWithFrame:self.view.bounds];
     cameraPreview.contentMode = UIViewContentModeScaleToFill;
+    cameraPreview.hidden = YES;
     [overlayView addSubview:cameraPreview];
 
+    boardPreview = [[UIImageView alloc] initWithFrame:self.view.bounds];
+    boardPreview.contentMode = UIViewContentModeScaleToFill;
+    boardPreview.hidden = NO;
+    [overlayView addSubview:boardPreview];
+
+    [self addBoardGridLayer];
     [self addBoardContourLayer];
-    [self addPreviewLabel];
+    [self addCameraPreviewLabel];
+    [self addBoardPreviewLabel];
 
     boardButton = [self addButtonWithText:@"Board"];
     cameraPreviewButton = [self addButtonWithText:@"Camera"];
     
     [boardButton addTarget:self action:@selector(boardButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [cameraPreviewButton addTarget:self action:@selector(cameraPreviewButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    cameraPreviewButton.enabled = NO;
+    boardButton.enabled = NO;
 }
 
 - (void)boardButtonPressed:(id)sender {
+    boardPreview.hidden = NO;
     cameraPreview.hidden = YES;
     boardButton.enabled = NO;
     cameraPreviewButton.enabled = YES;
 }
 
 - (void)cameraPreviewButtonPressed:(id)sender {
+    boardPreview.hidden = YES;
     cameraPreview.hidden = NO;
     boardButton.enabled = YES;
     cameraPreviewButton.enabled = NO;
@@ -92,13 +106,31 @@ PreviewableViewController *previewInstance = nil;
     button.frame = CGRectMake(x - (buttonWidth / 2.0f), self.view.bounds.size.height - 10.0f - buttonHeight, buttonWidth, buttonHeight);
 }
 
-- (void)addPreviewLabel {
+- (void)addCameraPreviewLabel {
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, 30.0f)];
     label.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:0.2f];
     label.textColor = [UIColor yellowColor];
     label.text = @"CAMERA PREVIEW";
     [label sizeToFit];
     [cameraPreview addSubview:label];
+}
+
+- (void)addBoardPreviewLabel {
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, 30.0f)];
+    label.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:0.2f];
+    label.textColor = [UIColor yellowColor];
+    label.text = @"BOARD PREVIEW";
+    [label sizeToFit];
+    [boardPreview addSubview:label];
+}
+
+- (void)addBoardGridLayer {
+    boardGridLayer = [CAShapeLayer layer];
+    boardGridLayer.frame = self.view.bounds;
+    boardGridLayer.fillColor = [UIColor clearColor].CGColor;
+    boardGridLayer.strokeColor = [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:0.75f].CGColor;
+    boardGridLayer.backgroundColor = [UIColor clearColor].CGColor;
+    [boardPreview.layer addSublayer:boardGridLayer];
 }
 
 - (void)addBoardContourLayer {
@@ -110,18 +142,49 @@ PreviewableViewController *previewInstance = nil;
     [cameraPreview.layer addSublayer:boardContourLayer];
 }
 
-- (void)previewFrame:(UIImage *)image {
-    if (cameraPreview.hidden) {
-        return;
-    }
+- (void)previewFrame:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
     dispatch_async(dispatch_get_main_queue(), ^{
-        cameraPreview.image = image;
+        [self previewCamera:image];
+        [self previewBoard:image boardCalibrator:boardCalibrator];
     });
+}
+
+- (void)previewCamera:(UIImage *)image {
+    if (cameraPreview.hidden == NO) {
+        cameraPreview.image = image;
+    }
+}
+
+- (void)previewBoard:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
+    if (boardPreview.hidden == NO && boardCalibrator.boardPoints.defined) {
+        boardPreview.image = [CameraUtil affineTransformImage:image withTransformation:boardCalibrator.boardCameraToScreenTransformation];
+    }
 }
 
 - (void)hideBoardContour {
     dispatch_async(dispatch_get_main_queue(), ^{
         boardContourLayer.hidden = YES;
+    });
+}
+
+- (void)previewBoardGrid:(FourPoints)boardPoints {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!boardPoints.defined) {
+            boardContourLayer.hidden = YES;
+        }
+        boardContourLayer.hidden = NO;
+        [CATransaction begin];
+        [CATransaction setAnimationDuration:0.0f];
+        
+        UIBezierPath *path = [UIBezierPath bezierPath];
+        [path moveToPoint:[self scalePointToScreen:boardPoints.p1]];
+        [path addLineToPoint:[self scalePointToScreen:boardPoints.p2]];
+        [path addLineToPoint:[self scalePointToScreen:boardPoints.p3]];
+        [path addLineToPoint:[self scalePointToScreen:boardPoints.p4]];
+        [path closePath];
+        
+        boardContourLayer.path = path.CGPath;
+        [CATransaction commit];
     });
 }
 

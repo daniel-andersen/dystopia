@@ -26,6 +26,9 @@
 #import <QuartzCore/QuartzCore.h>
 
 #import "BoardCalibrator.h"
+#import "CameraSession.h"
+#import "CameraUtil.h"
+#import "ExternalDisplay.h"
 
 @implementation BoardCalibrator
 
@@ -36,6 +39,7 @@ const float calibrationFadeInterval = 2.0f;
 
 @synthesize state;
 @synthesize boardPoints;
+@synthesize boardCameraToScreenTransformation;
 
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
@@ -63,12 +67,19 @@ const float calibrationFadeInterval = 2.0f;
     boardPoints = [boardRecognizer findBoardFromImage:image];
     if (boardPoints.defined) {
         successCount++;
+        [self findCameraToScreenTransformation];
         if (successCount >= BOARD_CALIBRATION_SUCCESS_COUNT) {
             [self success];
         }
     } else {
         successCount = 0;
     }
+}
+
+- (void)findCameraToScreenTransformation {
+    CGSize screenSize = [ExternalDisplay instance].widescreenBounds.size;
+    FourPoints dstPoints = {.p1 = CGPointMake(0.0f, 0.0f), .p2 = CGPointMake(screenSize.width, 0.0f), .p3 = CGPointMake(screenSize.width, screenSize.height), .p4 = CGPointMake(0.0f, screenSize.height)};
+    boardCameraToScreenTransformation = [CameraUtil findAffineTransformationSrcPoints:boardPoints dstPoints:dstPoints];
 }
 
 - (void)success {

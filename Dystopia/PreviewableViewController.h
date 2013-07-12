@@ -25,17 +25,21 @@
 
 #import <QuartzCore/QuartzCore.h>
 
+#import "BoardCalibrator.h"
 #import "Util.h"
 
 @interface PreviewableViewController : UIViewController {
     UIImageView *cameraPreview;
     CAShapeLayer *boardContourLayer;
     
+    UIImageView *boardPreview;
+    CAShapeLayer *boardGridLayer;
+    
     UIButton *boardButton;
     UIButton *cameraPreviewButton;
 }
 
-- (void)previewFrame:(UIImage *)image;
+- (void)previewFrame:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator;
 
 - (void)hideBoardContour;
 - (void)previewBoardContour:(FourPoints)boardPoints;

@@ -66,7 +66,7 @@ extern PreviewableViewController *previewInstance;
 
 - (void)processFrame:(UIImage *)image {
     //[previewInstance previewFrame:[[[BoardRecognizer alloc] init] filterAndThresholdUIImage:image]];
-    [previewInstance previewFrame:image];
+    [previewInstance previewFrame:image boardCalibrator:boardCalibrator];
 
     [self calibrateBoard:image];
 
