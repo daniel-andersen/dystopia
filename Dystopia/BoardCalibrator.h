@@ -47,6 +47,7 @@
 
 @property (readonly) int state;
 @property (readonly) FourPoints boardPoints;
+@property (readonly) FourPoints screenPoints;
 @property (readwrite) cv::Mat boardCameraToScreenTransformation;
 
 @end

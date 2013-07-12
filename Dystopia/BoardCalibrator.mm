@@ -39,6 +39,7 @@ const float calibrationFadeInterval = 2.0f;
 
 @synthesize state;
 @synthesize boardPoints;
+@synthesize screenPoints;
 @synthesize boardCameraToScreenTransformation;
 
 - (id)initWithFrame:(CGRect)frame {
@@ -68,6 +69,7 @@ const float calibrationFadeInterval = 2.0f;
     if (boardPoints.defined) {
         successCount++;
         [self findCameraToScreenTransformation];
+        [self findScreenPoints];
         if (successCount >= BOARD_CALIBRATION_SUCCESS_COUNT) {
             [self success];
         }
@@ -80,6 +82,22 @@ const float calibrationFadeInterval = 2.0f;
     CGSize screenSize = [ExternalDisplay instance].widescreenBounds.size;
     FourPoints dstPoints = {.p1 = CGPointMake(0.0f, 0.0f), .p2 = CGPointMake(screenSize.width, 0.0f), .p3 = CGPointMake(screenSize.width, screenSize.height), .p4 = CGPointMake(0.0f, screenSize.height)};
     boardCameraToScreenTransformation = [CameraUtil findAffineTransformationSrcPoints:boardPoints dstPoints:dstPoints];
+}
+
+- (void)findScreenPoints {
+    screenPoints.p1 = [self affineTransformPoint:boardPoints.p1 transformation:boardCameraToScreenTransformation];
+    screenPoints.p2 = [self affineTransformPoint:boardPoints.p2 transformation:boardCameraToScreenTransformation];
+    screenPoints.p3 = [self affineTransformPoint:boardPoints.p3 transformation:boardCameraToScreenTransformation];
+    screenPoints.p4 = [self affineTransformPoint:boardPoints.p4 transformation:boardCameraToScreenTransformation];
+}
+
+- (CGPoint)affineTransformPoint:(CGPoint)p transformation:(cv::Mat)transformation {
+    cv::Mat src(3, 1, CV_64F);
+    src.at<double>(0, 0) = p.x;
+    src.at<double>(1, 0) = p.y;
+    src.at<double>(2, 0) = 1.0f;
+    cv::Mat dst = transformation * src;
+    return CGPointMake(dst.at<double>(0, 0), dst.at<double>(1, 0));
 }
 
 - (void)success {

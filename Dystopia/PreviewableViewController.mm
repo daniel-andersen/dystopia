@@ -158,6 +158,7 @@ PreviewableViewController *previewInstance = nil;
 - (void)previewBoard:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
     if (boardPreview.hidden == NO && boardCalibrator.boardPoints.defined) {
         boardPreview.image = [CameraUtil affineTransformImage:image withTransformation:boardCalibrator.boardCameraToScreenTransformation];
+        NSLog(@"(%f, %f), (%f, %f) - (%f, %f), (%f, %f)", boardCalibrator.screenPoints.p1.x, boardCalibrator.screenPoints.p1.y, boardCalibrator.screenPoints.p2.x, boardCalibrator.screenPoints.p2.y, boardCalibrator.screenPoints.p3.x, boardCalibrator.screenPoints.p3.y, boardCalibrator.screenPoints.p4.x, boardCalibrator.screenPoints.p4.y);
     }
 }
 
@@ -168,24 +169,6 @@ PreviewableViewController *previewInstance = nil;
 }
 
 - (void)previewBoardGrid:(FourPoints)boardPoints {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (!boardPoints.defined) {
-            boardContourLayer.hidden = YES;
-        }
-        boardContourLayer.hidden = NO;
-        [CATransaction begin];
-        [CATransaction setAnimationDuration:0.0f];
-        
-        UIBezierPath *path = [UIBezierPath bezierPath];
-        [path moveToPoint:[self scalePointToScreen:boardPoints.p1]];
-        [path addLineToPoint:[self scalePointToScreen:boardPoints.p2]];
-        [path addLineToPoint:[self scalePointToScreen:boardPoints.p3]];
-        [path addLineToPoint:[self scalePointToScreen:boardPoints.p4]];
-        [path closePath];
-        
-        boardContourLayer.path = path.CGPath;
-        [CATransaction commit];
-    });
 }
 
 - (void)previewBoardContour:(FourPoints)boardPoints {
