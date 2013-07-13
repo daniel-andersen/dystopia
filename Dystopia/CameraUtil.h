@@ -32,7 +32,9 @@
 + (UIImage *)imageFromPixelBuffer:(CVImageBufferRef)pixelBuffer;
 
 + (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation;
-+ (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation;
++ (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation toSize:(CGSize)size;
+
++ (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation toSize:(CGSize)size;
 
 + (cv::Mat)findAffineTransformationSrcPoints:(FourPoints)srcPoints dstPoints:(FourPoints)dstPoints;
 

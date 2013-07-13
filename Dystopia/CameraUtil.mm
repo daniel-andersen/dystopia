@@ -44,15 +44,18 @@
 }
 
 + (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation {
+    return [self affineTransformImage:image withTransformation:transformation toSize:[ExternalDisplay instance].widescreenBounds.size];
+}
+
++ (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation toSize:(CGSize)size {
     cv::Mat srcImage = [image CVMat];
-    cv::Mat transformedImage = [self affineTransformCvMat:srcImage withTransformation:transformation];
+    cv::Mat transformedImage = [self affineTransformCvMat:srcImage withTransformation:transformation toSize:size];
     return [UIImage imageWithCVMat:transformedImage];
 }
 
-+ (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation {
++ (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation toSize:(CGSize)toSize {
     cv::Mat dst;
-    CGSize screenSize = [ExternalDisplay instance].widescreenBounds.size;
-    cv::Size size = cv::Size(screenSize.width, screenSize.height);
+    cv::Size size = cv::Size(toSize.width, toSize.height);
     cv::warpAffine(src, dst, transformation, size);
     return dst;
 }

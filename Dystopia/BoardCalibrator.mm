@@ -125,7 +125,7 @@ const float calibrationFadeInterval = 2.0f;
     self.hidden = YES;
     self.layer.opacity = 0.0f;
     
-    calibrationBorderColor = [UIColor colorWithRed:0.0f green:0.5f blue:0.0f alpha:1.0f];
+    calibrationBorderColor = [UIColor colorWithRed:0.0f green:0.4f blue:0.0f alpha:1.0f];
     
     float borderWidth = self.frame.size.width * calibrationBorderPct;
     float borderHeight = self.frame.size.height * calibrationBorderPct;

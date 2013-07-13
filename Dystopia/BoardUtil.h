@@ -29,7 +29,7 @@
 #define __BOARD_UTIL__
 
     #define BOARD_WIDTH 30
-    #define BOARD_HEIGHT 30
+    #define BOARD_HEIGHT 20
 
     #define BRICK_IMAGES_COUNT 10
 
@@ -46,7 +46,7 @@
 
 - (UIImage *)brickImageOfType:(int)type;
 
-- (float)singleBrickScreenSize;
+- (CGSize)singleBrickScreenSize;
 - (CGSize)brickTypeBoardSize:(int)type;
 - (CGSize)brickTypeScreenSize:(int)type;
 

@@ -67,8 +67,8 @@ BoardUtil *boardUtilInstance = nil;
     return brickImages[type];
 }
 
-- (float)singleBrickScreenSize {
-    return [ExternalDisplay instance].widescreenBounds.size.width / BOARD_WIDTH;
+- (CGSize)singleBrickScreenSize {
+    return CGSizeMake([ExternalDisplay instance].widescreenBounds.size.width / BOARD_WIDTH, [ExternalDisplay instance].widescreenBounds.size.height / BOARD_HEIGHT);
 }
 
 - (CGSize)brickTypeBoardSize:(int)type {
@@ -76,11 +76,11 @@ BoardUtil *boardUtilInstance = nil;
 }
 
 - (CGSize)brickTypeScreenSize:(int)type {
-    return CGSizeMake(brickSizes[type].width * [self singleBrickScreenSize], brickSizes[type].height * [self singleBrickScreenSize]);
+    return CGSizeMake(brickSizes[type].width * [self singleBrickScreenSize].width, brickSizes[type].height * [self singleBrickScreenSize].height);
 }
 
 - (CGPoint)brickScreenPosition:(CGPoint)brickBoardPosition {
-    return CGPointMake(brickBoardPosition.x * [self singleBrickScreenSize], brickBoardPosition.y * [self singleBrickScreenSize]);
+    return CGPointMake(brickBoardPosition.x * [self singleBrickScreenSize].width, brickBoardPosition.y * [self singleBrickScreenSize].height);
 }
 
 - (CGRect)brickTypeFrame:(int)brickType position:(CGPoint)position {
