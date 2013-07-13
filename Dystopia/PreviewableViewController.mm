@@ -159,6 +159,7 @@ PreviewableViewController *previewInstance = nil;
     if (boardPreview.hidden == NO && boardCalibrator.boardPoints.defined) {
         boardPreview.image = [CameraUtil affineTransformImage:image withTransformation:boardCalibrator.boardCameraToScreenTransformation];
         NSLog(@"(%f, %f), (%f, %f) - (%f, %f), (%f, %f)", boardCalibrator.screenPoints.p1.x, boardCalibrator.screenPoints.p1.y, boardCalibrator.screenPoints.p2.x, boardCalibrator.screenPoints.p2.y, boardCalibrator.screenPoints.p3.x, boardCalibrator.screenPoints.p3.y, boardCalibrator.screenPoints.p4.x, boardCalibrator.screenPoints.p4.y);
+        NSLog(@"%f, %f", boardPreview.image.size.width, boardPreview.image.size.height);
     }
 }
 

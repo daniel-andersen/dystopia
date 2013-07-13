@@ -24,6 +24,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import "CameraUtil.h"
+#import "ExternalDisplay.h"
 #import "UIImage+OpenCV.h"
 
 @implementation CameraUtil
@@ -50,7 +51,9 @@
 
 + (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation {
     cv::Mat dst;
-    warpAffine(src, dst, transformation, src.size());
+    CGSize screenSize = [ExternalDisplay instance].widescreenBounds.size;
+    cv::Size size = cv::Size(screenSize.width, screenSize.height);
+    cv::warpAffine(src, dst, transformation, size);
     return dst;
 }
 
