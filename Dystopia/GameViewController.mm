@@ -65,8 +65,8 @@ extern PreviewableViewController *previewInstance;
 }
 
 - (void)processFrame:(UIImage *)image {
-    //[previewInstance previewFrame:[[[BoardRecognizer alloc] init] filterAndThresholdUIImage:image] boardCalibrator:boardCalibrator];
-    [previewInstance previewFrame:image boardCalibrator:boardCalibrator];
+    [previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
+    //[previewInstance previewFrame:image boardCalibrator:boardCalibrator];
 
     [self calibrateBoard:image];
 
@@ -116,7 +116,7 @@ extern PreviewableViewController *previewInstance;
     if (boardCalibrator.state == BOARD_CALIBRATION_STATE_CALIBRATED) {
         [previewInstance hideBoardContour];
     } else {
-        [previewInstance previewBoardContour:boardCalibrator.boardPoints];
+        [previewInstance previewBoardContour:boardCalibrator.boardBounds];
     }
 }
 

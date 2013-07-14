@@ -32,13 +32,13 @@
 
 @implementation BoardCalibrator
 
-const float calibrationBorderPct = 0.02f;
+const float calibrationBorderPct = 0.03f;
 const UIColor *calibrationBorderColor;
 
 const float calibrationFadeInterval = 2.0f;
 
 @synthesize state;
-@synthesize boardPoints;
+@synthesize boardBounds;
 @synthesize screenPoints;
 @synthesize boardCameraToScreenTransformation;
 
@@ -52,7 +52,7 @@ const float calibrationFadeInterval = 2.0f;
 - (void)initialize {
     boardRecognizer = [[BoardRecognizer alloc] init];
     state = BOARD_CALIBRATION_STATE_UNCALIBRATED;
-    boardPoints.defined = NO;
+    boardBounds.defined = NO;
     [self setupView];
 }
 
@@ -60,13 +60,13 @@ const float calibrationFadeInterval = 2.0f;
     [self setCalibrationViewAlpha:1.0f];
     state = BOARD_CALIBRATION_STATE_CALIBRATING;
     successCount = 0;
-    boardPoints.defined = NO;
+    boardBounds.defined = NO;
     NSLog(@"Board calibration started");
 }
 
 - (void)updateWithImage:(UIImage *)image {
-    boardPoints = [boardRecognizer findBoardFromImage:image];
-    if (boardPoints.defined) {
+    boardBounds = [boardRecognizer findBoardBoundsFromImage:image];
+    if (boardBounds.defined) {
         successCount++;
         [self findCameraToScreenTransformation];
         [self findScreenPoints];
@@ -81,14 +81,14 @@ const float calibrationFadeInterval = 2.0f;
 - (void)findCameraToScreenTransformation {
     CGSize screenSize = [ExternalDisplay instance].widescreenBounds.size;
     FourPoints dstPoints = {.p1 = CGPointMake(0.0f, 0.0f), .p2 = CGPointMake(screenSize.width, 0.0f), .p3 = CGPointMake(screenSize.width, screenSize.height), .p4 = CGPointMake(0.0f, screenSize.height)};
-    boardCameraToScreenTransformation = [CameraUtil findAffineTransformationSrcPoints:boardPoints dstPoints:dstPoints];
+    boardCameraToScreenTransformation = [CameraUtil findAffineTransformationSrcPoints:boardBounds dstPoints:dstPoints];
 }
 
 - (void)findScreenPoints {
-    screenPoints.p1 = [self affineTransformPoint:boardPoints.p1 transformation:boardCameraToScreenTransformation];
-    screenPoints.p2 = [self affineTransformPoint:boardPoints.p2 transformation:boardCameraToScreenTransformation];
-    screenPoints.p3 = [self affineTransformPoint:boardPoints.p3 transformation:boardCameraToScreenTransformation];
-    screenPoints.p4 = [self affineTransformPoint:boardPoints.p4 transformation:boardCameraToScreenTransformation];
+    screenPoints.p1 = [self affineTransformPoint:boardBounds.p1 transformation:boardCameraToScreenTransformation];
+    screenPoints.p2 = [self affineTransformPoint:boardBounds.p2 transformation:boardCameraToScreenTransformation];
+    screenPoints.p3 = [self affineTransformPoint:boardBounds.p3 transformation:boardCameraToScreenTransformation];
+    screenPoints.p4 = [self affineTransformPoint:boardBounds.p4 transformation:boardCameraToScreenTransformation];
 }
 
 - (CGPoint)affineTransformPoint:(CGPoint)p transformation:(cv::Mat)transformation {

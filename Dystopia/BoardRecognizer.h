@@ -29,8 +29,8 @@
 
 @interface BoardRecognizer : NSObject
 
-- (FourPoints)findBoardFromImage:(UIImage *)image;
+- (FourPoints)findBoardBoundsFromImage:(UIImage *)image;
 
-- (UIImage *)filterAndThresholdUIImage:(UIImage *)image;
+- (UIImage *)boardBoundsToImage:(UIImage *)image;
 
 @end

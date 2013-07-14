@@ -28,14 +28,14 @@
 
 @implementation BoardRecognizer
 
-- (FourPoints)findBoardFromImage:(UIImage *)image {
+- (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
     cv::Mat matImage = [image CVMat];
     cv::Mat originalImage = cv::Mat(matImage);
     cv::Mat filteredAndThresholdedImage = [self filterAndThreshold:matImage];
     return [self findContours:filteredAndThresholdedImage originalImage:originalImage];
 }
 
-- (UIImage *)filterAndThresholdUIImage:(UIImage *)image {
+- (UIImage *)boardBoundsToImage:(UIImage *)image {
     cv::Mat img = [image CVMat];
     img = [self smooth:img];
     img = [self convertToHsv:img];
@@ -51,7 +51,7 @@
 }
 
 - (cv::Mat)smooth:(cv::Mat)image {
-    cv::GaussianBlur(image, image, cv::Size(5.0f, 5.0f), 1.0f);
+    cv::GaussianBlur(image, image, cv::Size(21.0f, 21.0f), 1.0f);
     return image;
 }
 
