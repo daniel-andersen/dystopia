@@ -39,7 +39,7 @@ extern PreviewableViewController *previewInstance;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self initialize];
-    [boardCalibrator start];
+    [boardCalibrator startFindBounds];
 }
 
 - (void)viewWillLayoutSubviews {
@@ -58,32 +58,38 @@ extern PreviewableViewController *previewInstance;
     
     cameraSession = [[CameraSession alloc] initWithDelegate:self];
 
-    boardCalibrator = [[BoardCalibrator alloc] initWithFrame:self.view.bounds];
+    boardCalibrator = [[BoardCalibrator alloc] initWithFrame:self.view.bounds cameraSession:cameraSession];
     [self.view addSubview:boardCalibrator];
 
     gameState = GAME_STATE_INITIAL_CALIBRATION;
 }
 
 - (void)processFrame:(UIImage *)image {
-    [previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
+    [previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardEdgesToImage:image] boardCalibrator:boardCalibrator];
     //[previewInstance previewFrame:image boardCalibrator:boardCalibrator];
 
     [self calibrateBoard:image];
-
     [self updateGameStateAccordingToFrame];
-    
-    cameraSession.readyToProcessFrame = YES;
 }
 
 - (void)updateGameStateAccordingToFrame {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self setFrameUpdateIntervalAccordingToGameState];
         if (gameState == GAME_STATE_INITIAL_CALIBRATION) {
             if (boardCalibrator.state == BOARD_CALIBRATION_STATE_CALIBRATED) {
                 [self startIntro];
-                return;
             }
         }
+        cameraSession.readyToProcessFrame = YES;
     });
+}
+
+- (void)setFrameUpdateIntervalAccordingToGameState {
+    if (boardCalibrator.state != BOARD_CALIBRATION_STATE_CALIBRATED) {
+        cameraSession.delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_FAST;
+    } else {
+        //cameraSession.delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_DEFAULT;
+    }
 }
 
 - (void)startIntro {
@@ -112,7 +118,7 @@ extern PreviewableViewController *previewInstance;
     if (boardCalibrator.state != BOARD_CALIBRATION_STATE_CALIBRATING) {
         return;
     }
-    [boardCalibrator updateWithImage:image];
+    [boardCalibrator updateBoundsWithImage:image];
     if (boardCalibrator.state == BOARD_CALIBRATION_STATE_CALIBRATED) {
         [previewInstance hideBoardContour];
     } else {

@@ -26,6 +26,9 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 
+#define CAMERA_SESSION_DELEGATE_INTERVAL_DEFAULT 0.5f
+#define CAMERA_SESSION_DELEGATE_INTERVAL_FAST    0.1f
+
 @protocol CameraSessionDelegate <NSObject>
 
 - (void)processFrame:(UIImage *)image;
@@ -35,6 +38,7 @@
 
 @interface CameraSession : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate> {
     AVCaptureSession *session;
+    AVCaptureDevice *device;
     id<CameraSessionDelegate> delegate;
     dispatch_queue_t frameProcessQueue;
     double lastDeliveredFrameTime;
@@ -45,6 +49,9 @@
 
 - (void)start;
 - (void)stop;
+
+- (void)lock;
+- (void)unlock;
 
 @property (readonly) bool initialized;
 @property (readwrite) bool readyToProcessFrame;

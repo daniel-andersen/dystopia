@@ -28,8 +28,6 @@
 
 @implementation CameraSession
 
-const CFTimeInterval cameraSessionDefaultDelegateInterval = 0.5f;
-
 @synthesize initialized;
 @synthesize readyToProcessFrame;
 @synthesize delegateProcessFrameInterval;
@@ -45,7 +43,7 @@ const CFTimeInterval cameraSessionDefaultDelegateInterval = 0.5f;
 - (void)initialize {
     initialized = NO;
     
-    delegateProcessFrameInterval = cameraSessionDefaultDelegateInterval;
+    delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_DEFAULT;
 
     frameProcessQueue = dispatch_queue_create("dk.trollsahead.dystopia.CameraSession.ProcessFrame", NULL);
 
@@ -101,18 +99,18 @@ const CFTimeInterval cameraSessionDefaultDelegateInterval = 0.5f;
 
 - (AVCaptureDeviceInput *)findDeviceInput {
     NSError *error;
-    AVCaptureDevice *device = [self findBackfacingDevice];
+    device = [self findBackfacingDevice];
     AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
     if (!input) {
-        NSLog(@"%@", error.description);
+        NSLog(@"Error creating capture input: %@", error.description);
     }
     return input;
 }
 
 - (AVCaptureDevice *)findBackfacingDevice {
-    for (AVCaptureDevice *device in [AVCaptureDevice devices]) {
-        if ([device hasMediaType:AVMediaTypeVideo] && [device position] == AVCaptureDevicePositionBack) {
-            return device;
+    for (AVCaptureDevice *d in [AVCaptureDevice devices]) {
+        if ([d hasMediaType:AVMediaTypeVideo] && [d position] == AVCaptureDevicePositionBack) {
+            return d;
         }
     }
     return nil;
@@ -140,6 +138,26 @@ const CFTimeInterval cameraSessionDefaultDelegateInterval = 0.5f;
         fakeDeliverFrameTimer = nil;
         NSLog(@"Fake camera session stopped");
     }
+}
+
+- (void)lock {
+    NSError *error;
+    if (![device lockForConfiguration:&error]) {
+        NSLog(@"Error locking focus: %@", error.description);
+    }
+    device.focusMode = AVCaptureFocusModeLocked;
+    device.whiteBalanceMode = AVCaptureWhiteBalanceModeLocked;
+    device.exposureMode = AVCaptureExposureModeLocked;
+    [device unlockForConfiguration];
+}
+
+- (void)unlock {
+    NSError *error;
+    if (![device lockForConfiguration:&error]) {
+        NSLog(@"Error unlocking focus: %@", error.description);
+    }
+    device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
+    [device unlockForConfiguration];
 }
 
 - (void)deliverFakeFrame {

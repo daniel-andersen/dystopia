@@ -23,30 +23,45 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <Foundation/Foundation.h>
+#import <QuartzCore/QuartzCore.h>
 
 #import "BoardRecognizer.h"
+#import "BoardBoundsRecognizer.h"
+#import "CameraSession.h"
 #import "Util.h"
 
 #define BOARD_CALIBRATION_STATE_UNCALIBRATED 0
 #define BOARD_CALIBRATION_STATE_CALIBRATING  1
 #define BOARD_CALIBRATION_STATE_CALIBRATED   2
 
-#define BOARD_CALIBRATION_SUCCESS_COUNT 5
+#define BOARD_CALIBRATION_SUCCESS_ACCEPT_INTERVAL 1.0f
+#define BOARD_CALIBRATION_UNSUCCESS_ADJUST_BRIGHTNESS_ALPHA 0.001f
+
+#define BOARD_CALIBRATION_BRIGHTNESS_DARK   0.4f
+#define BOARD_CALIBRATION_BRIGHTNESS_BRIGHT 1.0f
 
 @interface BoardCalibrator : UIView {
     BoardRecognizer *boardRecognizer;
+    BoardBoundsRecognizer *boardBoundsRecognizer;
 
-    int successCount;
+    CameraSession *cameraSession;
+    
+    CAShapeLayer *borderLayer;
+    
+    CFAbsoluteTime successTime;
+    CFAbsoluteTime lastUpdateTime;
+    
+    int borderBrightnessDirection;
+    float borderBrightness;
 }
 
-- (id)initWithFrame:(CGRect)frame;
+- (id)initWithFrame:(CGRect)frame cameraSession:(CameraSession *)session;
 
-- (void)start;
-- (void)updateWithImage:(UIImage *)image;
+- (void)startFindBounds;
+- (void)updateBoundsWithImage:(UIImage *)image;
 
 @property (readonly) int state;
-@property (readonly) FourPoints boardPoints;
+@property (readonly) FourPoints boardBounds;
 @property (readonly) FourPoints screenPoints;
 @property (readwrite) cv::Mat boardCameraToScreenTransformation;
 

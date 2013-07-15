@@ -33,6 +33,7 @@
 		650D4297178F365F00D89CEB /* trap.png in Resources */ = {isa = PBXBuildFile; fileRef = 650D428D178F365F00D89CEB /* trap.png */; };
 		650D429B178F40DE00D89CEB /* BrickView.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D429A178F40DD00D89CEB /* BrickView.m */; };
 		650D429E178F41B400D89CEB /* BoardUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 650D429D178F41B300D89CEB /* BoardUtil.m */; };
+		65526F861793302E00784CD7 /* BoardBoundsRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65526F851793302E00784CD7 /* BoardBoundsRecognizer.mm */; };
 		65B9307317806B4500312B88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307217806B4500312B88 /* UIKit.framework */; };
 		65B9307517806B4500312B88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307417806B4500312B88 /* Foundation.framework */; };
 		65B9307717806B4500312B88 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307617806B4500312B88 /* CoreGraphics.framework */; };
@@ -99,6 +100,8 @@
 		650D429A178F40DD00D89CEB /* BrickView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrickView.m; sourceTree = "<group>"; };
 		650D429C178F41B100D89CEB /* BoardUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardUtil.h; sourceTree = "<group>"; };
 		650D429D178F41B300D89CEB /* BoardUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardUtil.m; sourceTree = "<group>"; };
+		65526F841793302D00784CD7 /* BoardBoundsRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardBoundsRecognizer.h; sourceTree = "<group>"; };
+		65526F851793302E00784CD7 /* BoardBoundsRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BoardBoundsRecognizer.mm; sourceTree = "<group>"; };
 		65B9306F17806B4500312B88 /* Dystopia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dystopia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B9307217806B4500312B88 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		65B9307417806B4500312B88 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -310,6 +313,8 @@
 		65EA264B1780C89500E84BA4 /* Recognizers */ = {
 			isa = PBXGroup;
 			children = (
+				65526F841793302D00784CD7 /* BoardBoundsRecognizer.h */,
+				65526F851793302E00784CD7 /* BoardBoundsRecognizer.mm */,
 				65EA26761782038800E84BA4 /* BoardRecognizer.h */,
 				65EA26771782038800E84BA4 /* BoardRecognizer.mm */,
 				650D4238178DDF6700D89CEB /* BoardCalibrator.h */,
@@ -444,6 +449,7 @@
 				650D4243178DF27800D89CEB /* RotatedView.m in Sources */,
 				650D429B178F40DE00D89CEB /* BrickView.m in Sources */,
 				650D429E178F41B400D89CEB /* BoardUtil.m in Sources */,
+				65526F861793302E00784CD7 /* BoardBoundsRecognizer.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

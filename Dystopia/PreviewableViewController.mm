@@ -60,12 +60,12 @@ PreviewableViewController *previewInstance = nil;
     
     cameraPreview = [[UIImageView alloc] initWithFrame:self.view.bounds];
     cameraPreview.contentMode = UIViewContentModeScaleToFill;
-    cameraPreview.hidden = YES;
+    cameraPreview.hidden = NO;
     [overlayView addSubview:cameraPreview];
 
     boardPreview = [[UIImageView alloc] initWithFrame:self.view.bounds];
     boardPreview.contentMode = UIViewContentModeScaleToFill;
-    boardPreview.hidden = NO;
+    boardPreview.hidden = YES;
     [overlayView addSubview:boardPreview];
 
     [self addBoardGridLayer];
@@ -78,7 +78,7 @@ PreviewableViewController *previewInstance = nil;
     
     [boardButton addTarget:self action:@selector(boardButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [cameraPreviewButton addTarget:self action:@selector(cameraPreviewButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    boardButton.enabled = NO;
+    cameraPreviewButton.enabled = NO;
 }
 
 - (void)boardButtonPressed:(id)sender {

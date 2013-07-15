@@ -28,73 +28,89 @@
 
 @implementation BoardRecognizer
 
-- (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
-    cv::Mat matImage = [image CVMat];
-    cv::Mat originalImage = cv::Mat(matImage);
-    cv::Mat filteredAndThresholdedImage = [self filterAndThreshold:matImage];
-    return [self findContours:filteredAndThresholdedImage originalImage:originalImage];
-}
+float threshold = 50.0f;
 
-- (UIImage *)boardBoundsToImage:(UIImage *)image {
+/*- (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
+ cv::Mat matImage = [image CVMat];
+ cv::Mat originalImage = cv::Mat(matImage);
+ cv::Mat filteredAndThresholdedImage = [self filterAndThreshold:matImage];
+ return [self findContours:filteredAndThresholdedImage originalImage:originalImage];
+ }*/
+
+- (UIImage *)boardEdgesToImage:(UIImage *)image {
     cv::Mat img = [image CVMat];
+    cv::Mat origImg = cv::Mat(img);
     img = [self smooth:img];
-    img = [self convertToHsv:img];
-    img = [self applyThreshold:img];
+    img = [self grayscale:img];
+    img = [self applyCanny:img];
+    img = [self findContours:img originalImage:origImg];
     return [UIImage imageWithCVMat:img];
 }
 
 - (cv::Mat)filterAndThreshold:(cv::Mat)image {
     image = [self smooth:image];
-    image = [self convertToHsv:image];
-    image = [self applyThreshold:image];
     return image;
 }
 
 - (cv::Mat)smooth:(cv::Mat)image {
-    cv::GaussianBlur(image, image, cv::Size(21.0f, 21.0f), 1.0f);
+    cv::GaussianBlur(image, image, cv::Size(1.0f, 1.0f), 1.0f);
     return image;
 }
 
-- (cv::Mat)convertToHsv:(cv::Mat)image {
-    cv::cvtColor(image, image, CV_BGR2HSV);
+- (cv::Mat)grayscale:(cv::Mat)image {
+    cv::cvtColor(image, image, CV_RGB2GRAY);
     return image;
 }
 
-- (cv::Mat)applyThreshold:(cv::Mat)image {
-    cv::inRange(image, cv::Scalar(30, 50, 150, 0), cv::Scalar(80, 255, 255, 255), image);
+- (cv::Mat)applyCanny:(cv::Mat)image {
+    cv::Canny(image, image, threshold, threshold * 3.0f);
+    threshold += 5.0f;
+    if (threshold > 100.0f) {
+        threshold = 50.0f;
+    }
+    threshold = 50.0f;
     return image;
 }
 
-- (FourPoints)findContours:(cv::Mat)image originalImage:(cv::Mat)origImage {
+double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0) {
+    double dx1 = pt1.x - pt0.x;
+    double dy1 = pt1.y - pt0.y;
+    double dx2 = pt2.x - pt0.x;
+    double dy2 = pt2.y - pt0.y;
+    return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
+}
+
+- (cv::Mat)findContours:(cv::Mat)image originalImage:(cv::Mat)origImage {
+    NSMutableArray *polys = [NSMutableArray array];
     cv::vector<cv::vector<cv::Point>> contours;
     cv::vector<cv::Vec4i> hierarchy;
 
-    cv::findContours(image, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
-
-    cv::vector<cv::vector<cv::Point>> polys(contours.size());
+    findContours(image, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
     
-    for (int i = 0; i < polys.size(); i++) {
-        int parent = hierarchy[i][3];
-        int firstChild = hierarchy[i][2];
-        if (parent == -1 && firstChild != -1) {
-            int nextChild = hierarchy[firstChild][2];
-            if (nextChild == -1) {
-                cv::approxPolyDP(cv::Mat(contours[i]), polys[i], 5, true);
-                if (polys[i].size() == 4) {
-                    FourPoints boardPoints = {
-                        .defined = YES,
-                        .p1 = CGPointMake(polys[i][0].x, polys[i][0].y),
-                        .p2 = CGPointMake(polys[i][1].x, polys[i][1].y),
-                        .p3 = CGPointMake(polys[i][2].x, polys[i][2].y),
-                        .p4 = CGPointMake(polys[i][3].x, polys[i][3].y),
-                    };
-                    return boardPoints;
+    cv::vector<cv::Point> approx;
+    for (int i = 0; i < contours.size(); i++) {
+        cv::approxPolyDP(cv::Mat(contours[i]), approx, 5, true);
+        if (approx.size() >= 4) {
+            double maxCosine = 0;
+            for (int j = 2; j <= approx.size(); j++) {
+                double cosine = fabs(angle(approx[j % approx.size()], approx[j - 2], approx[j - 1]));
+                maxCosine = MAX(maxCosine, cosine);
+            }
+            if (maxCosine < 0.3) {
+                CGPoint contour[approx.size()];
+                for (int l = 0; l < approx.size(); l++) {
+                    contour[l] = [self cvPointToCGPoint:approx[l]];
                 }
+                //[polys addObject:contour];
+                cv::drawContours(origImage, contours, i, cv::Scalar(255, 0, 0), 1, 8, std::vector<cv::Vec4i>(), 0, cv::Point());
             }
         }
     }
-    FourPoints boardPoints = {.defined = NO};
-    return boardPoints;
+    return origImage;
+}
+
+- (CGPoint)cvPointToCGPoint:(cv::Point)p {
+    return CGPointMake(p.x, p.y);
 }
 
 @end
