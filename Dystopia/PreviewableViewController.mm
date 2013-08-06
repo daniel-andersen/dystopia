@@ -30,6 +30,18 @@
 
 PreviewableViewController *previewInstance = nil;
 
+@interface PreviewableViewController () {
+    UIImageView *cameraPreview;
+    CAShapeLayer *boardBoundsLayer;
+    
+    UIImageView *boardPreview;
+    
+    UIButton *boardButton;
+    UIButton *cameraPreviewButton;
+}
+
+@end
+
 @implementation PreviewableViewController
 
 @synthesize overlayView;
@@ -43,13 +55,10 @@ PreviewableViewController *previewInstance = nil;
     overlayView.frame = self.view.bounds;
     boardPreview.frame = self.view.bounds;
     cameraPreview.frame = self.view.bounds;
-    boardGridLayer.frame = self.view.bounds;
-    boardContourLayer.frame = self.view.bounds;
+    boardBoundsLayer.frame = self.view.bounds;
     
     [self setButtonFrame:boardButton x:75.0f];
     [self setButtonFrame:cameraPreviewButton x:(self.view.bounds.size.width - 75.0f)];
-    
-    [self drawBoardGrid];
 }
 
 - (void)setupPreview {
@@ -68,8 +77,7 @@ PreviewableViewController *previewInstance = nil;
     boardPreview.hidden = YES;
     [overlayView addSubview:boardPreview];
 
-    [self addBoardGridLayer];
-    [self addBoardContourLayer];
+    [self addBoardBoundsLayer];
     [self addCameraPreviewLabel];
     [self addBoardPreviewLabel];
 
@@ -126,29 +134,20 @@ PreviewableViewController *previewInstance = nil;
     [boardPreview addSubview:label];
 }
 
-- (void)addBoardGridLayer {
-    boardGridLayer = [CAShapeLayer layer];
-    boardGridLayer.frame = self.view.bounds;
-    boardGridLayer.fillColor = [UIColor clearColor].CGColor;
-    boardGridLayer.strokeColor = [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:0.75f].CGColor;
-    boardGridLayer.backgroundColor = [UIColor clearColor].CGColor;
-    [self drawBoardGrid];
-    [boardPreview.layer addSublayer:boardGridLayer];
-}
-
-- (void)addBoardContourLayer {
-    boardContourLayer = [CAShapeLayer layer];
-    boardContourLayer.frame = self.view.bounds;
-    boardContourLayer.fillColor = [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:0.35f].CGColor;
-    boardContourLayer.strokeColor = [UIColor colorWithWhite:1.0f alpha:0.75f].CGColor;
-    boardContourLayer.backgroundColor = [UIColor clearColor].CGColor;
-    [cameraPreview.layer addSublayer:boardContourLayer];
+- (void)addBoardBoundsLayer {
+    boardBoundsLayer = [CAShapeLayer layer];
+    boardBoundsLayer.frame = self.view.bounds;
+    boardBoundsLayer.fillColor = [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:0.35f].CGColor;
+    boardBoundsLayer.strokeColor = [UIColor colorWithWhite:1.0f alpha:0.75f].CGColor;
+    boardBoundsLayer.backgroundColor = [UIColor clearColor].CGColor;
+    [cameraPreview.layer addSublayer:boardBoundsLayer];
 }
 
 - (void)previewFrame:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self previewCamera:image];
         [self previewBoard:image boardCalibrator:boardCalibrator];
+        [self previewBoardBounds:boardCalibrator.boardBounds];
     });
 }
 
@@ -162,52 +161,24 @@ PreviewableViewController *previewInstance = nil;
     if (boardPreview.hidden == NO) {
         if (boardCalibrator.boardBounds.defined) {
             boardPreview.image = [CameraUtil affineTransformImage:image withTransformation:boardCalibrator.boardCameraToScreenTransformation];
-            boardGridLayer.hidden = NO;
         } else {
             boardPreview.image = image;
-            boardGridLayer.hidden = YES;
         }
     }
 }
 
-- (void)hideBoardContour {
+- (void)hideBoardBounds {
     dispatch_async(dispatch_get_main_queue(), ^{
-        boardContourLayer.hidden = YES;
+        boardBoundsLayer.hidden = YES;
     });
 }
 
-- (void)drawBoardGrid {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [CATransaction begin];
-        [CATransaction setAnimationDuration:0.0f];
-        
-        UIBezierPath *path = [UIBezierPath bezierPath];
-        for (int i = 0; i < BOARD_WIDTH; i++) {
-            float x = i * self.view.bounds.size.width / BOARD_WIDTH;
-            float y1 = 0.0f;
-            float y2 = self.view.bounds.size.height;
-            [path moveToPoint:CGPointMake(x, y1)];
-            [path addLineToPoint:CGPointMake(x, y2)];
-        }
-        for (int i = 0; i < BOARD_HEIGHT; i++) {
-            float x1 = 0;
-            float x2 = self.view.bounds.size.width;
-            float y = i * self.view.bounds.size.height / BOARD_HEIGHT;
-            [path moveToPoint:CGPointMake(x1, y)];
-            [path addLineToPoint:CGPointMake(x2, y)];
-        }
-        
-        boardGridLayer.path = path.CGPath;
-        [CATransaction commit];
-    });
-}
-
-- (void)previewBoardContour:(FourPoints)boardPoints {
+- (void)previewBoardBounds:(FourPoints)boardPoints {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!boardPoints.defined) {
-            boardContourLayer.hidden = YES;
+            boardBoundsLayer.hidden = YES;
         }
-        boardContourLayer.hidden = NO;
+        boardBoundsLayer.hidden = NO;
         [CATransaction begin];
         [CATransaction setAnimationDuration:0.0f];
 
@@ -218,13 +189,13 @@ PreviewableViewController *previewInstance = nil;
         [path addLineToPoint:[self scalePointToScreen:boardPoints.p4]];
         [path closePath];
 
-        boardContourLayer.path = path.CGPath;
+        boardBoundsLayer.path = path.CGPath;
         [CATransaction commit];
     });
 }
 
 - (CGPoint)scalePointToScreen:(CGPoint)p {
-    return CGPointMake(p.x * boardContourLayer.frame.size.width / cameraPreview.image.size.width, p.y * boardContourLayer.frame.size.height / cameraPreview.image.size.height);
+    return CGPointMake(p.x * boardBoundsLayer.frame.size.width / cameraPreview.image.size.width, p.y * boardBoundsLayer.frame.size.height / cameraPreview.image.size.height);
 }
 
 @end

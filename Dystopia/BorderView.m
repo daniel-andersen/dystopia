@@ -23,25 +23,26 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <QuartzCore/QuartzCore.h>
+#import "BorderView.h"
 
-#import "PreviewableViewController.h"
-#import "CameraSession.h"
-#import "BoardCalibrator.h"
-#import "BoardGame.h"
-#import "Intro.h"
+@implementation BorderView
 
-#define GAME_STATE_INTRO 0
-#define GAME_STATE_GAME  1
-
-@interface GameViewController : PreviewableViewController <CameraSessionDelegate, IntroDelegate, BoardGameProtocol> {
-    CameraSession *cameraSession;
-    
-    BoardCalibrator *boardCalibrator;
-    BoardGame *boardGame;
-    Intro *intro;
-    
-    int gameState;
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        // Initialization code
+    }
+    return self;
 }
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect
+{
+    // Drawing code
+}
+*/
 
 @end

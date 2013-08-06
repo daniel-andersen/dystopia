@@ -39,7 +39,6 @@ extern PreviewableViewController *previewInstance;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self initialize];
-    [boardCalibrator startFindBounds];
 }
 
 - (void)viewWillLayoutSubviews {
@@ -61,12 +60,12 @@ extern PreviewableViewController *previewInstance;
     boardCalibrator = [[BoardCalibrator alloc] initWithFrame:self.view.bounds cameraSession:cameraSession];
     [self.view addSubview:boardCalibrator];
 
-    gameState = GAME_STATE_INITIAL_CALIBRATION;
+    [self startIntro];
 }
 
 - (void)processFrame:(UIImage *)image {
-    [previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardEdgesToImage:image] boardCalibrator:boardCalibrator];
-    //[previewInstance previewFrame:image boardCalibrator:boardCalibrator];
+    //[previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardEdgesToImage:image] boardCalibrator:boardCalibrator];
+    [previewInstance previewFrame:image boardCalibrator:boardCalibrator];
 
     [self calibrateBoard:image];
     [self updateGameStateAccordingToFrame];
@@ -75,11 +74,6 @@ extern PreviewableViewController *previewInstance;
 - (void)updateGameStateAccordingToFrame {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setFrameUpdateIntervalAccordingToGameState];
-        if (gameState == GAME_STATE_INITIAL_CALIBRATION) {
-            if (boardCalibrator.state == BOARD_CALIBRATION_STATE_CALIBRATED) {
-                [self startIntro];
-            }
-        }
         cameraSession.readyToProcessFrame = YES;
     });
 }
@@ -88,7 +82,7 @@ extern PreviewableViewController *previewInstance;
     if (boardCalibrator.state != BOARD_CALIBRATION_STATE_CALIBRATED) {
         cameraSession.delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_FAST;
     } else {
-        //cameraSession.delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_DEFAULT;
+        cameraSession.delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_DEFAULT;
     }
 }
 
@@ -105,6 +99,7 @@ extern PreviewableViewController *previewInstance;
 }
 
 - (void)startBoardGame {
+    gameState = GAME_STATE_GAME;
     boardGame = [[BoardGame alloc] initWithFrame:self.view.bounds delegate:self];
     [self.view insertSubview:boardGame atIndex:0];
     [boardGame startWithLevel:0];
@@ -115,15 +110,7 @@ extern PreviewableViewController *previewInstance;
 }
 
 - (void)calibrateBoard:(UIImage *)image {
-    if (boardCalibrator.state != BOARD_CALIBRATION_STATE_CALIBRATING) {
-        return;
-    }
     [boardCalibrator updateBoundsWithImage:image];
-    if (boardCalibrator.state == BOARD_CALIBRATION_STATE_CALIBRATED) {
-        [previewInstance hideBoardContour];
-    } else {
-        [previewInstance previewBoardContour:boardCalibrator.boardBounds];
-    }
 }
 
 - (UIImage *)requestSimulatedImageIfNoCamera {

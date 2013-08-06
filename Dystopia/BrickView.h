@@ -30,5 +30,6 @@
 - (id)initWithFrame:(CGRect)frame brickType:(int)b;
 
 @property (readonly) int brickType;
+@property (readwrite) bool visible;
 
 @end

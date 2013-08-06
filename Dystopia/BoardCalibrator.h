@@ -26,7 +26,6 @@
 #import <QuartzCore/QuartzCore.h>
 
 #import "BoardRecognizer.h"
-#import "BoardBoundsRecognizer.h"
 #import "CameraSession.h"
 #import "Util.h"
 
@@ -42,27 +41,21 @@
 
 @interface BoardCalibrator : UIView {
     BoardRecognizer *boardRecognizer;
-    BoardBoundsRecognizer *boardBoundsRecognizer;
 
     CameraSession *cameraSession;
     
-    CAShapeLayer *borderLayer;
-    
     CFAbsoluteTime successTime;
     CFAbsoluteTime lastUpdateTime;
-    
-    int borderBrightnessDirection;
-    float borderBrightness;
 }
 
 - (id)initWithFrame:(CGRect)frame cameraSession:(CameraSession *)session;
 
-- (void)startFindBounds;
 - (void)updateBoundsWithImage:(UIImage *)image;
 
 @property (readonly) int state;
 @property (readonly) FourPoints boardBounds;
 @property (readonly) FourPoints screenPoints;
+
 @property (readwrite) cv::Mat boardCameraToScreenTransformation;
 
 @end

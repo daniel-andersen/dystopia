@@ -60,6 +60,15 @@
     return dst;
 }
 
++ (CGPoint)affineTransformPoint:(CGPoint)p transformation:(cv::Mat)transformation {
+    cv::Mat src(3, 1, CV_64F);
+    src.at<double>(0, 0) = p.x;
+    src.at<double>(1, 0) = p.y;
+    src.at<double>(2, 0) = 1.0f;
+    cv::Mat dst = transformation * src;
+    return CGPointMake(dst.at<double>(0, 0), dst.at<double>(1, 0));
+}
+
 + (cv::Mat)findAffineTransformationSrcPoints:(FourPoints)srcPoints dstPoints:(FourPoints)dstPoints {
     cv::Point2f srcCvPoints[4];
     srcCvPoints[0] = cv::Point2f(srcPoints.p1.x, srcPoints.p1.y);

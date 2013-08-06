@@ -25,25 +25,31 @@
 
 #import "BoardRecognizer.h"
 #import "UIImage+OpenCV.h"
+#import "BoardUtil.h"
+#import "CameraUtil.h"
+
+@interface BoardRecognizer () {
+    float threshold;
+}
+
+@end
 
 @implementation BoardRecognizer
 
-float threshold = 50.0f;
-
-/*- (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
- cv::Mat matImage = [image CVMat];
- cv::Mat originalImage = cv::Mat(matImage);
- cv::Mat filteredAndThresholdedImage = [self filterAndThreshold:matImage];
- return [self findContours:filteredAndThresholdedImage originalImage:originalImage];
- }*/
-
-- (UIImage *)boardEdgesToImage:(UIImage *)image {
+- (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
+    threshold = 80.0f;
     cv::Mat img = [image CVMat];
-    cv::Mat origImg = cv::Mat(img);
     img = [self smooth:img];
     img = [self grayscale:img];
     img = [self applyCanny:img];
-    img = [self findContours:img originalImage:origImg];
+    return [self findContours:img];
+}
+
+- (UIImage *)boardBoundsToImage:(UIImage *)image {
+    cv::Mat img = [image CVMat];
+    img = [self smooth:img];
+    img = [self grayscale:img];
+    img = [self applyCanny:img];
     return [UIImage imageWithCVMat:img];
 }
 
@@ -63,54 +69,48 @@ float threshold = 50.0f;
 }
 
 - (cv::Mat)applyCanny:(cv::Mat)image {
-    cv::Canny(image, image, threshold, threshold * 3.0f);
-    threshold += 5.0f;
-    if (threshold > 100.0f) {
-        threshold = 50.0f;
-    }
-    threshold = 50.0f;
+    cv::Canny(image, image, 10, 300);
+    //cv::Canny(image, image, threshold, threshold * 3.0f);
     return image;
 }
 
-double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0) {
-    double dx1 = pt1.x - pt0.x;
-    double dy1 = pt1.y - pt0.y;
-    double dx2 = pt2.x - pt0.x;
-    double dy2 = pt2.y - pt0.y;
-    return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
-}
-
-- (cv::Mat)findContours:(cv::Mat)image originalImage:(cv::Mat)origImage {
-    NSMutableArray *polys = [NSMutableArray array];
+- (FourPoints)findContours:(cv::Mat)image {
     cv::vector<cv::vector<cv::Point>> contours;
     cv::vector<cv::Vec4i> hierarchy;
 
-    findContours(image, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+    cv::findContours(image, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
     
     cv::vector<cv::Point> approx;
     for (int i = 0; i < contours.size(); i++) {
         cv::approxPolyDP(cv::Mat(contours[i]), approx, 5, true);
-        if (approx.size() >= 4) {
-            double maxCosine = 0;
+        if (approx.size() == 4) {
+            float maxCosine = 0;
             for (int j = 2; j <= approx.size(); j++) {
-                double cosine = fabs(angle(approx[j % approx.size()], approx[j - 2], approx[j - 1]));
+                float cosine = fabs(angle(approx[j % approx.size()], approx[j - 2], approx[j - 1]));
                 maxCosine = MAX(maxCosine, cosine);
             }
-            if (maxCosine < 0.3) {
-                CGPoint contour[approx.size()];
-                for (int l = 0; l < approx.size(); l++) {
-                    contour[l] = [self cvPointToCGPoint:approx[l]];
-                }
-                //[polys addObject:contour];
-                cv::drawContours(origImage, contours, i, cv::Scalar(255, 0, 0), 1, 8, std::vector<cv::Vec4i>(), 0, cv::Point());
+            if (maxCosine < 0.4f) {
+                FourPoints boardPoints = {
+                    .defined = YES,
+                    .p1 = CGPointMake(approx[0].x, approx[0].y),
+                    .p2 = CGPointMake(approx[1].x, approx[1].y),
+                    .p3 = CGPointMake(approx[2].x, approx[2].y),
+                    .p4 = CGPointMake(approx[3].x, approx[3].y),
+                };
+                return boardPoints;
             }
         }
     }
-    return origImage;
+    FourPoints boardPoints = {.defined = NO};
+    return boardPoints;
 }
 
-- (CGPoint)cvPointToCGPoint:(cv::Point)p {
-    return CGPointMake(p.x, p.y);
+float angle(cv::Point pt1, cv::Point pt2, cv::Point pt0) {
+    float dx1 = pt1.x - pt0.x;
+    float dy1 = pt1.y - pt0.y;
+    float dx2 = pt2.x - pt0.x;
+    float dy2 = pt2.y - pt0.y;
+    return (dx1*dx2 + dy1*dy2) / sqrt((dx1*dx1 + dy1*dy1) * (dx2*dx2 + dy2*dy2) + 1e-10);
 }
 
 @end

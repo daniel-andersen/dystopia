@@ -36,6 +36,8 @@
     BrickView *brickViews[BOARD_BRICK_VIEWS_COUNT];
     int brickViewsCount;
 
+    NSMutableArray *boardContours;
+    
     int level;
 }
 

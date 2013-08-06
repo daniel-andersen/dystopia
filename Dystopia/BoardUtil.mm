@@ -90,4 +90,8 @@ BoardUtil *boardUtilInstance = nil;
                       [self brickTypeScreenSize:brickType].height);
 }
 
+- (CGPoint)cvPointToCGPoint:(cv::Point)p {
+    return CGPointMake(p.x, p.y);
+}
+
 @end

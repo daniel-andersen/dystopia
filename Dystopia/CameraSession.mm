@@ -146,6 +146,7 @@
         NSLog(@"Error locking focus: %@", error.description);
     }
     device.focusMode = AVCaptureFocusModeLocked;
+    device.focusPointOfInterest = CGPointMake(640 / 2, 480 / 2);
     device.whiteBalanceMode = AVCaptureWhiteBalanceModeLocked;
     device.exposureMode = AVCaptureExposureModeLocked;
     [device unlockForConfiguration];

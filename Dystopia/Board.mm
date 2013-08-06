@@ -56,12 +56,31 @@
 
 - (void)setupBrickViews {
     brickViewsCount = 0;
-    brickViews[brickViewsCount++] = [[BrickView alloc] initWithFrame:[[BoardUtil instance] brickTypeFrame:0 position:CGPointMake(5, 5)] brickType:0];
-    brickViews[brickViewsCount++] = [[BrickView alloc] initWithFrame:[[BoardUtil instance] brickTypeFrame:1 position:CGPointMake(8, 5)] brickType:1];
-    brickViews[brickViewsCount++] = [[BrickView alloc] initWithFrame:[[BoardUtil instance] brickTypeFrame:2 position:CGPointMake(5, 8)] brickType:2];
+    [self addBrickOfType:0 atPosition:CGPointMake(5, 5)];
+    [self addBrickOfType:1 atPosition:CGPointMake(8, 5)];
+    [self addBrickOfType:2 atPosition:CGPointMake(5, 8)];
+    [self addBrickOfType:5 atPosition:CGPointMake(11, 6)];
+    [self addBrickOfType:5 atPosition:CGPointMake(14, 6)];
+    [self addBrickOfType:3 atPosition:CGPointMake(17, 5)];
+    [self calculateVisibleBoardContour];
     for (int i = 0; i < brickViewsCount; i++) {
         [self addSubview:brickViews[i]];
     }
+}
+
+- (void)addBrickOfType:(int)type atPosition:(CGPoint)position {
+    brickViews[brickViewsCount++] = [[BrickView alloc] initWithFrame:[[BoardUtil instance] brickTypeFrame:type position:position] brickType:type];
+    CGSize size = [[BoardUtil instance] brickTypeBoardSize:type];
+    for (int i = 0; i < size.height; i++) {
+        for (int j = 0; j< size.width; j++) {
+            bricks[i + (int)position.y][j + (int)position.x] = type;
+        }
+    }
+}
+
+- (void)calculateVisibleBoardContour {
+    boardContours = [NSMutableArray array];
+    //boardContour = [[BoardContour alloc] init];
 }
 
 @end

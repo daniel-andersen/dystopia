@@ -31,6 +31,7 @@
 @implementation BrickView
 
 @synthesize brickType;
+@synthesize visible;
 
 - (id)initWithFrame:(CGRect)frame brickType:(int)b {
     if (self = [super initWithFrame:frame]) {

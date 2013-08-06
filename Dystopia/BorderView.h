@@ -23,14 +23,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
-#import "Util.h"
-
-@interface BoardBoundsRecognizer : NSObject
-
-- (FourPoints)findBoardBoundsFromImage:(UIImage *)image;
-
-- (UIImage *)boardBoundsToImage:(UIImage *)image;
+@interface BorderView : UIView
 
 @end

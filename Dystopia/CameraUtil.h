@@ -35,6 +35,7 @@
 + (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation toSize:(CGSize)size;
 
 + (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation toSize:(CGSize)size;
++ (CGPoint)affineTransformPoint:(CGPoint)p transformation:(cv::Mat)transformation;
 
 + (cv::Mat)findAffineTransformationSrcPoints:(FourPoints)srcPoints dstPoints:(FourPoints)dstPoints;
 
