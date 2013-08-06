@@ -28,6 +28,13 @@
 
 BoardUtil *boardUtilInstance = nil;
 
+@interface BoardUtil () {
+    UIImage *brickImages[BRICK_IMAGES_COUNT];
+    CGSize brickSizes[BRICK_IMAGES_COUNT];
+}
+
+@end
+
 @implementation BoardUtil
 
 + (BoardUtil *)instance {

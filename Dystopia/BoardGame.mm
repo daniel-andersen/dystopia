@@ -25,6 +25,15 @@
 
 #import "BoardGame.h"
 
+@interface BoardGame () {
+    int level;
+    id<BoardGameProtocol> delegate;
+    
+    Board *board;
+}
+
+@end
+
 @implementation BoardGame
 
 - (id)initWithFrame:(CGRect)frame delegate:(id<BoardGameProtocol>)d {

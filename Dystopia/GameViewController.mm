@@ -30,6 +30,18 @@
 
 extern PreviewableViewController *previewInstance;
 
+@interface GameViewController () {
+    CameraSession *cameraSession;
+    
+    BoardCalibrator *boardCalibrator;
+    BoardGame *boardGame;
+    Intro *intro;
+    
+    int gameState;
+}
+
+@end
+
 @implementation GameViewController
 
 - (void)viewDidLoad {

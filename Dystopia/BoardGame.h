@@ -34,12 +34,7 @@
 
 @end
 
-@interface BoardGame : RotatedView {
-    int level;
-    id<BoardGameProtocol> delegate;
-    
-    Board *board;
-}
+@interface BoardGame : RotatedView
 
 - (id)initWithFrame:(CGRect)frame delegate:(id<BoardGameProtocol>)d;
 

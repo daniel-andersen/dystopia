@@ -30,16 +30,7 @@
 
 #define BOARD_BRICK_VIEWS_COUNT 50
 
-@interface Board : UIView {
-    int bricks[BOARD_WIDTH][BOARD_HEIGHT];
-
-    BrickView *brickViews[BOARD_BRICK_VIEWS_COUNT];
-    int brickViewsCount;
-
-    NSMutableArray *boardContours;
-    
-    int level;
-}
+@interface Board : UIView
 
 - (id)initWithFrame:(CGRect)frame;
 

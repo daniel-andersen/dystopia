@@ -41,7 +41,7 @@
 		6552706017B1733F00784CD7 /* border_top_left.png in Resources */ = {isa = PBXBuildFile; fileRef = 6552705817B1733F00784CD7 /* border_top_left.png */; };
 		6552706117B1733F00784CD7 /* border_top_right.png in Resources */ = {isa = PBXBuildFile; fileRef = 6552705917B1733F00784CD7 /* border_top_right.png */; };
 		6552706217B1733F00784CD7 /* border_top.png in Resources */ = {isa = PBXBuildFile; fileRef = 6552705A17B1733F00784CD7 /* border_top.png */; };
-		6552706517B177B300784CD7 /* BorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6552706417B177B300784CD7 /* BorderView.m */; };
+		6552706517B177B300784CD7 /* BorderView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6552706417B177B300784CD7 /* BorderView.mm */; };
 		65B9307317806B4500312B88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307217806B4500312B88 /* UIKit.framework */; };
 		65B9307517806B4500312B88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307417806B4500312B88 /* Foundation.framework */; };
 		65B9307717806B4500312B88 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307617806B4500312B88 /* CoreGraphics.framework */; };
@@ -117,7 +117,7 @@
 		6552705917B1733F00784CD7 /* border_top_right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = border_top_right.png; path = board/border/border_top_right.png; sourceTree = "<group>"; };
 		6552705A17B1733F00784CD7 /* border_top.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = border_top.png; path = board/border/border_top.png; sourceTree = "<group>"; };
 		6552706317B177B300784CD7 /* BorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BorderView.h; sourceTree = "<group>"; };
-		6552706417B177B300784CD7 /* BorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BorderView.m; sourceTree = "<group>"; };
+		6552706417B177B300784CD7 /* BorderView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BorderView.mm; sourceTree = "<group>"; };
 		65B9306F17806B4500312B88 /* Dystopia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dystopia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B9307217806B4500312B88 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		65B9307417806B4500312B88 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -191,7 +191,7 @@
 				650D4299178F40DC00D89CEB /* BrickView.h */,
 				650D429A178F40DD00D89CEB /* BrickView.mm */,
 				6552706317B177B300784CD7 /* BorderView.h */,
-				6552706417B177B300784CD7 /* BorderView.m */,
+				6552706417B177B300784CD7 /* BorderView.mm */,
 			);
 			name = "Game Engine";
 			sourceTree = "<group>";
@@ -497,7 +497,7 @@
 				650D4243178DF27800D89CEB /* RotatedView.m in Sources */,
 				650D429B178F40DE00D89CEB /* BrickView.mm in Sources */,
 				650D429E178F41B400D89CEB /* BoardUtil.mm in Sources */,
-				6552706517B177B300784CD7 /* BorderView.m in Sources */,
+				6552706517B177B300784CD7 /* BorderView.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

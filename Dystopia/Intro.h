@@ -33,10 +33,7 @@
 
 @end
 
-@interface Intro : RotatedView {
-    UIImageView *logoView;
-    id<IntroDelegate> delegate;
-}
+@interface Intro : RotatedView
 
 - (id)initWithFrame:(CGRect)frame delegate:(id<IntroDelegate>)d;
 

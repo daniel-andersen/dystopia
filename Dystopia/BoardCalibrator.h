@@ -39,14 +39,7 @@
 #define BOARD_CALIBRATION_BRIGHTNESS_DARK   0.4f
 #define BOARD_CALIBRATION_BRIGHTNESS_BRIGHT 1.0f
 
-@interface BoardCalibrator : UIView {
-    BoardRecognizer *boardRecognizer;
-
-    CameraSession *cameraSession;
-    
-    CFAbsoluteTime successTime;
-    CFAbsoluteTime lastUpdateTime;
-}
+@interface BoardCalibrator : UIView
 
 - (id)initWithFrame:(CGRect)frame cameraSession:(CameraSession *)session;
 

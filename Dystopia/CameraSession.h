@@ -36,14 +36,7 @@
 
 @end
 
-@interface CameraSession : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate> {
-    AVCaptureSession *session;
-    AVCaptureDevice *device;
-    id<CameraSessionDelegate> delegate;
-    dispatch_queue_t frameProcessQueue;
-    double lastDeliveredFrameTime;
-    NSTimer *fakeDeliverFrameTimer;
-}
+@interface CameraSession : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate>
 
 - (id)initWithDelegate:(id<CameraSessionDelegate>)d;
 

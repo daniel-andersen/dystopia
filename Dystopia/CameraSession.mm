@@ -26,6 +26,17 @@
 #import "CameraSession.h"
 #import "CameraUtil.h"
 
+@interface CameraSession () {
+    AVCaptureSession *session;
+    AVCaptureDevice *device;
+    id<CameraSessionDelegate> delegate;
+    dispatch_queue_t frameProcessQueue;
+    double lastDeliveredFrameTime;
+    NSTimer *fakeDeliverFrameTimer;
+}
+
+@end
+
 @implementation CameraSession
 
 @synthesize initialized;

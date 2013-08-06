@@ -28,6 +28,17 @@
 #import "CameraUtil.h"
 #import "ExternalDisplay.h"
 
+@interface BoardCalibrator () {
+    BoardRecognizer *boardRecognizer;
+    
+    CameraSession *cameraSession;
+    
+    CFAbsoluteTime successTime;
+    CFAbsoluteTime lastUpdateTime;
+}
+
+@end
+
 @implementation BoardCalibrator
 
 @synthesize state;

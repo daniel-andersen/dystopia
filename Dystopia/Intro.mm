@@ -32,6 +32,13 @@
 #define INTRO_FADE_OUT_DURATION 5.0f
 #define INTRO_PRESENT_DURATION 2.0f
 
+@interface Intro () {
+    UIImageView *logoView;
+    id<IntroDelegate> delegate;
+}
+
+@end
+
 @implementation Intro
 
 - (id)initWithFrame:(CGRect)frame delegate:(id<IntroDelegate>)d {

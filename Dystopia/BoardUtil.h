@@ -35,10 +35,7 @@
 
 #endif
 
-@interface BoardUtil : NSObject {
-    UIImage *brickImages[BRICK_IMAGES_COUNT];
-    CGSize brickSizes[BRICK_IMAGES_COUNT];
-}
+@interface BoardUtil : NSObject
 
 + (BoardUtil *)instance;
 

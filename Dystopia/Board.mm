@@ -24,6 +24,22 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import "Board.h"
+#import "BorderView.h"
+
+@interface Board () {
+    int bricks[BOARD_WIDTH][BOARD_HEIGHT];
+    
+    BrickView *brickViews[BOARD_BRICK_VIEWS_COUNT];
+    int brickViewsCount;
+
+    BorderView *borderView;
+    
+    NSMutableArray *boardContours;
+    
+    int level;
+}
+
+@end
 
 @implementation Board
 
@@ -42,6 +58,7 @@
 - (void)loadLevel:(int)l {
     level = l;
     [self loadBoard];
+    [self setupBorderView];
     [self setupBrickViews];
     NSLog(@"Level %i loaded", level + 1);
 }
@@ -52,6 +69,11 @@
             bricks[i][j] = -1;
         }
     }
+}
+
+- (void)setupBorderView {
+    borderView = [[BorderView alloc] initWithFrame:self.bounds];
+    [self addSubview:borderView];
 }
 
 - (void)setupBrickViews {

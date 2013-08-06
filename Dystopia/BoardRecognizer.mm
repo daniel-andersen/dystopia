@@ -30,6 +30,7 @@
 
 @interface BoardRecognizer () {
     float threshold;
+    float minContourArea;
 }
 
 @end
@@ -38,6 +39,8 @@
 
 - (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
     threshold = 80.0f;
+    minContourArea = (image.size.width * 0.6) * (image.size.height * 0.6f);
+
     cv::Mat img = [image CVMat];
     img = [self smooth:img];
     img = [self grayscale:img];
@@ -83,7 +86,7 @@
     cv::vector<cv::Point> approx;
     for (int i = 0; i < contours.size(); i++) {
         cv::approxPolyDP(cv::Mat(contours[i]), approx, 5, true);
-        if (approx.size() == 4) {
+        if (approx.size() == 4 && cv::contourArea(contours[i]) >= minContourArea) {
             float maxCosine = 0;
             for (int j = 2; j <= approx.size(); j++) {
                 float cosine = fabs(angle(approx[j % approx.size()], approx[j - 2], approx[j - 1]));
