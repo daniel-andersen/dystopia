@@ -83,18 +83,30 @@
 
     cv::findContours(image, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
     
+    FourPoints boardPoints = [self findSimpleBoardBoundsFromContours:contours hierachy:hierarchy];
+    if (boardPoints.defined) {
+        return boardPoints;
+    } else {
+        boardPoints = [self findBrokenBoardBoundsFromContours:contours hierachy:hierarchy];
+    }
+    return boardPoints;
+}
+
+- (FourPoints)findSimpleBoardBoundsFromContours:(cv::vector<cv::vector<cv::Point>>)contours hierachy:(cv::vector<cv::Vec4i>)hierarchy {
     cv::vector<cv::Point> approx;
+
     for (int i = 0; i < contours.size(); i++) {
         cv::approxPolyDP(cv::Mat(contours[i]), approx, 5, true);
-
+        
         int parentContour = hierarchy[i][3];
         int childContour = hierarchy[i][2];
-
+        
         if ((approx.size() == 4 &&
              cv::contourArea(contours[i]) >= minContourArea &&
              parentContour == -1 &&
              childContour != -1 &&
              cv::contourArea(contours[childContour]) >= minContourArea)) {
+
             float maxCosine = 0;
             for (int j = 2; j <= approx.size(); j++) {
                 float cosine = fabs(angle(approx[j % approx.size()], approx[j - 2], approx[j - 1]));
@@ -112,6 +124,11 @@
             }
         }
     }
+    FourPoints boardPoints = {.defined = NO};
+    return boardPoints;
+}
+
+- (FourPoints)findBrokenBoardBoundsFromContours:(cv::vector<cv::vector<cv::Point>>)contours hierachy:(cv::vector<cv::Vec4i>)hierarchy {
     FourPoints boardPoints = {.defined = NO};
     return boardPoints;
 }
