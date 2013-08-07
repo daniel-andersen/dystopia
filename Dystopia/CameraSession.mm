@@ -152,6 +152,9 @@
 }
 
 - (void)lock {
+    if (!initialized) {
+        return;
+    }
     NSError *error;
     if (![device lockForConfiguration:&error]) {
         NSLog(@"Error locking focus: %@", error.description);
@@ -164,6 +167,9 @@
 }
 
 - (void)unlock {
+    if (!initialized) {
+        return;
+    }
     NSError *error;
     if (![device lockForConfiguration:&error]) {
         NSLog(@"Error unlocking focus: %@", error.description);

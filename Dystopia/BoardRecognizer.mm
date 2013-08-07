@@ -81,12 +81,23 @@
     cv::vector<cv::vector<cv::Point>> contours;
     cv::vector<cv::Vec4i> hierarchy;
 
-    cv::findContours(image, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+    cv::findContours(image, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
     
     cv::vector<cv::Point> approx;
     for (int i = 0; i < contours.size(); i++) {
         cv::approxPolyDP(cv::Mat(contours[i]), approx, 5, true);
-        if (approx.size() == 4 && cv::contourArea(contours[i]) >= minContourArea) {
+
+        int parentContour = hierarchy[i][3];
+        int childContour = hierarchy[i][2];
+
+        bool satisfiesCriterias = YES;
+        satisfiesCriterias &= approx.size() == 4;
+        satisfiesCriterias &= cv::contourArea(contours[i]) >= minContourArea;
+        satisfiesCriterias &= parentContour;
+        satisfiesCriterias &= childContour != -1;
+        satisfiesCriterias &= cv::contourArea(contours[childContour]) >= minContourArea;
+
+        if (satisfiesCriterias) {
             float maxCosine = 0;
             for (int j = 2; j <= approx.size(); j++) {
                 float cosine = fabs(angle(approx[j % approx.size()], approx[j - 2], approx[j - 1]));

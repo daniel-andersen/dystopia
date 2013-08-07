@@ -65,8 +65,10 @@
     if (boardBounds.defined) {
         [self findCameraToScreenTransformation];
         [self findScreenPoints];
+        [cameraSession lock];
     } else {
         state = BOARD_CALIBRATION_STATE_CALIBRATING;
+        [cameraSession unlock];
     }
 }
 
