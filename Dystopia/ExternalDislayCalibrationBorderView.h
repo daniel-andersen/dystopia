@@ -23,20 +23,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <QuartzCore/QuartzCore.h>
+#import <UIKit/UIKit.h>
 
-#import "PreviewableViewController.h"
-#import "CameraSession.h"
-#import "BoardCalibrator.h"
-#import "BoardGame.h"
-#import "Intro.h"
-
-#define GAME_STATE_AWAITING_START 0
-#define GAME_STATE_INTRO          1
-#define GAME_STATE_GAME           2
-
-@interface GameViewController : PreviewableViewController <CameraSessionDelegate, IntroDelegate, BoardGameProtocol>
-
-- (void)startGame;
+@interface ExternalDislayCalibrationBorderView : UIView
 
 @end

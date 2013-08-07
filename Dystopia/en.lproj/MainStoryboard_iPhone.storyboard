@@ -28,32 +28,35 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Gone external..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wJT-DW-JhL">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Ready?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wJT-DW-JhL">
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="syB-sN-rjn">
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="73" id="kOp-V0-kKC"/>
+                                    <constraint firstAttribute="width" constant="116" id="Kl3-I2-3wy"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="OK">
+                                <state key="normal" title="READY!">
                                     <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="startButtonPressed:" destination="2YJ-BG-XZW" eventType="touchUpInside" id="8dJ-ww-cYV"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="wJT-DW-JhL" firstAttribute="top" secondItem="gBZ-vE-QzW" secondAttribute="top" constant="273" id="4Km-0D-VHh"/>
-                            <constraint firstItem="syB-sN-rjn" firstAttribute="centerX" secondItem="wJT-DW-JhL" secondAttribute="centerX" type="default" id="GGL-ob-qWK"/>
                             <constraint firstAttribute="trailing" secondItem="wJT-DW-JhL" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="ROt-NY-nmN"/>
                             <constraint firstAttribute="bottom" secondItem="syB-sN-rjn" secondAttribute="bottom" constant="129" id="bc7-EB-pgm"/>
                             <constraint firstItem="wJT-DW-JhL" firstAttribute="leading" secondItem="gBZ-vE-QzW" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="cq1-0K-Sts"/>
+                            <constraint firstItem="syB-sN-rjn" firstAttribute="centerX" secondItem="wJT-DW-JhL" secondAttribute="centerX" type="default" id="euU-fq-eue"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="azo-br-FLo"/>
@@ -89,6 +92,9 @@
         </class>
         <class className="PhoneViewController" superclassName="PreviewableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/PhoneViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="startButtonPressed:"/>
+            </relationships>
         </class>
         <class className="PreviewableViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/PreviewableViewController.h"/>

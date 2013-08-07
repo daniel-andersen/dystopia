@@ -29,7 +29,6 @@
 #import "CameraUtil.h"
 
 @interface BoardRecognizer () {
-    float threshold;
     float minContourArea;
 }
 
@@ -38,13 +37,13 @@
 @implementation BoardRecognizer
 
 - (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
-    threshold = 80.0f;
     minContourArea = (image.size.width * 0.6) * (image.size.height * 0.6f);
 
     cv::Mat img = [image CVMat];
     img = [self smooth:img];
     img = [self grayscale:img];
     img = [self applyCanny:img];
+    img = [self erode:img];
     return [self findContours:img];
 }
 
@@ -53,6 +52,7 @@
     img = [self smooth:img];
     img = [self grayscale:img];
     img = [self applyCanny:img];
+    img = [self erode:img];
     return [UIImage imageWithCVMat:img];
 }
 
@@ -62,7 +62,7 @@
 }
 
 - (cv::Mat)smooth:(cv::Mat)image {
-    cv::GaussianBlur(image, image, cv::Size(1.0f, 1.0f), 1.0f);
+    cv::GaussianBlur(image, image, cv::Size(3.0f, 3.0f), 1.0f);
     return image;
 }
 
@@ -72,8 +72,14 @@
 }
 
 - (cv::Mat)applyCanny:(cv::Mat)image {
-    cv::Canny(image, image, 10, 300);
+    cv::Canny(image, image, 100, 300);
     //cv::Canny(image, image, threshold, threshold * 3.0f);
+    return image;
+}
+
+- (cv::Mat)erode:(cv::Mat)image {
+    cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3.0f, 3.0f));
+    cv::dilate(image, image, element);
     return image;
 }
 
@@ -94,38 +100,45 @@
 
 - (FourPoints)findSimpleBoardBoundsFromContours:(cv::vector<cv::vector<cv::Point>>)contours hierachy:(cv::vector<cv::Vec4i>)hierarchy {
     cv::vector<cv::Point> approx;
+    FourPoints bestMatchedPoints = {.defined = NO};
+    int bestMatchedConditionsSatisfied = 0;
 
     for (int i = 0; i < contours.size(); i++) {
-        cv::approxPolyDP(cv::Mat(contours[i]), approx, 5, true);
-        
-        int parentContour = hierarchy[i][3];
-        int childContour = hierarchy[i][2];
-        
-        if ((approx.size() == 4 &&
-             cv::contourArea(contours[i]) >= minContourArea &&
-             parentContour == -1 &&
-             childContour != -1 &&
-             cv::contourArea(contours[childContour]) >= minContourArea)) {
-
-            float maxCosine = 0;
-            for (int j = 2; j <= approx.size(); j++) {
-                float cosine = fabs(angle(approx[j % approx.size()], approx[j - 2], approx[j - 1]));
-                maxCosine = MAX(maxCosine, cosine);
-            }
-            if (maxCosine < 0.4f) {
-                FourPoints boardPoints = {
-                    .defined = YES,
-                    .p1 = CGPointMake(approx[0].x, approx[0].y),
-                    .p2 = CGPointMake(approx[1].x, approx[1].y),
-                    .p3 = CGPointMake(approx[2].x, approx[2].y),
-                    .p4 = CGPointMake(approx[3].x, approx[3].y),
-                };
-                return boardPoints;
+        //cv::approxPolyDP(cv::Mat(contours[i]), approx, 5, true);
+        cv::approxPolyDP(cv::Mat(contours[i]), approx, arcLength(cv::Mat(contours[i]), true) * 0.02f, true);
+        for (int conditionsCount = 5; conditionsCount >= 2; conditionsCount--) {
+            if ([self areSimpleBoardBoundsConditionsSatisfiedWithContours:contours hierachy:hierarchy approx:approx conditionsCount:conditionsCount contourIndex:i]) {
+                float maxCosine = 0;
+                for (int j = 2; j <= approx.size(); j++) {
+                    float cosine = fabs(angle(approx[j % approx.size()], approx[j - 2], approx[j - 1]));
+                    maxCosine = MAX(maxCosine, cosine);
+                }
+                int conditionsMatched = maxCosine < 0.4f ? (conditionsCount + 1) : conditionsCount;
+                if (conditionsMatched > bestMatchedConditionsSatisfied) {
+                    bestMatchedConditionsSatisfied = conditionsMatched;
+                    bestMatchedPoints = {
+                        .defined = YES,
+                        .p1 = CGPointMake(approx[0].x, approx[0].y),
+                        .p2 = CGPointMake(approx[1].x, approx[1].y),
+                        .p3 = CGPointMake(approx[2].x, approx[2].y),
+                        .p4 = CGPointMake(approx[3].x, approx[3].y),
+                    };
+                }
             }
         }
     }
-    FourPoints boardPoints = {.defined = NO};
-    return boardPoints;
+    return bestMatchedPoints;
+}
+
+- (bool)areSimpleBoardBoundsConditionsSatisfiedWithContours:(cv::vector<cv::vector<cv::Point>>)contours hierachy:(cv::vector<cv::Vec4i>)hierarchy approx:(cv::vector<cv::Point>)approx conditionsCount:(int)conditionsCount contourIndex:(int)i {
+    int parentContour = hierarchy[i][3];
+    int childContour = hierarchy[i][2];
+    
+    return ((conditionsCount < 1 || fabs(cv::contourArea(contours[i])) >= minContourArea) &&
+            (conditionsCount < 2 || approx.size() == 4) &&
+            (conditionsCount < 3 || parentContour == -1) &&
+            (conditionsCount < 4 || childContour != -1) &&
+            (conditionsCount < 5 || cv::contourArea(contours[childContour]) >= minContourArea));
 }
 
 - (FourPoints)findBrokenBoardBoundsFromContours:(cv::vector<cv::vector<cv::Point>>)contours hierachy:(cv::vector<cv::Vec4i>)hierarchy {

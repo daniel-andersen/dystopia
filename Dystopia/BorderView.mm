@@ -38,9 +38,7 @@
 #define BORDER_BOTTOM_LEFT  6
 #define BORDER_BOTTOM_RIGHT 7
 
-@interface BorderView () {
-    UIImage *borderImage;
-}
+@interface BorderView ()
 
 @end
 
@@ -64,11 +62,11 @@
     [borderImages setObject:[UIImage imageNamed:@"border_bottom_left.png" ] atIndexedSubscript:BORDER_BOTTOM_LEFT];
     [borderImages setObject:[UIImage imageNamed:@"border_bottom_right.png"] atIndexedSubscript:BORDER_BOTTOM_RIGHT];
     
-    [self drawBorderWithImages:borderImages];
+    UIImage *borderImage = [self drawBorderWithImages:borderImages];
     self.layer.contents = (id)borderImage.CGImage;
 }
 
-- (void)drawBorderWithImages:(NSMutableArray *)borderImages {
+- (UIImage *)drawBorderWithImages:(NSMutableArray *)borderImages {
     int countX = ((BOARD_WIDTH * 2) - 2) / 9;
     int countY = ((BOARD_HEIGHT * 2)- 2) / 9;
 
@@ -94,8 +92,10 @@
     [borderImages[BORDER_BOTTOM_LEFT] drawInRect:CGRectMake(0.0f, self.bounds.size.height - singleSize.height, singleSize.width, singleSize.height)];
     [borderImages[BORDER_BOTTOM_RIGHT] drawInRect:CGRectMake(self.bounds.size.width - singleSize.width, self.bounds.size.height - singleSize.height, singleSize.width, singleSize.height)];
 
-    borderImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIImage *borderImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
+    
+    return borderImage;
 }
 
 @end

@@ -25,18 +25,42 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-#import "PreviewableViewController.h"
-#import "CameraSession.h"
-#import "BoardCalibrator.h"
-#import "BoardGame.h"
-#import "Intro.h"
+#import "ExternalDislayCalibrationBorderView.h"
 
-#define GAME_STATE_AWAITING_START 0
-#define GAME_STATE_INTRO          1
-#define GAME_STATE_GAME           2
+@interface ExternalDislayCalibrationBorderView ()
 
-@interface GameViewController : PreviewableViewController <CameraSessionDelegate, IntroDelegate, BoardGameProtocol>
+@end
 
-- (void)startGame;
+@implementation ExternalDislayCalibrationBorderView
+
+- (id)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        [self initialize];
+    }
+    return self;
+}
+
+- (void)initialize {
+    UIView *borderView = [[UIView alloc] initWithFrame:self.bounds];
+    borderView.backgroundColor = [UIColor clearColor];
+    
+    CAShapeLayer *borderLayer = [CAShapeLayer layer];
+    borderLayer.frame = self.bounds;
+    borderLayer.fillColor = [UIColor clearColor].CGColor;
+    borderLayer.strokeColor = [UIColor colorWithWhite:1.0f alpha:1.0f].CGColor;
+    borderLayer.backgroundColor = [UIColor clearColor].CGColor;
+    
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:CGPointMake(0.0f, 0.0f)];
+    [path addLineToPoint:CGPointMake(self.bounds.size.width - 1.0f, 0.0f)];
+    [path addLineToPoint:CGPointMake(self.bounds.size.width - 1.0f, self.bounds.size.height - 1.0f)];
+    [path addLineToPoint:CGPointMake(0.0f, self.bounds.size.height - 1.0f)];
+    [path closePath];
+    
+    borderLayer.path = path.CGPath;
+    
+    [borderView.layer addSublayer:borderLayer];
+    [self addSubview:borderView];
+}
 
 @end

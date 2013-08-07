@@ -29,4 +29,6 @@
 
 @interface PhoneViewController : PreviewableViewController
 
+- (IBAction)startButtonPressed:(id)sender;
+
 @end

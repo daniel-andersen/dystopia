@@ -29,24 +29,40 @@
 
 extern PreviewableViewController *previewInstance;
 
+@interface PhoneViewController () {
+    GameViewController *gameViewController;
+    bool started;
+}
+
+@end
+
 @implementation PhoneViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self setupExternalDisplay];
+    [self transitionToGame];
+    started = NO;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self setupExternalDisplay];
-    [self transitionToGame];
 }
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
+    super.overlayView.hidden = !started;
     [self.view bringSubviewToFront:super.overlayView];
 }
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
+}
+
+- (IBAction)startButtonPressed:(id)sender {
+    [gameViewController startGame];
+    super.overlayView.hidden = NO;
+    started = YES;
 }
 
 - (void)setupExternalDisplay {
@@ -54,10 +70,13 @@ extern PreviewableViewController *previewInstance;
 }
 
 - (void)transitionToGame {
-    GameViewController *gameViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"gameViewController"];
+    gameViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"gameViewController"];
     [ExternalDisplay instance].window.rootViewController = gameViewController;
     [[ExternalDisplay instance].window makeKeyAndVisible];
     previewInstance = [ExternalDisplay instance].externalDisplayFound ? self : gameViewController;
+    if (![ExternalDisplay instance].externalDisplayFound) {
+        [gameViewController startGame];
+    }
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
