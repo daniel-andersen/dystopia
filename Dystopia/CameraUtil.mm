@@ -39,6 +39,8 @@
     UIImage *uiImage = [UIImage imageWithCGImage:cgImage];
     
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+    
+    CGImageRelease(cgImage);
 
     return uiImage;
 }
