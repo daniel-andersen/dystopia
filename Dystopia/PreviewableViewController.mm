@@ -160,7 +160,7 @@ PreviewableViewController *previewInstance = nil;
 - (void)previewBoard:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
     if (boardPreview.hidden == NO) {
         if (boardCalibrator.boardBounds.defined) {
-            boardPreview.image = [CameraUtil affineTransformImage:image withTransformation:boardCalibrator.boardCameraToScreenTransformation];
+            boardPreview.image = [CameraUtil perspectiveTransformImage:image withTransformation:boardCalibrator.boardCameraToScreenTransformation];
         } else {
             boardPreview.image = image;
         }

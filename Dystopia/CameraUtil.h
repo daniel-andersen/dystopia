@@ -31,12 +31,11 @@
 
 + (UIImage *)imageFromPixelBuffer:(CVImageBufferRef)pixelBuffer;
 
-+ (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation;
-+ (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation toSize:(CGSize)size;
++ (UIImage *)perspectiveTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation;
++ (UIImage *)perspectiveTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation toSize:(CGSize)size;
 
-+ (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation toSize:(CGSize)size;
-+ (CGPoint)affineTransformPoint:(CGPoint)p transformation:(cv::Mat)transformation;
++ (cv::Mat)perspectiveTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation toSize:(CGSize)size;
 
-+ (cv::Mat)findAffineTransformationSrcPoints:(FourPoints)srcPoints dstPoints:(FourPoints)dstPoints;
++ (cv::Mat)findPerspectiveTransformationSrcPoints:(FourPoints)srcPoints dstPoints:(FourPoints)dstPoints;
 
 @end

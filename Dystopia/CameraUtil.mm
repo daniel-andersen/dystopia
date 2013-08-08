@@ -45,33 +45,24 @@
     return uiImage;
 }
 
-+ (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation {
-    return [self affineTransformImage:image withTransformation:transformation toSize:[ExternalDisplay instance].widescreenBounds.size];
++ (UIImage *)perspectiveTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation {
+    return [self perspectiveTransformImage:image withTransformation:transformation toSize:[ExternalDisplay instance].widescreenBounds.size];
 }
 
-+ (UIImage *)affineTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation toSize:(CGSize)size {
++ (UIImage *)perspectiveTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation toSize:(CGSize)size {
     cv::Mat srcImage = [image CVMat];
-    cv::Mat transformedImage = [self affineTransformCvMat:srcImage withTransformation:transformation toSize:size];
+    cv::Mat transformedImage = [self perspectiveTransformCvMat:srcImage withTransformation:transformation toSize:size];
     return [UIImage imageWithCVMat:transformedImage];
 }
 
-+ (cv::Mat)affineTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation toSize:(CGSize)toSize {
++ (cv::Mat)perspectiveTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation toSize:(CGSize)toSize {
     cv::Mat dst;
     cv::Size size = cv::Size(toSize.width, toSize.height);
-    cv::warpAffine(src, dst, transformation, size);
+    cv::warpPerspective(src, dst, transformation, size);
     return dst;
 }
 
-+ (CGPoint)affineTransformPoint:(CGPoint)p transformation:(cv::Mat)transformation {
-    cv::Mat src(3, 1, CV_64F);
-    src.at<double>(0, 0) = p.x;
-    src.at<double>(1, 0) = p.y;
-    src.at<double>(2, 0) = 1.0f;
-    cv::Mat dst = transformation * src;
-    return CGPointMake(dst.at<double>(0, 0), dst.at<double>(1, 0));
-}
-
-+ (cv::Mat)findAffineTransformationSrcPoints:(FourPoints)srcPoints dstPoints:(FourPoints)dstPoints {
++ (cv::Mat)findPerspectiveTransformationSrcPoints:(FourPoints)srcPoints dstPoints:(FourPoints)dstPoints {
     cv::Point2f srcCvPoints[4];
     srcCvPoints[0] = cv::Point2f(srcPoints.p1.x, srcPoints.p1.y);
     srcCvPoints[1] = cv::Point2f(srcPoints.p2.x, srcPoints.p2.y);
@@ -84,7 +75,7 @@
     dstCvPoints[2] = cv::Point2f(dstPoints.p3.x, dstPoints.p3.y);
     dstCvPoints[3] = cv::Point2f(dstPoints.p4.x, dstPoints.p4.y);
     
-    return cv::getAffineTransform(srcCvPoints, dstCvPoints);
+    return cv::getPerspectiveTransform(srcCvPoints, dstCvPoints);
 }
 
 @end

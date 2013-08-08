@@ -64,7 +64,6 @@
     boardBounds = [boardRecognizer findBoardBoundsFromImage:image];
     if (boardBounds.defined) {
         [self findCameraToScreenTransformation];
-        [self findScreenPoints];
         [cameraSession lock];
     } else {
         state = BOARD_CALIBRATION_STATE_CALIBRATING;
@@ -75,14 +74,7 @@
 - (void)findCameraToScreenTransformation {
     CGSize screenSize = [ExternalDisplay instance].widescreenBounds.size;
     FourPoints dstPoints = {.p1 = CGPointMake(0.0f, 0.0f), .p2 = CGPointMake(screenSize.width, 0.0f), .p3 = CGPointMake(screenSize.width, screenSize.height), .p4 = CGPointMake(0.0f, screenSize.height)};
-    boardCameraToScreenTransformation = [CameraUtil findAffineTransformationSrcPoints:boardBounds dstPoints:dstPoints];
-}
-
-- (void)findScreenPoints {
-    screenPoints.p1 = [CameraUtil affineTransformPoint:boardBounds.p1 transformation:boardCameraToScreenTransformation];
-    screenPoints.p2 = [CameraUtil affineTransformPoint:boardBounds.p2 transformation:boardCameraToScreenTransformation];
-    screenPoints.p3 = [CameraUtil affineTransformPoint:boardBounds.p3 transformation:boardCameraToScreenTransformation];
-    screenPoints.p4 = [CameraUtil affineTransformPoint:boardBounds.p4 transformation:boardCameraToScreenTransformation];
+    boardCameraToScreenTransformation = [CameraUtil findPerspectiveTransformationSrcPoints:boardBounds dstPoints:dstPoints];
 }
 
 - (void)success {
