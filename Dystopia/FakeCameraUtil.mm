@@ -36,4 +36,27 @@
     return [CameraUtil perspectiveTransformImage:image withTransformation:transformation toSize:image.size];
 }
 
++ (UIImage *)putHandsInImage:(UIImage *)image {
+    CGSize handSize = CGSizeMake(30.0f, 100.0f);
+    
+    UIGraphicsBeginImageContext(image.size);
+    [image drawAtPoint:CGPointZero];
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+    CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+    CGContextSetStrokeColorWithColor(context, [UIColor blackColor].CGColor);
+    CGContextFillEllipseInRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, image.size.height - handSize.height, handSize.width, handSize.height));
+
+    CGContextFillEllipseInRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, 0.0f, handSize.width, handSize.height));
+    CGContextSetFillColorWithColor(context, [UIColor blackColor].CGColor);
+    //CGContextFillRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, 0.0f, handSize.width / 2.0f, handSize.height));
+    
+    UIImage *destImage = UIGraphicsGetImageFromCurrentImageContext();
+
+    UIGraphicsEndImageContext();
+
+    return destImage;
+}
+
 @end

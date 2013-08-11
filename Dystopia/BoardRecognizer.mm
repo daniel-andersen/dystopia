@@ -49,11 +49,61 @@
 
 - (UIImage *)boardBoundsToImage:(UIImage *)image {
     cv::Mat img = [image CVMat];
+
     img = [self smooth:img];
     img = [self grayscale:img];
     img = [self applyCanny:img];
     img = [self erode:img];
-    return [UIImage imageWithCVMat:img];
+
+    // !!!!!!!!!!!!!!!!!!!!!!!
+    cv::Mat originalImg = img.clone();
+    cv::cvtColor(originalImg, originalImg, CV_GRAY2RGB);
+
+    minContourArea = (image.size.width * 0.6) * (image.size.height * 0.6f);
+    cv::vector<cv::vector<cv::Point>> contours;
+    cv::vector<cv::Vec4i> hierarchy;
+    
+    cv::findContours(img, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+
+    cv::vector<cv::vector<cv::Point>> hulls (contours.size());
+
+    for (int i = 0; i < contours.size(); i++) {
+        if (fabs(cv::contourArea(contours[i])) <= 10000.0f) {
+            continue;
+        }
+        cv::convexHull(cv::Mat(contours[i]), hulls[i]);
+        cv::approxPolyDP(hulls[i], hulls[i], cv::arcLength(cv::Mat(hulls[i]), true) * 0.005f, true);
+
+        /*if (hulls[i].size() > 5) {
+            continue;
+        }*/
+        cv::Scalar color = cv::Scalar(0, 255, 0);
+        cv::drawContours(originalImg, hulls, i, color);
+
+        NSLog(@"------------------------");
+        NSLog(@"%i", (int)hulls[i].size());
+        for (int j = 2; j < hulls[i].size() + 2; j++) {
+            float cosine = fabs(angle(hulls[i][j % hulls[i].size()], hulls[i][(j - 2) % hulls[i].size()], hulls[i][(j - 1) % hulls[i].size()]));
+            NSLog(@"Cosine: %f", cosine);
+        }
+    
+        /*cv::vector<cv::vector<cv::Point>> approx (1);
+        approx[0] = cv::vector<cv::Point> (4);
+        int k = 0;
+        for (int j = 0; j < hulls[i].size(); j++) {
+            if (j == minCosineIdx[0] || j == minCosineIdx[1] || j == (minCosineIdx[0] - 1 + hulls[i].size()) % hulls[i].size() || j == (minCosineIdx[1] - 1 + hulls[i].size()) % hulls[i].size() || j == minCosineIdx[1] || j == (minCosineIdx[0] + 1 + hulls[i].size()) % hulls[i].size() || j == (minCosineIdx[1] + 1 + hulls[i].size()) % hulls[i].size()) {
+                approx[0][k++] = hulls[i][j];
+                NSLog(@"-- %i", j);
+                if (k >= 4) {
+                    break;
+                }
+            }
+        }
+        cv::Scalar color2 = cv::Scalar(0, 0, 255);
+        cv::drawContours(originalImg, approx, 0, color2);*/
+    }
+    // !!!!!!!!!!!!!!!!!!!!!!!
+    return [UIImage imageWithCVMat:originalImg];
 }
 
 - (cv::Mat)filterAndThreshold:(cv::Mat)image {
@@ -73,7 +123,6 @@
 
 - (cv::Mat)applyCanny:(cv::Mat)image {
     cv::Canny(image, image, 100, 300);
-    //cv::Canny(image, image, threshold, threshold * 3.0f);
     return image;
 }
 
@@ -100,17 +149,20 @@
 
 - (FourPoints)findSimpleBoardBoundsFromContours:(cv::vector<cv::vector<cv::Point>>)contours hierachy:(cv::vector<cv::Vec4i>)hierarchy {
     cv::vector<cv::Point> approx;
+    cv::vector<cv::vector<cv::Point>> hulls (contours.size());
+
     FourPoints bestMatchedPoints = {.defined = NO};
     int bestMatchedConditionsSatisfied = 0;
 
     for (int i = 0; i < contours.size(); i++) {
-        //cv::approxPolyDP(cv::Mat(contours[i]), approx, 5, true);
-        cv::approxPolyDP(cv::Mat(contours[i]), approx, arcLength(cv::Mat(contours[i]), true) * 0.02f, true);
+        cv::convexHull(cv::Mat(contours[i]), hulls[i]);
+        cv::approxPolyDP(hulls[i], approx, cv::arcLength(cv::Mat(hulls[i]), true) * 0.005f, true);
+
         for (int conditionsCount = 5; conditionsCount >= 2; conditionsCount--) {
             if ([self areSimpleBoardBoundsConditionsSatisfiedWithContours:contours hierachy:hierarchy approx:approx conditionsCount:conditionsCount contourIndex:i]) {
                 float maxCosine = 0;
-                for (int j = 2; j <= approx.size(); j++) {
-                    float cosine = fabs(angle(approx[j % approx.size()], approx[j - 2], approx[j - 1]));
+                for (int j = 2; j < approx.size() + 2; j++) {
+                    float cosine = fabs(angle(approx[j % approx.size()], approx[(j - 2) % approx.size()], approx[(j - 1) % approx.size()]));
                     maxCosine = MAX(maxCosine, cosine);
                 }
                 int conditionsMatched = maxCosine < 0.4f ? (conditionsCount + 1) : conditionsCount;

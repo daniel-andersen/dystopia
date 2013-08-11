@@ -28,5 +28,6 @@
 @interface FakeCameraUtil : NSObject
 
 + (UIImage *)fakePerspectiveOnImage:(UIImage *)image;
++ (UIImage *)putHandsInImage:(UIImage *)image;
 
 @end

@@ -142,9 +142,10 @@ extern PreviewableViewController *previewInstance;
 - (UIImage *)requestSimulatedImageIfNoCamera {
     super.overlayView.hidden = YES;
     UIImage *image = [UIImage imageWithView:self.view];
-    UIImage *transformedImage = [FakeCameraUtil fakePerspectiveOnImage:image];
+    image = [FakeCameraUtil fakePerspectiveOnImage:image];
+    image = [FakeCameraUtil putHandsInImage:image];
     super.overlayView.hidden = NO;
-    return transformedImage;
+    return image;
 }
 
 - (NSUInteger)supportedInterfaceOrientations {

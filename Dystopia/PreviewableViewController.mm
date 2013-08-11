@@ -177,7 +177,9 @@ PreviewableViewController *previewInstance = nil;
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!boardPoints.defined) {
             boardBoundsLayer.hidden = YES;
+            return;
         }
+        return;
         boardBoundsLayer.hidden = NO;
         [CATransaction begin];
         [CATransaction setAnimationDuration:0.0f];
