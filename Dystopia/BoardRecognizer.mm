@@ -29,6 +29,7 @@
 #import "CameraUtil.h"
 
 @interface BoardRecognizer () {
+    //float minContourLength;
     float minContourArea;
 }
 
@@ -37,13 +38,14 @@
 @implementation BoardRecognizer
 
 - (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
-    minContourArea = (image.size.width * 0.6) * (image.size.height * 0.6f);
+    //minContourLength = (image.size.width * 0.6) * 2.0f + (image.size.height * 0.6f) * 2.0f;
+    minContourArea = (image.size.width * 0.5) * (image.size.height * 0.5f);
 
     cv::Mat img = [image CVMat];
     img = [self smooth:img];
     img = [self grayscale:img];
     img = [self applyCanny:img];
-    img = [self erode:img];
+    img = [self dilate:img];
     return [self findContours:img];
 }
 
@@ -53,13 +55,13 @@
     img = [self smooth:img];
     img = [self grayscale:img];
     img = [self applyCanny:img];
-    img = [self erode:img];
+    img = [self dilate:img];
 
     // !!!!!!!!!!!!!!!!!!!!!!!
     cv::Mat originalImg = img.clone();
     cv::cvtColor(originalImg, originalImg, CV_GRAY2RGB);
 
-    minContourArea = (image.size.width * 0.6) * (image.size.height * 0.6f);
+    minContourArea = (image.size.width * 0.7) * (image.size.height * 0.5f);
     cv::vector<cv::vector<cv::Point>> contours;
     cv::vector<cv::Vec4i> hierarchy;
     
@@ -68,39 +70,30 @@
     cv::vector<cv::vector<cv::Point>> hulls (contours.size());
 
     for (int i = 0; i < contours.size(); i++) {
-        if (fabs(cv::contourArea(contours[i])) <= 10000.0f) {
-            continue;
-        }
-        cv::convexHull(cv::Mat(contours[i]), hulls[i]);
-        cv::approxPolyDP(hulls[i], hulls[i], cv::arcLength(cv::Mat(hulls[i]), true) * 0.005f, true);
-
-        /*if (hulls[i].size() > 5) {
+        /*if (cv::arcLength(cv::Mat(contours[i]), true) < minArcLength) {
             continue;
         }*/
-        cv::Scalar color = cv::Scalar(0, 255, 0);
-        cv::drawContours(originalImg, hulls, i, color);
+        cv::convexHull(cv::Mat(contours[i]), hulls[i]);
+        cv::approxPolyDP(hulls[i], hulls[i], cv::arcLength(cv::Mat(hulls[i]), true) * 0.01f, true);
 
-        NSLog(@"------------------------");
-        NSLog(@"%i", (int)hulls[i].size());
-        for (int j = 2; j < hulls[i].size() + 2; j++) {
-            float cosine = fabs(angle(hulls[i][j % hulls[i].size()], hulls[i][(j - 2) % hulls[i].size()], hulls[i][(j - 1) % hulls[i].size()]));
-            NSLog(@"Cosine: %f", cosine);
+        if (hulls[i].size() < 4 || hulls[i].size() > 8) {
+            continue;
         }
-    
-        /*cv::vector<cv::vector<cv::Point>> approx (1);
-        approx[0] = cv::vector<cv::Point> (4);
-        int k = 0;
-        for (int j = 0; j < hulls[i].size(); j++) {
-            if (j == minCosineIdx[0] || j == minCosineIdx[1] || j == (minCosineIdx[0] - 1 + hulls[i].size()) % hulls[i].size() || j == (minCosineIdx[1] - 1 + hulls[i].size()) % hulls[i].size() || j == minCosineIdx[1] || j == (minCosineIdx[0] + 1 + hulls[i].size()) % hulls[i].size() || j == (minCosineIdx[1] + 1 + hulls[i].size()) % hulls[i].size()) {
-                approx[0][k++] = hulls[i][j];
-                NSLog(@"-- %i", j);
-                if (k >= 4) {
-                    break;
-                }
-            }
+        if (fabs(cv::contourArea(hulls[i])) <= 10000.0f) {
+            continue;
         }
-        cv::Scalar color2 = cv::Scalar(0, 0, 255);
-        cv::drawContours(originalImg, approx, 0, color2);*/
+
+        cv::vector<int> minIndexes = [self findFourIndexesFromContour:hulls[i]];
+
+        cv::vector<cv::vector<cv::Point>> squareContour (1);
+        squareContour[0] = cv::vector<cv::Point> (4);
+        for (int j = 0; j < 4; j++) {
+            squareContour[0][j] = hulls[i][minIndexes[j]];
+        }
+        
+        cv::Scalar color2 = cv::Scalar(0, 255, 0);
+        cv::drawContours(originalImg, squareContour, 0, color2);
+        
     }
     // !!!!!!!!!!!!!!!!!!!!!!!
     return [UIImage imageWithCVMat:originalImg];
@@ -126,7 +119,7 @@
     return image;
 }
 
-- (cv::Mat)erode:(cv::Mat)image {
+- (cv::Mat)dilate:(cv::Mat)image {
     cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3.0f, 3.0f));
     cv::dilate(image, image, element);
     return image;
@@ -138,63 +131,149 @@
 
     cv::findContours(image, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
     
-    FourPoints boardPoints = [self findSimpleBoardBoundsFromContours:contours hierachy:hierarchy];
-    if (boardPoints.defined) {
-        return boardPoints;
-    } else {
-        boardPoints = [self findBrokenBoardBoundsFromContours:contours hierachy:hierarchy];
+    FourPoints boardPoints = [self simpleBoardBoundsFromContours:contours hierarchy:hierarchy];
+    if (!boardPoints.defined) {
     }
     return boardPoints;
 }
 
-- (FourPoints)findSimpleBoardBoundsFromContours:(cv::vector<cv::vector<cv::Point>>)contours hierachy:(cv::vector<cv::Vec4i>)hierarchy {
-    cv::vector<cv::Point> approx;
-    cv::vector<cv::vector<cv::Point>> hulls (contours.size());
-
-    FourPoints bestMatchedPoints = {.defined = NO};
-    int bestMatchedConditionsSatisfied = 0;
-
+- (FourPoints)simpleBoardBoundsFromContours:(cv::vector<cv::vector<cv::Point>>)contours hierarchy:(cv::vector<cv::Vec4i>)hierarchy {
     for (int i = 0; i < contours.size(); i++) {
-        cv::convexHull(cv::Mat(contours[i]), hulls[i]);
-        cv::approxPolyDP(hulls[i], approx, cv::arcLength(cv::Mat(hulls[i]), true) * 0.005f, true);
-
-        for (int conditionsCount = 5; conditionsCount >= 2; conditionsCount--) {
-            if ([self areSimpleBoardBoundsConditionsSatisfiedWithContours:contours hierachy:hierarchy approx:approx conditionsCount:conditionsCount contourIndex:i]) {
-                float maxCosine = 0;
-                for (int j = 2; j < approx.size() + 2; j++) {
-                    float cosine = fabs(angle(approx[j % approx.size()], approx[(j - 2) % approx.size()], approx[(j - 1) % approx.size()]));
-                    maxCosine = MAX(maxCosine, cosine);
-                }
-                int conditionsMatched = maxCosine < 0.4f ? (conditionsCount + 1) : conditionsCount;
-                if (conditionsMatched > bestMatchedConditionsSatisfied) {
-                    bestMatchedConditionsSatisfied = conditionsMatched;
-                    bestMatchedPoints = {
-                        .defined = YES,
-                        .p1 = CGPointMake(approx[0].x, approx[0].y),
-                        .p2 = CGPointMake(approx[1].x, approx[1].y),
-                        .p3 = CGPointMake(approx[2].x, approx[2].y),
-                        .p4 = CGPointMake(approx[3].x, approx[3].y),
-                    };
-                }
+        //                                                                                                --------    ========
+        // Parent must have 3 children because of dilation; that is, the top border (fx.) transforms from -------- to ========
+        int borderIndices[4];
+        borderIndices[0] = i;
+        borderIndices[1] = borderIndices[0] != -1 ? hierarchy[borderIndices[0]][2] : -1;
+        borderIndices[2] = borderIndices[1] != -1 ? hierarchy[borderIndices[1]][2] : -1;
+        borderIndices[3] = borderIndices[2] != -1 ? hierarchy[borderIndices[2]][2] : -1;
+        if (borderIndices[1] == -1 || borderIndices[2] == -1 || borderIndices[3] == -1) {
+            continue;
+        }
+        
+        // Conditions to be satisfied
+        cv::vector<cv::vector<cv::Point>> approx (4);
+        for (int j = 0; j < 4; j++) {
+            cv::convexHull(cv::Mat(contours[borderIndices[j]]), approx[j]);
+            cv::approxPolyDP(approx[j], approx[j], cv::arcLength(cv::Mat(approx[j]), true) * 0.01f, true);
+            if (![self areSimpleConditionsSatisfied:approx[j]]) {
+                goto nextContour;
             }
         }
+        return [self dilatedContoursToBoardPoints:approx[2] withContour:approx[3]];
+        
+    nextContour:
+        continue;
     }
-    return bestMatchedPoints;
+    FourPoints undefinedPoints = {.defined = NO};
+    return undefinedPoints;
 }
 
-- (bool)areSimpleBoardBoundsConditionsSatisfiedWithContours:(cv::vector<cv::vector<cv::Point>>)contours hierachy:(cv::vector<cv::Vec4i>)hierarchy approx:(cv::vector<cv::Point>)approx conditionsCount:(int)conditionsCount contourIndex:(int)i {
-    int parentContour = hierarchy[i][3];
-    int childContour = hierarchy[i][2];
+- (FourPoints)dilatedContoursToBoardPoints:(cv::vector<cv::Point>)contour1 withContour:(cv::vector<cv::Point>)contour2 {
+    contour1 = [self sortPointsInContour:contour1];
+    contour2 = [self sortPointsInContour:contour2];
+    FourPoints points = {
+        .defined = YES,
+        .p1 = CGPointMake((contour1[0].x + contour2[0].x) / 2.0f, (contour1[0].y + contour2[0].y) / 2.0f),
+        .p2 = CGPointMake((contour1[1].x + contour2[1].x) / 2.0f, (contour1[1].y + contour2[1].y) / 2.0f),
+        .p3 = CGPointMake((contour1[2].x + contour2[2].x) / 2.0f, (contour1[2].y + contour2[2].y) / 2.0f),
+        .p4 = CGPointMake((contour1[3].x + contour2[3].x) / 2.0f, (contour1[3].y + contour2[3].y) / 2.0f)
+    };
+    return points;
+}
+
+- (cv::vector<cv::Point>)sortPointsInContour:(cv::vector<cv::Point>)contour {
+    int topLeftIndex = -1;
+    float topLeftSum = 0.0f;
+    for (int i = 0; i < contour.size(); i++) {
+        float sum = (contour[i].x * contour[i].x) + (contour[i].y * contour[i].y);
+        if (topLeftIndex == -1 || sum < topLeftSum) {
+            topLeftIndex = i;
+            topLeftSum = sum;
+        }
+    }
+    int neighbourIdx1 = (topLeftIndex + contour.size() - 1) % contour.size();
+    int neighbourIdx2 = (topLeftIndex + contour.size() + 1) % contour.size();
+    int dir = ABS(contour[topLeftIndex].x - contour[neighbourIdx1].x) > ABS(contour[topLeftIndex].x - contour[neighbourIdx2].x) ? -1 : 1;
     
-    return ((conditionsCount < 1 || fabs(cv::contourArea(contours[i])) >= minContourArea) &&
-            (conditionsCount < 2 || approx.size() == 4) &&
-            (conditionsCount < 3 || parentContour == -1) &&
-            (conditionsCount < 4 || childContour != -1) &&
-            (conditionsCount < 5 || cv::contourArea(contours[childContour]) >= minContourArea));
+    cv::vector<cv::Point> outPoints = cv::vector<cv::Point> (contour.size());
+    for (int i = 0; i < contour.size(); i++) {
+        outPoints[i] = contour[topLeftIndex];
+        topLeftIndex = (topLeftIndex + contour.size() + dir) % contour.size();
+    }
+    return outPoints;
 }
 
-- (FourPoints)findBrokenBoardBoundsFromContours:(cv::vector<cv::vector<cv::Point>>)contours hierachy:(cv::vector<cv::Vec4i>)hierarchy {
-    FourPoints boardPoints = {.defined = NO};
+- (bool)areSimpleConditionsSatisfied:(cv::vector<cv::Point>)contour {
+    return (//fabs(cv::arcLength(contour, true)) >= minContourLength &&
+            fabs(cv::contourArea(contour)) >= minContourArea &&
+            contour.size() == 4 &&
+            [self maxCosineFromContour:contour] <= 0.3f);
+}
+
+- (float)maxCosineFromContour:(cv::vector<cv::Point>)contour {
+    float maxCosine = 0.0f;
+    for (int j = 2; j < contour.size() + 2; j++) {
+        float cosine = fabs(angle(contour[j % contour.size()], contour[(j - 2) % contour.size()], contour[(j - 1) % contour.size()]));
+        if (cosine > maxCosine) {
+            maxCosine = cosine;
+        }
+    }
+    return maxCosine;
+}
+
+- (cv::vector<int>)findFourIndexesFromContour:(cv::vector<cv::Point>)contour {
+    cv::vector<int> indexes = cv::vector<int> (4);
+    for (int i = 0; i < indexes.size(); i++) {
+        indexes[i] = i;
+    }
+
+    cv::vector<int> minIndexes = cv::vector<int> (4);
+    float minAngleSum = 1000.0f;
+
+    while (true) {
+        float angleSum = [self sumOfAnglesFromContour:contour withIndexes:indexes];
+        if (angleSum < minAngleSum) {
+            minAngleSum = angleSum;
+            minIndexes = indexes;
+        }
+        if (indexes[0] == contour.size() - 4 && indexes[1] == contour.size() - 3 && indexes[2] == contour.size() - 2 && indexes[3] == contour.size() - 1) {
+            break;
+        }
+        indexes = [self nextIndexes:indexes maxIndex:(contour.size() - 1)];
+    }
+    return minIndexes;
+}
+
+- (cv::vector<int>)nextIndexes:(cv::vector<int>)indexes maxIndex:(int)maxIndex {
+    for (int i = 0; i < indexes.size(); i++) {
+        int idx = indexes.size() - i - 1;
+        if (indexes[idx] < maxIndex - i) {
+            indexes[idx]++;
+            for (int j = idx + 1; j < indexes.size(); j++) {
+                indexes[j] = indexes[idx] + (j - idx);
+            }
+            return indexes;
+        }
+    }
+    return indexes;
+}
+
+- (float)sumOfAnglesFromContour:(cv::vector<cv::Point>)contour withIndexes:(cv::vector<int>)indexes {
+    float angleSum = 0.0f;
+    for (int i = 2; i < indexes.size() + 2; i++) {
+        angleSum += fabs(angle(contour[indexes[i % indexes.size()]], contour[indexes[(i - 2) % indexes.size()]], contour[indexes[(i - 1) % indexes.size()]]));
+    }
+    return angleSum;
+}
+
+- (FourPoints)contourToBoardPoints:(cv::vector<cv::Point>)contour {
+    FourPoints boardPoints = {
+        .defined = YES,
+        .p1 = CGPointMake(contour[0].x, contour[0].y),
+        .p2 = CGPointMake(contour[1].x, contour[1].y),
+        .p3 = CGPointMake(contour[2].x, contour[2].y),
+        .p4 = CGPointMake(contour[3].x, contour[3].y),
+    };
     return boardPoints;
 }
 

@@ -179,7 +179,6 @@ PreviewableViewController *previewInstance = nil;
             boardBoundsLayer.hidden = YES;
             return;
         }
-        return;
         boardBoundsLayer.hidden = NO;
         [CATransaction begin];
         [CATransaction setAnimationDuration:0.0f];
