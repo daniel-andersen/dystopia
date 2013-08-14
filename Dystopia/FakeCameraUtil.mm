@@ -36,6 +36,26 @@
     return [CameraUtil perspectiveTransformImage:image withTransformation:transformation toSize:image.size];
 }
 
++ (UIImage *)distortImage:(UIImage *)image {
+    UIGraphicsBeginImageContext(image.size);
+    [image drawAtPoint:CGPointZero];
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+    CGPoint lines[4] = {CGPointMake(20.0f, 20.0f), CGPointMake(20.0f, image.size.height - 20.0f),
+                        CGPointMake(20.0f, 20.0f), CGPointMake(image.size.width / 3.0f, 20.0f)};
+    
+    CGContextSetStrokeColorWithColor(context, [UIColor whiteColor].CGColor);
+    CGContextSetLineWidth(context, 1.0f);
+    CGContextStrokeLineSegments(context, lines, 4);
+    
+    UIImage *destImage = UIGraphicsGetImageFromCurrentImageContext();
+
+    UIGraphicsEndImageContext();
+    
+    return destImage;
+}
+
 + (UIImage *)putHandsInImage:(UIImage *)image {
     CGSize handSize = CGSizeMake(30.0f, 100.0f);
     
@@ -44,13 +64,21 @@
     
     CGContextRef context = UIGraphicsGetCurrentContext();
 
-    CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
-    CGContextSetStrokeColorWithColor(context, [UIColor blackColor].CGColor);
-    CGContextFillEllipseInRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, image.size.height - handSize.height, handSize.width, handSize.height));
+    CGContextSetLineWidth(context, 1.0f);
 
-    CGContextFillEllipseInRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, 0.0f, handSize.width, handSize.height));
+    CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+    CGContextSetStrokeColorWithColor(context, [UIColor whiteColor].CGColor);
+    CGContextFillEllipseInRect(context, CGRectMake(70.0f, image.size.height - handSize.height, handSize.width, handSize.height));
+    //CGContextFillEllipseInRect(context, CGRectMake(image.size.width - 90.0f, image.size.height - handSize.height, handSize.width, handSize.height));
+    //CGContextFillEllipseInRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, image.size.height - handSize.height, handSize.width, handSize.height));
+    CGContextFillEllipseInRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, -20.0f, handSize.width, handSize.height));
+
     CGContextSetFillColorWithColor(context, [UIColor blackColor].CGColor);
-    //CGContextFillRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, 0.0f, handSize.width / 2.0f, handSize.height));
+    CGContextSetStrokeColorWithColor(context, [UIColor blackColor].CGColor);
+    CGContextFillRect(context, CGRectMake(70.0f, image.size.height - handSize.height, handSize.width / 2.0f, handSize.height));
+    //CGContextFillRect(context, CGRectMake(image.size.width - 90.0f, image.size.height - handSize.height, handSize.width / 2.0f, handSize.height));
+    //CGContextFillRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, image.size.height - handSize.height, handSize.width / 2.0f, handSize.height));
+    CGContextFillRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, -20.0f, handSize.width / 2.0f, handSize.height));
     
     UIImage *destImage = UIGraphicsGetImageFromCurrentImageContext();
 

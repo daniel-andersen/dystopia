@@ -93,8 +93,8 @@ extern PreviewableViewController *previewInstance;
 - (void)processFrame:(UIImage *)image {
     [self calibrateBoard:image];
     [self updateGameStateAccordingToFrame];
-    [previewInstance previewFrame:image boardCalibrator:boardCalibrator];
-    //[previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
+    //[previewInstance previewFrame:image boardCalibrator:boardCalibrator];
+    [previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
 }
 
 - (void)updateGameStateAccordingToFrame {
@@ -143,7 +143,8 @@ extern PreviewableViewController *previewInstance;
     super.overlayView.hidden = YES;
     UIImage *image = [UIImage imageWithView:self.view];
     image = [FakeCameraUtil fakePerspectiveOnImage:image];
-    //image = [FakeCameraUtil putHandsInImage:image];
+    image = [FakeCameraUtil distortImage:image];
+    image = [FakeCameraUtil putHandsInImage:image];
     super.overlayView.hidden = NO;
     return image;
 }
