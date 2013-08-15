@@ -28,11 +28,19 @@
 #import "BoardUtil.h"
 #import "CameraUtil.h"
 
+float intersectionAcceptDistanceMin = 0.02f;
+float intersectionAcceptDistanceMax = 2.0f;
+
 typedef struct {
     cv::Point p1;
     cv::Point p2;
     float angle;
 } LineWithAngle;
+
+typedef struct {
+    LineWithAngle lineWithAngle;
+    cv::vector<cv::Point> intersections;
+} LineWithAngleAndIntersectionPoints;
 
 typedef struct {
     cv::vector<LineWithAngle> lines;
@@ -104,7 +112,7 @@ typedef struct {
                 continue;
             }
 
-            lineWithAngle.angle = lineAngle(lineWithAngle.p1, lineWithAngle.p2);
+            lineWithAngle.angle = lineAngle(lineWithAngle.p1, lineWithAngle.p2) * 180.0f / M_PI;
             linesAndAngles.push_back(lineWithAngle);
         }
     }
@@ -117,11 +125,75 @@ typedef struct {
     cv::vector<LineGroup> bestTwoLineGroups = [self findBestTwoLineGroups:lineGroups];
 
     [self drawBestTwoLineGroups:bestTwoLineGroups ontoImage:originalImg];
-    
+
+    cv::vector<LineWithAngleAndIntersectionPoints> validIntersections;
+    validIntersections = [self findValidIntersectionsBetweenLines:bestTwoLineGroups[0].lines andLines:bestTwoLineGroups[1].lines];
+
+    [self drawIntersections:validIntersections image:originalImg];
+    //NSLog(@"------------");
     //NSLog(@"%i", (int)lines.size());
 
     // !!!!!!!!!!!!!!!!!!!!!!!
     return [UIImage imageWithCVMat:originalImg];
+}
+
+- (cv::vector<LineWithAngleAndIntersectionPoints>)findValidIntersectionsBetweenLines:(cv::vector<LineWithAngle>)lines1 andLines:(cv::vector<LineWithAngle>)lines2 {
+    cv::vector<LineWithAngleAndIntersectionPoints> validIntersections;
+    for (int i = 0; i < lines1.size(); i++) {
+        cv::vector<cv::Point> intersectionPoints;
+        float minT1 = 1.0f;
+        float maxT1 = 0.0f;
+        float minT2 = 1.0f;
+        float maxT2 = 0.0f;
+        for (int j = 0; j < lines2.size(); j++) {
+            cv::Point r;
+            cv::Point2f t;
+            if ([self isAcceptableIntersectionP1:lines1[i] p2:lines2[j] r:r t:t]) {
+                intersectionPoints.push_back(r);
+                minT1 = MIN(minT1, t.x);
+                maxT1 = MAX(maxT1, t.x);
+                minT2 = MIN(minT2, t.y);
+                maxT2 = MAX(maxT2, t.y);
+            }
+        }
+        if ([self isWithinAcceptableDistanceMin:minT1] && [self isWithinAcceptableDistanceMax:maxT1] && [self isWithinAcceptableDistanceMin:minT2] && [self isWithinAcceptableDistanceMax:maxT2]) {
+            LineWithAngleAndIntersectionPoints l = {
+                .lineWithAngle = lines1[i],
+                .intersections = intersectionPoints
+            };
+            validIntersections.push_back(l);
+        }
+    }
+    return validIntersections;
+}
+
+- (bool)isAcceptableIntersectionP1:(LineWithAngle)line1 p2:(LineWithAngle)line2 r:(cv::Point &)r t:(cv::Point2f &)t {
+    if (intersection(line1.p1, line1.p2, line2.p1, line2.p2, r, t)) {
+        return [self isWithinAcceptableDistance:t.x] && [self isWithinAcceptableDistance:t.y];
+    } else {
+        return NO;
+    }
+}
+
+- (bool)isWithinAcceptableDistance:(float)t {
+    return [self isWithinAcceptableDistanceMin:t] || [self isWithinAcceptableDistanceMax:t];
+}
+
+- (bool)isWithinAcceptableDistanceMin:(float)t {
+    return t > -intersectionAcceptDistanceMax && t < intersectionAcceptDistanceMin;
+}
+
+- (bool)isWithinAcceptableDistanceMax:(float)t {
+    return t > 1.0f - intersectionAcceptDistanceMin && t < 1.0f + intersectionAcceptDistanceMax;
+}
+
+- (void)drawIntersections:(cv::vector<LineWithAngleAndIntersectionPoints>)lines image:(cv::Mat)image {
+    for (int i = 0; i < lines.size(); i++) {
+        for (int j = 0; j < lines[i].intersections.size(); j++) {
+            cv::Scalar color = cv::Scalar(255, 0, 255);
+            cv::circle(image, lines[i].intersections[j], 5.0f, color);
+        }
+    }
 }
 
 - (void)drawBestTwoLineGroups:(cv::vector<LineGroup>)bestTwoLineGroups ontoImage:(cv::Mat)image {
@@ -138,7 +210,7 @@ typedef struct {
 }
 
 - (cv::vector<LineGroup>)findBestTwoLineGroups:(cv::vector<LineGroup>)lineGroups {
-    const float perpendicularAngleEpsilon = 10.0f;
+    const float perpendicularAngleEpsilon = 20.0f;
     
     cv::vector<LineGroup> groups;
 
@@ -156,7 +228,7 @@ typedef struct {
     int secondBestGroupSize = 0;
     int secondBestGroupIndex = 0;
     for (int i = 0; i < lineGroups.size(); i++) {
-        int deltaPerpendicularAngle = ABS(((int)(bestAngle + 90.0f - lineGroups[i].angle + 180.0f)) % 180);
+        int deltaPerpendicularAngle = angleDelta180(bestAngle + 90.0f, lineGroups[i].angle);
         if (deltaPerpendicularAngle < perpendicularAngleEpsilon && lineGroups[i].lines.size() > secondBestGroupSize) {
             secondBestGroupSize = lineGroups[i].lines.size();
             secondBestGroupIndex = i;
@@ -168,10 +240,11 @@ typedef struct {
 }
 
 - (cv::vector<LineGroup>)groupLines:(cv::vector<LineWithAngle>)linesWithAngles {
-    int groupAngleSize = 8 * 2;
-    cv::vector<cv::vector<LineWithAngle>> buckets = cv::vector<cv::vector<LineWithAngle>> (360);
+    int bucketSize = 4;
+    int groupAngleSize = 10;
+    cv::vector<cv::vector<LineWithAngle>> buckets = cv::vector<cv::vector<LineWithAngle>> (180 / bucketSize);
     for (int i = 0; i < linesWithAngles.size(); i++) {
-        int intAngle = (int)(linesWithAngles[i].angle * 180.0f / M_PI) % 180;
+        int intAngle = (((int)linesWithAngles[i].angle) % 180) / bucketSize;
         buckets[intAngle].push_back(linesWithAngles[i]);
     }
 
@@ -416,18 +489,32 @@ float lineAngle(cv::Point p1, cv::Point p2) {
     return atan2f(p1.y - p2.y, p1.x - p2.x) + M_PI;
 }
 
-bool intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2, cv::Point2f &r) {
-    cv::Point2f x = o2 - o1;
-    cv::Point2f d1 = p1 - o1;
-    cv::Point2f d2 = p2 - o2;
+int angleDelta(int angle1, int angle2) {
+    int delta = ABS(angle1 - angle2) % 360;
+    return delta > 180 ? 360 - delta : delta;
+}
+
+int angleDelta180(int angle1, int angle2) {
+    int delta = ABS(angle1 - angle2) % 180;
+    return delta > 90 ? 180 - delta : delta;
+}
+
+bool intersection(cv::Point o1, cv::Point p1, cv::Point o2, cv::Point p2, cv::Point &r, cv::Point2f &t) {
+    cv::Point x = o2 - o1;
+    cv::Point d1 = p1 - o1;
+    cv::Point d2 = p2 - o2;
     
     float cross = d1.x*d2.y - d1.y*d2.x;
-    if (abs(cross) < /*EPS*/1e-8) {
+    if (ABS(cross) < /*EPS*/1e-8) {
         return false;
     }
     
-    double t1 = (x.x * d2.y - x.y * d2.x)/cross;
+    float t1 = (x.x * d2.y - x.y * d2.x) / cross;
+    float t2 = (x.x * d1.y - x.y * d1.x) / cross;
+    
     r = o1 + d1 * t1;
+    t = cv::Point2f(t1, t2);
+    
     return true;
 }
 
