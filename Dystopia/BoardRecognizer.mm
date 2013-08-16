@@ -38,11 +38,6 @@ typedef struct {
 } LineWithAngle;
 
 typedef struct {
-    LineWithAngle lineWithAngle;
-    cv::vector<cv::Point> intersections;
-} LineWithAngleAndIntersectionPoints;
-
-typedef struct {
     cv::vector<LineWithAngle> lines;
     float angle;
 } LineGroup;
@@ -85,60 +80,152 @@ typedef struct {
     //cv::cvtColor(originalImg, originalImg, CV_GRAY2RGB);
 
     minContourArea = (image.size.width * 0.7) * (image.size.height * 0.5f);
+
+    // Find contours in image
     cv::vector<cv::vector<cv::Point>> contours;
-    cv::vector<cv::Vec4i> hierarchy;
+    cv::findContours(img, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+
+    // Find all lines that satisfy the minimum length property
+    cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:(image.size.width * 0.2f)];
+    if (linesAndAngles.size() == 0) {
+        return [UIImage imageWithCVMat:originalImg];
+    }
+
+    // Group lines into two groups (horizontal and vertical)
+    cv::vector<LineGroup> bestTwoLineGroups = [self findBestTwoLineGroups:[self groupLines:linesAndAngles]];
+
+    // Find all intersections that are not too far away from original line
+    cv::vector<cv::Point> validIntersections = [self findValidIntersectionsBetweenLines:bestTwoLineGroups[0].lines andLines:bestTwoLineGroups[1].lines];
+
+    // Group intersection points
+    cv::vector<cv::Point> groupedPoints = [self groupPoints:validIntersections groupRadius:10.0f];
     
-    cv::findContours(img, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+    // Find best square among points
+    cv::vector<cv::Point> squareGroupPoints = [self findBestSquareFromPoints:groupedPoints];
 
-    cv::vector<cv::vector<cv::Point>> hulls (contours.size());
+    // Find square from all points close to grouped square points
+    cv::vector<cv::Point> squarePoints = [self findSquareFromGroupPoints:squareGroupPoints allPoints:validIntersections groupRadius:10.0f];
 
+    // ----
+    [self drawBestTwoLineGroups:bestTwoLineGroups ontoImage:originalImg];
+    [self drawPoints:squarePoints image:originalImg];
+
+    cv::vector<cv::vector<cv::Point>> finalPointsContour = cv::vector<cv::vector<cv::Point>> (1);
+    finalPointsContour[0] = squarePoints;
+    cv::Scalar color = cv::Scalar(255, 0, 255);
+    cv::drawContours(originalImg, finalPointsContour, 0, color);
+
+    return [UIImage imageWithCVMat:originalImg];
+}
+
+- (cv::vector<cv::Point>)findSquareFromGroupPoints:(cv::vector<cv::Point>)groupPoints allPoints:(cv::vector<cv::Point>)allPoints groupRadius:(float)radius {
+    float radiusSquared = radius * radius;
+    
+    cv::vector<cv::Point> squarePoints;
+    for (int i = 0; i < groupPoints.size(); i++) {
+        for (int j = 0; j < allPoints.size(); j++) {
+            if (pointSquaredDistance(groupPoints[i], allPoints[j]) < radiusSquared) {
+                squarePoints.push_back(allPoints[j]);
+            }
+        }
+    }
+
+    cv::vector<cv::Point> hull;
+    cv::convexHull(squarePoints, hull);
+    cv::approxPolyDP(hull, hull, cv::arcLength(cv::Mat(hull), true) * 0.02f, true); // arcLength??? Makes sense?
+    
+    return hull;
+}
+
+- (cv::vector<cv::Point>)groupPoints:(cv::vector<cv::Point>)points groupRadius:(float)radius {
+    float radiusSquared = radius * radius;
+    
+    cv::vector<cv::Point> approxedPoints;
+    cv::vector<cv::Point> groupedPoints;
+
+    cv::approxPolyDP(points, approxedPoints, cv::arcLength(cv::Mat(points), true) * 0.02f, true); // arcLength??? Makes sense?
+    
+    for (int i = 0; i < approxedPoints.size(); i++) {
+        bool newGroup = true;
+        for (int j = 0; j < groupedPoints.size(); j++) {
+            if (pointSquaredDistance(approxedPoints[i], groupedPoints[j]) < radiusSquared) {
+                newGroup = false;
+            }
+        }
+        if (newGroup) {
+            groupedPoints.push_back(approxedPoints[i]);
+        }
+    }
+    return groupedPoints;
+}
+
+- (cv::vector<LineWithAngle>)findLinesFromContours:(cv::vector<cv::vector<cv::Point>>)contours minimumLineLength:(float)minimumLineLength {
     cv::vector<LineWithAngle> linesAndAngles = cv::vector<LineWithAngle> (0);
+    cv::vector<cv::Point> hull;
     
-    float minimumLineSizeSqr = (image.size.width * 0.2f) * (image.size.width * 0.2f);
-
+    float minimumLineLengthSqr = minimumLineLength * minimumLineLength;
+    
     for (int i = 0; i < contours.size(); i++) {
-        cv::approxPolyDP(contours[i], hulls[i], cv::arcLength(cv::Mat(contours[i]), true) * 0.002f, true);
+        cv::approxPolyDP(contours[i], hull, cv::arcLength(cv::Mat(contours[i]), true) * 0.002f, true);
         
-        for (int j = 0; j < hulls[i].size(); j++) {
+        for (int j = 0; j < hull.size(); j++) {
             LineWithAngle lineWithAngle = {
-                .p1 = hulls[i][(j + 0) % hulls[i].size()],
-                .p2 = hulls[i][(j + 1) % hulls[i].size()]
+                .p1 = hull[(j + 0) % hull.size()],
+                .p2 = hull[(j + 1) % hull.size()]
             };
             
             float deltaX = lineWithAngle.p1.x - lineWithAngle.p2.x;
             float deltaY = lineWithAngle.p1.y - lineWithAngle.p2.y;
-
-            if ((deltaX * deltaX) + (deltaY * deltaY) < minimumLineSizeSqr) {
+            
+            if ((deltaX * deltaX) + (deltaY * deltaY) < minimumLineLengthSqr) {
                 continue;
             }
-
+            
             lineWithAngle.angle = lineAngle(lineWithAngle.p1, lineWithAngle.p2) * 180.0f / M_PI;
             linesAndAngles.push_back(lineWithAngle);
         }
     }
-    
-    if (linesAndAngles.size() == 0) {
-        return [UIImage imageWithCVMat:originalImg];
-    }
-    
-    cv::vector<LineGroup> lineGroups = [self groupLines:linesAndAngles];
-    cv::vector<LineGroup> bestTwoLineGroups = [self findBestTwoLineGroups:lineGroups];
-
-    [self drawBestTwoLineGroups:bestTwoLineGroups ontoImage:originalImg];
-
-    cv::vector<LineWithAngleAndIntersectionPoints> validIntersections;
-    validIntersections = [self findValidIntersectionsBetweenLines:bestTwoLineGroups[0].lines andLines:bestTwoLineGroups[1].lines];
-
-    [self drawIntersections:validIntersections image:originalImg];
-    //NSLog(@"------------");
-    //NSLog(@"%i", (int)lines.size());
-
-    // !!!!!!!!!!!!!!!!!!!!!!!
-    return [UIImage imageWithCVMat:originalImg];
+    return linesAndAngles;
 }
 
-- (cv::vector<LineWithAngleAndIntersectionPoints>)findValidIntersectionsBetweenLines:(cv::vector<LineWithAngle>)lines1 andLines:(cv::vector<LineWithAngle>)lines2 {
-    cv::vector<LineWithAngleAndIntersectionPoints> validIntersections;
+- (cv::vector<cv::Point>)findBestSquareFromPoints:(cv::vector<cv::Point>)points {
+    cv::vector<cv::Point> bestPoints = cv::vector<cv::Point> (4);
+    cv::vector<cv::Point> currentPoints = cv::vector<cv::Point> (4);
+    cv::vector<cv::Point> hull;
+    
+    float minDifferenceFactor = 1000.0f;
+    
+    for (int i1 = 0; i1 < points.size(); i1++) {
+        currentPoints[0] = points[i1];
+
+        for (int i2 = i1 + 1; i2 < points.size(); i2++) {
+            currentPoints[1] = points[i2];
+        
+            for (int i3 = i2 + 1; i3 < points.size(); i3++) {
+                currentPoints[2] = points[i3];
+            
+                for (int i4 = i3 + 1; i4 < points.size(); i4++) {
+                    currentPoints[3] = points[i4];
+                    cv::convexHull(currentPoints, hull);
+                    
+                    float hullArea = cv::contourArea(hull);
+                    cv::RotatedRect hullRect = cv::minAreaRect(hull);
+
+                    float differenceFactor = (hullRect.size.width * hullRect.size.height) / hullArea;
+                    
+                    if (differenceFactor < minDifferenceFactor && [self areSimpleConditionsSatisfied:hull]) {
+                        bestPoints = hull;
+                        minDifferenceFactor = differenceFactor;
+                    }
+                }
+            }
+        }
+    }
+    return bestPoints;
+}
+
+- (cv::vector<cv::Point>)findValidIntersectionsBetweenLines:(cv::vector<LineWithAngle>)lines1 andLines:(cv::vector<LineWithAngle>)lines2 {
+    cv::vector<cv::Point> validIntersections;
     for (int i = 0; i < lines1.size(); i++) {
         cv::vector<cv::Point> intersectionPoints;
         float minT1 = 1.0f;
@@ -156,12 +243,11 @@ typedef struct {
                 maxT2 = MAX(maxT2, t.y);
             }
         }
-        if ([self isWithinAcceptableDistanceMin:minT1] && [self isWithinAcceptableDistanceMax:maxT1] && [self isWithinAcceptableDistanceMin:minT2] && [self isWithinAcceptableDistanceMax:maxT2]) {
-            LineWithAngleAndIntersectionPoints l = {
-                .lineWithAngle = lines1[i],
-                .intersections = intersectionPoints
-            };
-            validIntersections.push_back(l);
+        if ([self isWithinAcceptableDistanceMin:minT1] && [self isWithinAcceptableDistanceMax:maxT1] &&
+            [self isWithinAcceptableDistanceMin:minT2] && [self isWithinAcceptableDistanceMax:maxT2]) {
+            for (int j = 0; j < intersectionPoints.size(); j++) {
+                validIntersections.push_back(intersectionPoints[j]);
+            }
         }
     }
     return validIntersections;
@@ -187,12 +273,10 @@ typedef struct {
     return t > 1.0f - intersectionAcceptDistanceMin && t < 1.0f + intersectionAcceptDistanceMax;
 }
 
-- (void)drawIntersections:(cv::vector<LineWithAngleAndIntersectionPoints>)lines image:(cv::Mat)image {
-    for (int i = 0; i < lines.size(); i++) {
-        for (int j = 0; j < lines[i].intersections.size(); j++) {
-            cv::Scalar color = cv::Scalar(255, 0, 255);
-            cv::circle(image, lines[i].intersections[j], 5.0f, color);
-        }
+- (void)drawPoints:(cv::vector<cv::Point>)points image:(cv::Mat)image {
+    for (int i = 0; i < points.size(); i++) {
+        cv::Scalar color = cv::Scalar(255, 0, 255);
+        cv::circle(image, points[i], 5.0f, color);
     }
 }
 
@@ -432,6 +516,19 @@ typedef struct {
     return maxCosine;
 }
 
+- (int)maxCosineIndexFromContour:(cv::vector<cv::Point>)contour {
+    float maxCosine = 0.0f;
+    int maxCosineIndex = 0;
+    for (int j = 2; j < contour.size() + 2; j++) {
+        float cosine = fabs(angle(contour[j % contour.size()], contour[(j - 2) % contour.size()], contour[(j - 1) % contour.size()]));
+        if (cosine > maxCosine) {
+            maxCosine = cosine;
+            maxCosineIndex = j;
+        }
+    }
+    return maxCosineIndex;
+}
+
 - (cv::vector<int>)fourCornerIndexesFromContour:(cv::vector<cv::Point>)contour {
     cv::vector<int> indexes = cv::vector<int> (4);
     for (int i = 0; i < indexes.size(); i++) {
@@ -497,6 +594,12 @@ int angleDelta(int angle1, int angle2) {
 int angleDelta180(int angle1, int angle2) {
     int delta = ABS(angle1 - angle2) % 180;
     return delta > 90 ? 180 - delta : delta;
+}
+
+float pointSquaredDistance(cv::Point p1, cv::Point p2) {
+    int deltaX = p1.x - p2.x;
+    int deltaY = p1.y - p2.y;
+    return (deltaX * deltaX) + (deltaY * deltaY);
 }
 
 bool intersection(cv::Point o1, cv::Point p1, cv::Point o2, cv::Point p2, cv::Point &r, cv::Point2f &t) {
