@@ -27,6 +27,7 @@
 #import "CameraSession.h"
 #import "CameraUtil.h"
 #import "ExternalDisplay.h"
+#import "BoardUtil.h"
 
 @interface BoardCalibrator () {
     BoardRecognizer *boardRecognizer;
@@ -58,6 +59,7 @@
     boardRecognizer = [[BoardRecognizer alloc] init];
     state = BOARD_CALIBRATION_STATE_UNCALIBRATED;
     boardBounds.defined = NO;
+    [self addSubview:[self boardRecognizedView]];
 }
 
 - (void)updateBoundsWithImage:(UIImage *)image {
@@ -79,6 +81,13 @@
 
 - (void)success {
     state = BOARD_CALIBRATION_STATE_CALIBRATED;
+}
+
+- (UIView *)boardRecognizedView {
+    UIView *boardRecognizedView = [[UIView alloc] initWithFrame:CGRectMake([BoardUtil instance].singleBrickScreenSize.width - 10.0f, [BoardUtil instance].singleBrickScreenSize.height - 10.0f, 10.0f, 10.0f)];
+    boardRecognizedView.backgroundColor = [UIColor greenColor];
+    boardRecognizedView.hidden = YES;
+    return boardRecognizedView;
 }
 
 @end

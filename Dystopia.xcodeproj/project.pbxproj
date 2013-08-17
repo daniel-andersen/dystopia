@@ -60,7 +60,6 @@
 		65B930B217806C5500312B88 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B117806C5500312B88 /* AVFoundation.framework */; };
 		65B930B417806C6400312B88 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B317806C6400312B88 /* CoreMedia.framework */; };
 		65B930B817806D1400312B88 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B717806D1400312B88 /* CoreVideo.framework */; };
-		65E128A417B2DEB1007E2CF3 /* ExternalDislayCalibrationBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E128A317B2DEB1007E2CF3 /* ExternalDislayCalibrationBorderView.m */; };
 		65EA26461780C54B00E84BA4 /* UIImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */; };
 		65EA26481780C6D700E84BA4 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA26471780C6D700E84BA4 /* libz.dylib */; };
 		65EA264E1780C90300E84BA4 /* FingerRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA264D1780C90300E84BA4 /* FingerRecognizer.mm */; };
@@ -143,8 +142,6 @@
 		65B930B117806C5500312B88 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		65B930B317806C6400312B88 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		65B930B717806D1400312B88 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
-		65E128A217B2DEB1007E2CF3 /* ExternalDislayCalibrationBorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExternalDislayCalibrationBorderView.h; sourceTree = "<group>"; };
-		65E128A317B2DEB1007E2CF3 /* ExternalDislayCalibrationBorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExternalDislayCalibrationBorderView.m; sourceTree = "<group>"; };
 		65EA26441780C54B00E84BA4 /* UIImage+OpenCV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+OpenCV.h"; sourceTree = "<group>"; };
 		65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+OpenCV.mm"; sourceTree = "<group>"; };
 		65EA26471780C6D700E84BA4 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
@@ -373,8 +370,6 @@
 			children = (
 				65EA267D1783520900E84BA4 /* ExternalDisplay.h */,
 				65EA267E1783520900E84BA4 /* ExternalDisplay.m */,
-				65E128A217B2DEB1007E2CF3 /* ExternalDislayCalibrationBorderView.h */,
-				65E128A317B2DEB1007E2CF3 /* ExternalDislayCalibrationBorderView.m */,
 				65EA26441780C54B00E84BA4 /* UIImage+OpenCV.h */,
 				65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */,
 				650D421C178B45A700D89CEB /* UIImage+CaptureScreen.h */,
@@ -503,7 +498,6 @@
 				650D429B178F40DE00D89CEB /* BrickView.mm in Sources */,
 				650D429E178F41B400D89CEB /* BoardUtil.mm in Sources */,
 				6552706517B177B300784CD7 /* BorderView.mm in Sources */,
-				65E128A417B2DEB1007E2CF3 /* ExternalDislayCalibrationBorderView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -28,6 +28,8 @@
 
 #import <UIKit/UIKit.h>
 
+#define DEBUG 1
+
 typedef struct {
     CGPoint p1;
     CGPoint p2;

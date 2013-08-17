@@ -27,15 +27,12 @@
 #import "ExternalDisplay.h"
 #import "UIImage+CaptureScreen.h"
 #import "FakeCameraUtil.h"
-#import "ExternalDislayCalibrationBorderView.h"
 
 extern PreviewableViewController *previewInstance;
 
 @interface GameViewController () {
     CameraSession *cameraSession;
 
-    ExternalDislayCalibrationBorderView *externalDislayCalibrationBorderView;
-    
     BoardCalibrator *boardCalibrator;
     BoardGame *boardGame;
     Intro *intro;
@@ -60,9 +57,6 @@ extern PreviewableViewController *previewInstance;
     [super viewWillLayoutSubviews];
     [self.view bringSubviewToFront:boardCalibrator];
     [self.view bringSubviewToFront:super.overlayView];
-    if (externalDislayCalibrationBorderView != nil) {
-        [self.view bringSubviewToFront:externalDislayCalibrationBorderView];
-    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -78,23 +72,20 @@ extern PreviewableViewController *previewInstance;
     boardCalibrator = [[BoardCalibrator alloc] initWithFrame:self.view.bounds cameraSession:cameraSession];
     [self.view addSubview:boardCalibrator];
 
-    externalDislayCalibrationBorderView = [[ExternalDislayCalibrationBorderView alloc] initWithFrame:self.view.bounds];
-    [self.view addSubview:externalDislayCalibrationBorderView];
-
     gameState = GAME_STATE_AWAITING_START;
 }
 
 - (void)startGame {
-    [externalDislayCalibrationBorderView removeFromSuperview];
-    externalDislayCalibrationBorderView = nil;
     [self startIntro];
 }
 
 - (void)processFrame:(UIImage *)image {
-    [self calibrateBoard:image];
-    [self updateGameStateAccordingToFrame];
-    //[previewInstance previewFrame:image boardCalibrator:boardCalibrator];
-    [previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
+    @autoreleasepool {
+        [self calibrateBoard:image];
+        [self updateGameStateAccordingToFrame];
+        //[previewInstance previewFrame:image boardCalibrator:boardCalibrator];
+        [previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
+    }
 }
 
 - (void)updateGameStateAccordingToFrame {

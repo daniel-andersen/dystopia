@@ -30,6 +30,8 @@
     id<BoardGameProtocol> delegate;
     
     Board *board;
+
+    UIView *boardRecognizedView;
 }
 
 @end

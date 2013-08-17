@@ -29,7 +29,7 @@
 #import "CameraUtil.h"
 
 float intersectionAcceptDistanceMin = 0.02f;
-float intersectionAcceptDistanceMax = 2.0f;
+float intersectionAcceptDistanceMax = 1.5f;
 
 typedef struct {
     cv::Point p1;
@@ -76,9 +76,8 @@ typedef struct {
     img = [self dilate:img];
 
     // !!!!!!!!!!!!!!!!!!!!!!!
-    //cv::Mat originalImg = img.clone();
-    //cv::cvtColor(originalImg, originalImg, CV_GRAY2RGB);
-
+    float groupRadius = 30.0f;
+    
     minContourArea = (image.size.width * 0.7) * (image.size.height * 0.5f);
 
     // Find contours in image
@@ -95,20 +94,30 @@ typedef struct {
     cv::vector<LineGroup> bestTwoLineGroups = [self findBestTwoLineGroups:[self groupLines:linesAndAngles]];
 
     // Find all intersections that are not too far away from original line
-    cv::vector<cv::Point> validIntersections = [self findValidIntersectionsBetweenLines:bestTwoLineGroups[0].lines andLines:bestTwoLineGroups[1].lines];
+    cv::vector<cv::Point> validIntersections = [self findValidIntersectionsBetweenLines:bestTwoLineGroups[0].lines andLines:bestTwoLineGroups[1].lines imageSize:image.size];
+    if (validIntersections.size() == 0) {
+        return [UIImage imageWithCVMat:originalImg];
+    }
 
     // Group intersection points
-    cv::vector<cv::Point> groupedPoints = [self groupPoints:validIntersections groupRadius:10.0f];
+    cv::vector<cv::Point> groupedPoints = [self groupPoints:validIntersections groupRadius:groupRadius];
     
+    // Filter groups by number of enclosing points
+    groupedPoints = [self filterGroups:groupedPoints allPoints:validIntersections groupRadius:groupRadius threshold:8];
+
     // Find best square among points
     cv::vector<cv::Point> squareGroupPoints = [self findBestSquareFromPoints:groupedPoints];
+    if (squareGroupPoints.size() != 4) {
+        return [UIImage imageWithCVMat:originalImg];
+    }
 
     // Find square from all points close to grouped square points
-    cv::vector<cv::Point> squarePoints = [self findSquareFromGroupPoints:squareGroupPoints allPoints:validIntersections groupRadius:10.0f];
+    cv::vector<cv::Point> squarePoints = [self findSquareFromGroupPoints:squareGroupPoints allPoints:validIntersections groupRadius:groupRadius];
 
     // ----
     [self drawBestTwoLineGroups:bestTwoLineGroups ontoImage:originalImg];
-    [self drawPoints:squarePoints image:originalImg];
+    [self drawPoints:validIntersections image:originalImg];
+    //[self drawPoints:groupedPoints image:originalImg];
 
     cv::vector<cv::vector<cv::Point>> finalPointsContour = cv::vector<cv::vector<cv::Point>> (1);
     finalPointsContour[0] = squarePoints;
@@ -120,7 +129,7 @@ typedef struct {
 
 - (cv::vector<cv::Point>)findSquareFromGroupPoints:(cv::vector<cv::Point>)groupPoints allPoints:(cv::vector<cv::Point>)allPoints groupRadius:(float)radius {
     float radiusSquared = radius * radius;
-    
+
     cv::vector<cv::Point> squarePoints;
     for (int i = 0; i < groupPoints.size(); i++) {
         for (int j = 0; j < allPoints.size(); j++) {
@@ -132,28 +141,43 @@ typedef struct {
 
     cv::vector<cv::Point> hull;
     cv::convexHull(squarePoints, hull);
-    cv::approxPolyDP(hull, hull, cv::arcLength(cv::Mat(hull), true) * 0.02f, true); // arcLength??? Makes sense?
     
     return hull;
+}
+
+- (cv::vector<cv::Point>)filterGroups:(cv::vector<cv::Point>)groups allPoints:(cv::vector<cv::Point>)points groupRadius:(float)radius threshold:(int)threshold {
+    float radiusSquared = radius * radius;
+    
+    cv::vector<cv::Point> filteredGroups;
+
+    for (int i = 0; i < groups.size(); i++) {
+        int count = 0;
+        for (int j = 0; j < points.size(); j++) {
+            if (pointSquaredDistance(groups[i], points[j]) < radiusSquared) {
+                count++;
+            }
+        }
+        if (count >= threshold) {
+            filteredGroups.push_back(groups[i]);
+        }
+    }
+    return filteredGroups;
 }
 
 - (cv::vector<cv::Point>)groupPoints:(cv::vector<cv::Point>)points groupRadius:(float)radius {
     float radiusSquared = radius * radius;
     
-    cv::vector<cv::Point> approxedPoints;
     cv::vector<cv::Point> groupedPoints;
 
-    cv::approxPolyDP(points, approxedPoints, cv::arcLength(cv::Mat(points), true) * 0.02f, true); // arcLength??? Makes sense?
-    
-    for (int i = 0; i < approxedPoints.size(); i++) {
+    for (int i = 0; i < points.size(); i++) {
         bool newGroup = true;
         for (int j = 0; j < groupedPoints.size(); j++) {
-            if (pointSquaredDistance(approxedPoints[i], groupedPoints[j]) < radiusSquared) {
+            if (pointSquaredDistance(points[i], groupedPoints[j]) < radiusSquared) {
                 newGroup = false;
             }
         }
         if (newGroup) {
-            groupedPoints.push_back(approxedPoints[i]);
+            groupedPoints.push_back(points[i]);
         }
     }
     return groupedPoints;
@@ -166,7 +190,7 @@ typedef struct {
     float minimumLineLengthSqr = minimumLineLength * minimumLineLength;
     
     for (int i = 0; i < contours.size(); i++) {
-        cv::approxPolyDP(contours[i], hull, cv::arcLength(cv::Mat(contours[i]), true) * 0.002f, true);
+        cv::approxPolyDP(cv::Mat(contours[i]), hull, cv::arcLength(cv::Mat(contours[i]), true) * 0.002f, true);
         
         for (int j = 0; j < hull.size(); j++) {
             LineWithAngle lineWithAngle = {
@@ -189,11 +213,11 @@ typedef struct {
 }
 
 - (cv::vector<cv::Point>)findBestSquareFromPoints:(cv::vector<cv::Point>)points {
-    cv::vector<cv::Point> bestPoints = cv::vector<cv::Point> (4);
+    cv::vector<cv::Point> bestPoints;
     cv::vector<cv::Point> currentPoints = cv::vector<cv::Point> (4);
     cv::vector<cv::Point> hull;
     
-    float minDifferenceFactor = 1000.0f;
+    float minDifferenceFactor = 10000000.0f;
     
     for (int i1 = 0; i1 < points.size(); i1++) {
         currentPoints[0] = points[i1];
@@ -208,10 +232,7 @@ typedef struct {
                     currentPoints[3] = points[i4];
                     cv::convexHull(currentPoints, hull);
                     
-                    float hullArea = cv::contourArea(hull);
-                    cv::RotatedRect hullRect = cv::minAreaRect(hull);
-
-                    float differenceFactor = (hullRect.size.width * hullRect.size.height) / hullArea;
+                    float differenceFactor = [self maxCosineFromContour:hull];
                     
                     if (differenceFactor < minDifferenceFactor && [self areSimpleConditionsSatisfied:hull]) {
                         bestPoints = hull;
@@ -224,7 +245,7 @@ typedef struct {
     return bestPoints;
 }
 
-- (cv::vector<cv::Point>)findValidIntersectionsBetweenLines:(cv::vector<LineWithAngle>)lines1 andLines:(cv::vector<LineWithAngle>)lines2 {
+- (cv::vector<cv::Point>)findValidIntersectionsBetweenLines:(cv::vector<LineWithAngle>)lines1 andLines:(cv::vector<LineWithAngle>)lines2 imageSize:(CGSize)imageSize {
     cv::vector<cv::Point> validIntersections;
     for (int i = 0; i < lines1.size(); i++) {
         cv::vector<cv::Point> intersectionPoints;
@@ -235,7 +256,7 @@ typedef struct {
         for (int j = 0; j < lines2.size(); j++) {
             cv::Point r;
             cv::Point2f t;
-            if ([self isAcceptableIntersectionP1:lines1[i] p2:lines2[j] r:r t:t]) {
+            if ([self isAcceptableIntersectionP1:lines1[i] p2:lines2[j] r:r t:t imageSize:imageSize]) {
                 intersectionPoints.push_back(r);
                 minT1 = MIN(minT1, t.x);
                 maxT1 = MAX(maxT1, t.x);
@@ -253,12 +274,13 @@ typedef struct {
     return validIntersections;
 }
 
-- (bool)isAcceptableIntersectionP1:(LineWithAngle)line1 p2:(LineWithAngle)line2 r:(cv::Point &)r t:(cv::Point2f &)t {
+- (bool)isAcceptableIntersectionP1:(LineWithAngle)line1 p2:(LineWithAngle)line2 r:(cv::Point &)r t:(cv::Point2f &)t imageSize:(CGSize)imageSize {
     if (intersection(line1.p1, line1.p2, line2.p1, line2.p2, r, t)) {
-        return [self isWithinAcceptableDistance:t.x] && [self isWithinAcceptableDistance:t.y];
-    } else {
-        return NO;
+        if (r.x >= 0 && r.x < imageSize.width && r.y >= 0 && r.y < imageSize.height) {
+            return [self isWithinAcceptableDistance:t.x] && [self isWithinAcceptableDistance:t.y];
+        }
     }
+    return NO;
 }
 
 - (bool)isWithinAcceptableDistance:(float)t {
@@ -413,7 +435,7 @@ typedef struct {
     if (hasBeenApproxed[index]) {
         return;
     }
-    cv::approxPolyDP(contour, approx[index], cv::arcLength(cv::Mat(contour), true) * 0.01f, true);
+    cv::approxPolyDP(cv::Mat(contour), approx[index], cv::arcLength(cv::Mat(contour), true) * 0.01f, true);
     hasBeenApproxed[index] = true;
 }
 
@@ -445,7 +467,6 @@ typedef struct {
         if (![self areSimpleConditionsSatisfied:squareContour]) {
             continue;
         }
-        //NSLog(@"%i vs %i", i, hierarchy[i][2]);
         return [self contourToBoardPoints:squareContour];
     }
     FourPoints undefinedPoints = {.defined = NO};
