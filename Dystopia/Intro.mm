@@ -57,7 +57,7 @@
 - (void)setupLogoView {
     logoView = [[UIImageView alloc] initWithFrame:self.bounds];
     logoView.image = [UIImage imageNamed:@"trollsahead_logo.png"];
-    logoView.transform = CGAffineTransformScale(logoView.transform, 0.5f, 0.5f);
+    logoView.transform = CGAffineTransformScale(logoView.transform, 0.3f, 0.3f);
     logoView.contentMode = UIViewContentModeScaleAspectFit;
     logoView.layer.opacity = 0.0f;
     [self addSubview:logoView];
