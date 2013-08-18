@@ -67,6 +67,7 @@
 		65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA26771782038800E84BA4 /* BoardRecognizer.mm */; };
 		65EA267F1783520900E84BA4 /* ExternalDisplay.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA267E1783520900E84BA4 /* ExternalDisplay.m */; };
 		65EA2684178361E300E84BA4 /* PhoneViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA2683178361E300E84BA4 /* PhoneViewController.mm */; };
+		65F5E2B817C1460F00303009 /* ExternalDislayCalibrationBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65F5E2B717C1460F00303009 /* ExternalDislayCalibrationBorderView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -154,6 +155,8 @@
 		65EA267E1783520900E84BA4 /* ExternalDisplay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExternalDisplay.m; sourceTree = "<group>"; };
 		65EA2682178361E200E84BA4 /* PhoneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhoneViewController.h; sourceTree = "<group>"; };
 		65EA2683178361E300E84BA4 /* PhoneViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PhoneViewController.mm; sourceTree = "<group>"; };
+		65F5E2B617C1460F00303009 /* ExternalDislayCalibrationBorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExternalDislayCalibrationBorderView.h; sourceTree = "<group>"; };
+		65F5E2B717C1460F00303009 /* ExternalDislayCalibrationBorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExternalDislayCalibrationBorderView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -385,6 +388,8 @@
 				650D4225178C9E7000D89CEB /* Util.h */,
 				650D429C178F41B100D89CEB /* BoardUtil.h */,
 				650D429D178F41B300D89CEB /* BoardUtil.mm */,
+				65F5E2B617C1460F00303009 /* ExternalDislayCalibrationBorderView.h */,
+				65F5E2B717C1460F00303009 /* ExternalDislayCalibrationBorderView.m */,
 			);
 			name = Util;
 			sourceTree = "<group>";
@@ -498,6 +503,7 @@
 				650D429B178F40DE00D89CEB /* BrickView.mm in Sources */,
 				650D429E178F41B400D89CEB /* BoardUtil.mm in Sources */,
 				6552706517B177B300784CD7 /* BorderView.mm in Sources */,
+				65F5E2B817C1460F00303009 /* ExternalDislayCalibrationBorderView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

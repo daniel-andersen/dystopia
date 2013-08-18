@@ -68,12 +68,16 @@
     boardBounds = [boardRecognizer findBoardBoundsFromImage:image];
     if (boardBounds.defined) {
         [self findCameraToScreenTransformation];
-        [cameraSession lock];
+        //[cameraSession lock];
     } else {
         state = BOARD_CALIBRATION_STATE_CALIBRATING;
-        [cameraSession unlock];
+        //[cameraSession unlock];
     }
-    calibrationStateView.backgroundColor = boardBounds.defined ? [UIColor greenColor] : [UIColor redColor];
+    if (DEBUG) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            calibrationStateView.backgroundColor = boardBounds.defined ? [UIColor greenColor] : [UIColor redColor];
+        });
+    }
 }
 
 - (void)findCameraToScreenTransformation {
