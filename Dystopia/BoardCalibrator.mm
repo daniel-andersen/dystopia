@@ -34,6 +34,8 @@
     
     CameraSession *cameraSession;
     
+    UIView *calibrationStateView;
+    
     CFAbsoluteTime successTime;
     CFAbsoluteTime lastUpdateTime;
 }
@@ -59,18 +61,19 @@
     boardRecognizer = [[BoardRecognizer alloc] init];
     state = BOARD_CALIBRATION_STATE_UNCALIBRATED;
     boardBounds.defined = NO;
-    [self addSubview:[self boardRecognizedView]];
+    [self addCalibrationStateView];
 }
 
 - (void)updateBoundsWithImage:(UIImage *)image {
     boardBounds = [boardRecognizer findBoardBoundsFromImage:image];
     if (boardBounds.defined) {
         [self findCameraToScreenTransformation];
-        //[cameraSession lock];
+        [cameraSession lock];
     } else {
         state = BOARD_CALIBRATION_STATE_CALIBRATING;
-        //[cameraSession unlock];
+        [cameraSession unlock];
     }
+    calibrationStateView.backgroundColor = boardBounds.defined ? [UIColor greenColor] : [UIColor redColor];
 }
 
 - (void)findCameraToScreenTransformation {
@@ -83,11 +86,11 @@
     state = BOARD_CALIBRATION_STATE_CALIBRATED;
 }
 
-- (UIView *)boardRecognizedView {
-    UIView *boardRecognizedView = [[UIView alloc] initWithFrame:CGRectMake([BoardUtil instance].singleBrickScreenSize.width - 10.0f, [BoardUtil instance].singleBrickScreenSize.height - 10.0f, 10.0f, 10.0f)];
-    boardRecognizedView.backgroundColor = [UIColor greenColor];
-    boardRecognizedView.hidden = YES;
-    return boardRecognizedView;
+- (void)addCalibrationStateView {
+    calibrationStateView = [[UIView alloc] initWithFrame:CGRectMake([BoardUtil instance].singleBrickScreenSize.width - 10.0f, [BoardUtil instance].singleBrickScreenSize.height - 10.0f, 10.0f, 10.0f)];
+    calibrationStateView.backgroundColor = [UIColor clearColor];
+    calibrationStateView.hidden = !DEBUG;
+    [self addSubview:calibrationStateView];
 }
 
 @end

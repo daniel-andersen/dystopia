@@ -45,8 +45,6 @@
 
 - (void)updateBoundsWithImage:(UIImage *)image;
 
-- (UIView *)boardRecognizedView;
-
 @property (readonly) int state;
 @property (readonly) FourPoints boardBounds;
 @property (readonly) FourPoints screenPoints;

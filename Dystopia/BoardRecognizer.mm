@@ -43,8 +43,9 @@ typedef struct {
 } LineGroup;
 
 @interface BoardRecognizer () {
-    //float minContourLength;
     float minContourArea;
+    float minLineLength;
+    float groupRadius;
     cv::vector<cv::vector<cv::Point>> approx;
     cv::vector<bool> hasBeenApproxed;
 }
@@ -54,8 +55,9 @@ typedef struct {
 @implementation BoardRecognizer
 
 - (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
-    //minContourLength = (image.size.width * 0.6) * 2.0f + (image.size.height * 0.6f) * 2.0f;
     minContourArea = (image.size.width * 0.7) * (image.size.height * 0.5f);
+    minLineLength = MAX(image.size.width, image.size.height) * 0.2f;
+    groupRadius = 30.0f;
 
     cv::Mat img = [image CVMat];
     img = [self smooth:img];
@@ -66,65 +68,26 @@ typedef struct {
 }
 
 - (UIImage *)boardBoundsToImage:(UIImage *)image {
+    FourPoints boardPoints = [self findBoardBoundsFromImage:image];
+    if (!boardPoints.defined) {
+        return image;
+    }
+    
+    cv::vector<cv::Point> points;
+    points.push_back(cv::Point (boardPoints.p1.x, boardPoints.p1.y));
+    points.push_back(cv::Point (boardPoints.p2.x, boardPoints.p2.y));
+    points.push_back(cv::Point (boardPoints.p3.x, boardPoints.p3.y));
+    points.push_back(cv::Point (boardPoints.p4.x, boardPoints.p4.y));
+
     cv::Mat img = [image CVMat];
+    [self drawPoints:points image:img];
 
-    cv::Mat originalImg = img.clone();
-
-    img = [self smooth:img];
-    img = [self grayscale:img];
-    img = [self applyCanny:img];
-    img = [self dilate:img];
-
-    // !!!!!!!!!!!!!!!!!!!!!!!
-    float groupRadius = 30.0f;
-    
-    minContourArea = (image.size.width * 0.7) * (image.size.height * 0.5f);
-
-    // Find contours in image
-    cv::vector<cv::vector<cv::Point>> contours;
-    cv::findContours(img, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-
-    // Find all lines that satisfy the minimum length property
-    cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:(image.size.width * 0.2f)];
-    if (linesAndAngles.size() == 0) {
-        return [UIImage imageWithCVMat:originalImg];
-    }
-
-    // Group lines into two groups (horizontal and vertical)
-    cv::vector<LineGroup> bestTwoLineGroups = [self findBestTwoLineGroups:[self groupLines:linesAndAngles]];
-
-    // Find all intersections that are not too far away from original line
-    cv::vector<cv::Point> validIntersections = [self findValidIntersectionsBetweenLines:bestTwoLineGroups[0].lines andLines:bestTwoLineGroups[1].lines imageSize:image.size];
-    if (validIntersections.size() == 0) {
-        return [UIImage imageWithCVMat:originalImg];
-    }
-
-    // Group intersection points
-    cv::vector<cv::Point> groupedPoints = [self groupPoints:validIntersections groupRadius:groupRadius];
-    
-    // Filter groups by number of enclosing points
-    groupedPoints = [self filterGroups:groupedPoints allPoints:validIntersections groupRadius:groupRadius threshold:8];
-
-    // Find best square among points
-    cv::vector<cv::Point> squareGroupPoints = [self findBestSquareFromPoints:groupedPoints];
-    if (squareGroupPoints.size() != 4) {
-        return [UIImage imageWithCVMat:originalImg];
-    }
-
-    // Find square from all points close to grouped square points
-    cv::vector<cv::Point> squarePoints = [self findSquareFromGroupPoints:squareGroupPoints allPoints:validIntersections groupRadius:groupRadius];
-
-    // ----
-    [self drawBestTwoLineGroups:bestTwoLineGroups ontoImage:originalImg];
-    [self drawPoints:validIntersections image:originalImg];
-    //[self drawPoints:groupedPoints image:originalImg];
-
-    cv::vector<cv::vector<cv::Point>> finalPointsContour = cv::vector<cv::vector<cv::Point>> (1);
-    finalPointsContour[0] = squarePoints;
+    cv::vector<cv::vector<cv::Point>> contour = cv::vector<cv::vector<cv::Point>> (1);
+    contour[0] = points;
     cv::Scalar color = cv::Scalar(255, 0, 255);
-    cv::drawContours(originalImg, finalPointsContour, 0, color);
+    cv::drawContours(img, contour, 0, color);
 
-    return [UIImage imageWithCVMat:originalImg];
+    return [UIImage imageWithCVMat:img];
 }
 
 - (cv::vector<cv::Point>)findSquareFromGroupPoints:(cv::vector<cv::Point>)groupPoints allPoints:(cv::vector<cv::Point>)allPoints groupRadius:(float)radius {
@@ -142,7 +105,9 @@ typedef struct {
     cv::vector<cv::Point> hull;
     cv::convexHull(squarePoints, hull);
     
-    return hull;
+    return [self findBestSquareFromPoints:hull scoreFunction:^float(cv::vector<cv::Point> hull) {
+        return cv::contourArea(hull);
+    }];
 }
 
 - (cv::vector<cv::Point>)filterGroups:(cv::vector<cv::Point>)groups allPoints:(cv::vector<cv::Point>)points groupRadius:(float)radius threshold:(int)threshold {
@@ -212,12 +177,12 @@ typedef struct {
     return linesAndAngles;
 }
 
-- (cv::vector<cv::Point>)findBestSquareFromPoints:(cv::vector<cv::Point>)points {
+- (cv::vector<cv::Point>)findBestSquareFromPoints:(cv::vector<cv::Point>)points scoreFunction:(float(^)(cv::vector<cv::Point> hull))scoreFunction {
     cv::vector<cv::Point> bestPoints;
     cv::vector<cv::Point> currentPoints = cv::vector<cv::Point> (4);
     cv::vector<cv::Point> hull;
     
-    float minDifferenceFactor = 10000000.0f;
+    float bestScore = -1.0f;
     
     for (int i1 = 0; i1 < points.size(); i1++) {
         currentPoints[0] = points[i1];
@@ -232,11 +197,11 @@ typedef struct {
                     currentPoints[3] = points[i4];
                     cv::convexHull(currentPoints, hull);
                     
-                    float differenceFactor = [self maxCosineFromContour:hull];
+                    float score = scoreFunction(hull);
                     
-                    if (differenceFactor < minDifferenceFactor && [self areSimpleConditionsSatisfied:hull]) {
+                    if (score > bestScore && [self areSimpleConditionsSatisfied:hull]) {
                         bestPoints = hull;
-                        minDifferenceFactor = differenceFactor;
+                        bestScore = score;
                     }
                 }
             }
@@ -406,7 +371,7 @@ typedef struct {
     
     FourPoints boardPoints = [self simpleBoardBoundsFromContours:contours hierarchy:hierarchy];
     if (!boardPoints.defined) {
-        //boardPoints = [self simpleObstacledBoardBoundsFromContours:contours hierarchy:hierarchy];
+        boardPoints = [self obstacledBoardBoundsFromContours:contours hierarchy:hierarchy image:image];
     }
     return boardPoints;
 }
@@ -447,30 +412,49 @@ typedef struct {
     }
 }
 
-- (FourPoints)simpleObstacledBoardBoundsFromContours:(cv::vector<cv::vector<cv::Point>>)contours hierarchy:(cv::vector<cv::Vec4i>)hierarchy {
-    for (int i = 0; i < approx.size(); i++) {
-        [self polygonApproxContour:contours[i] index:i];
-
-        if (approx[i].size() < 4) {
-            continue;
-        }
-        if (fabs(cv::contourArea(approx[i])) <= minContourArea) {
-            continue;
-        }
+- (FourPoints)obstacledBoardBoundsFromContours:(cv::vector<cv::vector<cv::Point>>)contours hierarchy:(cv::vector<cv::Vec4i>)hierarchy image:(cv::Mat)image {
+    FourPoints boardPoints = {.defined = NO};
     
-        cv::vector<int> minIndexes = [self fourCornerIndexesFromContour:approx[i]];
-    
-        cv::vector<cv::Point> squareContour = cv::vector<cv::Point> (4);
-        for (int j = 0; j < 4; j++) {
-            squareContour[j] = approx[i][minIndexes[j]];
-        }
-        if (![self areSimpleConditionsSatisfied:squareContour]) {
-            continue;
-        }
-        return [self contourToBoardPoints:squareContour];
+    // Find all lines that satisfy the minimum length property
+    cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:minLineLength];
+    if (linesAndAngles.size() == 0) {
+        return boardPoints;
     }
-    FourPoints undefinedPoints = {.defined = NO};
-    return undefinedPoints;
+    
+    // Group lines into two groups (horizontal and vertical)
+    cv::vector<LineGroup> bestTwoLineGroups = [self findBestTwoLineGroups:[self groupLines:linesAndAngles]];
+    
+    // Find all intersections that are not too far away from original line
+    cv::vector<cv::Point> validIntersections = [self findValidIntersectionsBetweenLines:bestTwoLineGroups[0].lines andLines:bestTwoLineGroups[1].lines imageSize:CGSizeMake(image.cols, image.rows)];
+    if (validIntersections.size() == 0) {
+        return boardPoints;
+    }
+    
+    // Group intersection points
+    cv::vector<cv::Point> groupedPoints = [self groupPoints:validIntersections groupRadius:groupRadius];
+    
+    // Filter groups by number of enclosing points
+    groupedPoints = [self filterGroups:groupedPoints allPoints:validIntersections groupRadius:groupRadius threshold:8];
+    
+    // Find best square among points
+    cv::vector<cv::Point> squareGroupPoints = [self findBestSquareFromPoints:groupedPoints scoreFunction:^float(cv::vector<cv::Point> hull) {
+        return 1.0f / [self maxCosineFromContour:hull];
+    }];
+    if (squareGroupPoints.size() != 4) {
+        return boardPoints;
+    }
+    
+    // Find square from all points close to grouped square points
+    cv::vector<cv::Point> squarePoints = [self findSquareFromGroupPoints:squareGroupPoints allPoints:validIntersections groupRadius:groupRadius];
+
+    // Convert to FourPoints
+    boardPoints.defined = YES;
+    boardPoints.p1 = CGPointMake(squarePoints[0].x, squarePoints[0].y);
+    boardPoints.p2 = CGPointMake(squarePoints[1].x, squarePoints[1].y);
+    boardPoints.p3 = CGPointMake(squarePoints[2].x, squarePoints[2].y);
+    boardPoints.p4 = CGPointMake(squarePoints[3].x, squarePoints[3].y);
+
+    return boardPoints;
 }
 
 - (FourPoints)dilatedContoursToBoardPoints:(cv::vector<cv::Point>)contour1 withContour:(cv::vector<cv::Point>)contour2 {
