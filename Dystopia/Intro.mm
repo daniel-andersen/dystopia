@@ -28,12 +28,17 @@
 #import "Intro.h"
 #import "ExternalDisplay.h"
 
-#define INTRO_FADE_IN_DURATION 5.0f
-#define INTRO_FADE_OUT_DURATION 5.0f
-#define INTRO_PRESENT_DURATION 2.0f
+#define INTRO_TROLLS_AHEAD_FADE_IN_DURATION 5.0f
+#define INTRO_TROLLS_AHEAD_FADE_OUT_DURATION 5.0f
+#define INTRO_TROLLS_AHEAD_PRESENT_DURATION 2.0f
+
+#define INTRO_DYSTOPIA_FADE_IN_DURATION 5.0f
+#define INTRO_DYSTOPIA_FADE_OUT_DURATION 5.0f
+#define INTRO_DYSTOPIA_PRESENT_DURATION 0.0f
 
 @interface Intro () {
     UIImageView *logoView;
+    UIImageView *dystopiaView;
     id<IntroDelegate> delegate;
 }
 
@@ -52,40 +57,72 @@
 - (void)initialize {
     self.backgroundColor = [UIColor blackColor];
     [self setupLogoView];
+    [self setupDystopiaView];
 }
 
 - (void)setupLogoView {
     logoView = [[UIImageView alloc] initWithFrame:self.bounds];
     logoView.image = [UIImage imageNamed:@"trollsahead_logo.png"];
-    logoView.transform = CGAffineTransformScale(logoView.transform, 0.3f, 0.3f);
+    logoView.transform = CGAffineTransformMakeScale(0.3f, 0.3f);
     logoView.contentMode = UIViewContentModeScaleAspectFit;
     logoView.layer.opacity = 0.0f;
     [self addSubview:logoView];
 }
 
+- (void)setupDystopiaView {
+    dystopiaView = [[UIImageView alloc] initWithFrame:self.bounds];
+    dystopiaView.image = [UIImage imageNamed:@"dystopia_logo.png"];
+    dystopiaView.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
+    dystopiaView.contentMode = UIViewContentModeScaleAspectFit;
+    dystopiaView.layer.opacity = 0.0f;
+    [self addSubview:dystopiaView];
+}
+
 - (void)show {
     if ([ExternalDisplay instance].externalDisplayFound) {
-        [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(fadeIn) userInfo:nil repeats:NO];
+        [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(showTrollsAhead) userInfo:nil repeats:NO];
     } else {
         [delegate introFinished];
     }
     NSLog(@"Showing intro");
 }
 
-- (void)fadeIn {
+- (void)showTrollsAhead {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:INTRO_FADE_IN_DURATION animations:^{
+        [UIView animateWithDuration:INTRO_TROLLS_AHEAD_FADE_IN_DURATION animations:^{
             logoView.layer.opacity = 1.0f;
         } completion:^(BOOL finished) {
-            [NSTimer scheduledTimerWithTimeInterval:INTRO_PRESENT_DURATION target:self selector:@selector(hide) userInfo:nil repeats:NO];
+            [NSTimer scheduledTimerWithTimeInterval:INTRO_TROLLS_AHEAD_PRESENT_DURATION target:self selector:@selector(hideTrollsAhead) userInfo:nil repeats:NO];
         }];
     });
 }
 
-- (void)hide {
+- (void)hideTrollsAhead {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:INTRO_FADE_OUT_DURATION animations:^{
+        [UIView animateWithDuration:INTRO_TROLLS_AHEAD_FADE_OUT_DURATION animations:^{
             logoView.layer.opacity = 0.0f;
+        } completion:^(BOOL finished) {
+            [self showDystopia];
+        }];
+    });
+}
+
+- (void)showDystopia {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:INTRO_DYSTOPIA_FADE_IN_DURATION animations:^{
+            dystopiaView.layer.opacity = 1.0f;
+            dystopiaView.transform = CGAffineTransformMakeScale(0.3f, 0.3f);
+        } completion:^(BOOL finished) {
+            [NSTimer scheduledTimerWithTimeInterval:INTRO_DYSTOPIA_PRESENT_DURATION target:self selector:@selector(hideDystopia) userInfo:nil repeats:NO];
+        }];
+    });
+}
+
+- (void)hideDystopia {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:INTRO_DYSTOPIA_FADE_OUT_DURATION animations:^{
+            dystopiaView.layer.opacity = 0.0f;
+            dystopiaView.transform = CGAffineTransformMakeScale(0.15f, 0.15f);
         } completion:^(BOOL finished) {
             NSLog(@"Intro ended");
             [delegate introFinished];
