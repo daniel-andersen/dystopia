@@ -94,8 +94,8 @@ extern PreviewableViewController *previewInstance;
     @autoreleasepool {
         [self calibrateBoard:image];
         [self updateGameStateAccordingToFrame];
-        //[previewInstance previewFrame:image boardCalibrator:boardCalibrator];
-        [previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
+        [previewInstance previewFrame:image boardCalibrator:boardCalibrator];
+        //[previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
     }
 }
 
@@ -152,11 +152,11 @@ extern PreviewableViewController *previewInstance;
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskLandscape;
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    return UIInterfaceOrientationIsLandscape(interfaceOrientation);
+    return UIInterfaceOrientationIsPortrait(interfaceOrientation);
 }
 
 - (BOOL)shouldAutorotate {
