@@ -56,8 +56,8 @@ typedef struct {
 
 - (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
     minContourArea = (image.size.width * 0.7) * (image.size.height * 0.5f);
-    minLineLength = MAX(image.size.width, image.size.height) * 0.2f;
-    groupRadius = 30.0f;
+    minLineLength = MIN(image.size.width, image.size.height) * 0.1f;
+    groupRadius = (image.size.width * 0.1f) + (image.size.height * 0.1f);
 
     cv::Mat img = [image CVMat];
     img = [self smooth:img];
@@ -69,8 +69,23 @@ typedef struct {
 
 - (UIImage *)boardBoundsToImage:(UIImage *)image {
     FourPoints boardPoints = [self findBoardBoundsFromImage:image];
+
+    cv::Mat originalImage = [image CVMat];
+    
+    cv::Mat img = [image CVMat];
+    img = [self smooth:img];
+    img = [self grayscale:img];
+    img = [self applyCanny:img];
+    img = [self dilate:img];
+
+    cv::vector<cv::vector<cv::Point>> contours;
+    cv::vector<cv::Vec4i> hierarchy;
+    cv::findContours(img, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+    cv::vector<LineWithAngle> lines = [self findLinesFromContours:contours minimumLineLength:minLineLength];
+    [self drawLines:lines ontoImage:originalImage];
+    
     if (!boardPoints.defined) {
-        return image;
+        return [UIImage imageWithCVMat:originalImage];
     }
     
     cv::vector<cv::Point> points;
@@ -79,15 +94,14 @@ typedef struct {
     points.push_back(cv::Point (boardPoints.p3.x, boardPoints.p3.y));
     points.push_back(cv::Point (boardPoints.p4.x, boardPoints.p4.y));
 
-    cv::Mat img = [image CVMat];
-    [self drawPoints:points image:img];
+    [self drawPoints:points image:originalImage];
 
     cv::vector<cv::vector<cv::Point>> contour = cv::vector<cv::vector<cv::Point>> (1);
     contour[0] = points;
     cv::Scalar color = cv::Scalar(255, 0, 255);
-    cv::drawContours(img, contour, 0, color);
+    cv::drawContours(originalImage, contour, 0, color);
 
-    return [UIImage imageWithCVMat:img];
+    return [UIImage imageWithCVMat:originalImage];
 }
 
 - (cv::vector<cv::Point>)findSquareFromGroupPoints:(cv::vector<cv::Point>)groupPoints allPoints:(cv::vector<cv::Point>)allPoints groupRadius:(float)radius {
@@ -150,17 +164,17 @@ typedef struct {
 
 - (cv::vector<LineWithAngle>)findLinesFromContours:(cv::vector<cv::vector<cv::Point>>)contours minimumLineLength:(float)minimumLineLength {
     cv::vector<LineWithAngle> linesAndAngles = cv::vector<LineWithAngle> (0);
-    cv::vector<cv::Point> hull;
+    cv::vector<cv::Point> approxedContour;
     
     float minimumLineLengthSqr = minimumLineLength * minimumLineLength;
-    
+
     for (int i = 0; i < contours.size(); i++) {
-        cv::approxPolyDP(cv::Mat(contours[i]), hull, cv::arcLength(cv::Mat(contours[i]), true) * 0.002f, true);
+        cv::approxPolyDP(cv::Mat(contours[i]), approxedContour, cv::arcLength(cv::Mat(contours[i]), true) * 0.002f, true);
         
-        for (int j = 0; j < hull.size(); j++) {
+        for (int j = 0; j < approxedContour.size(); j++) {
             LineWithAngle lineWithAngle = {
-                .p1 = hull[(j + 0) % hull.size()],
-                .p2 = hull[(j + 1) % hull.size()]
+                .p1 = approxedContour[(j + 0) % approxedContour.size()],
+                .p2 = approxedContour[(j + 1) % approxedContour.size()]
             };
             
             float deltaX = lineWithAngle.p1.x - lineWithAngle.p2.x;
@@ -169,7 +183,7 @@ typedef struct {
             if ((deltaX * deltaX) + (deltaY * deltaY) < minimumLineLengthSqr) {
                 continue;
             }
-            
+
             lineWithAngle.angle = lineAngle(lineWithAngle.p1, lineWithAngle.p2) * 180.0f / M_PI;
             linesAndAngles.push_back(lineWithAngle);
         }
@@ -277,6 +291,17 @@ typedef struct {
             cv::Scalar color = cv::Scalar(i == 0 ? 255 : 0, i == 1 ? 255 : 0, 0);
             cv::drawContours(image, line, 0, color);
         }
+    }
+}
+
+- (void)drawLines:(cv::vector<LineWithAngle>)lines ontoImage:(cv::Mat)image {
+    for (int i = 0; i < lines.size(); i++) {
+        cv::vector<cv::vector<cv::Point>> line = cv::vector<cv::vector<cv::Point>> (1);
+        line[0].push_back(lines[i].p1);
+        line[0].push_back(lines[i].p2);
+            
+        cv::Scalar color = cv::Scalar(255, 0, 255);
+        cv::drawContours(image, line, 0, color);
     }
 }
 
@@ -434,7 +459,7 @@ typedef struct {
     cv::vector<cv::Point> groupedPoints = [self groupPoints:validIntersections groupRadius:groupRadius];
     
     // Filter groups by number of enclosing points
-    groupedPoints = [self filterGroups:groupedPoints allPoints:validIntersections groupRadius:groupRadius threshold:8];
+    groupedPoints = [self filterGroups:groupedPoints allPoints:validIntersections groupRadius:groupRadius threshold:6];
     
     // Find best square among points
     cv::vector<cv::Point> squareGroupPoints = [self findBestSquareFromPoints:groupedPoints scoreFunction:^float(cv::vector<cv::Point> hull) {

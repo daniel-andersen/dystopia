@@ -8,7 +8,7 @@
         <scene sceneID="Nbc-l5-NoO">
             <objects>
                 <navigationController wantsFullScreenLayout="YES" definesPresentationContext="YES" navigationBarHidden="YES" id="oqh-3u-mec" sceneMemberID="viewController">
-                    <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ueD-dl-pqj">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -25,7 +25,7 @@
             <objects>
                 <viewController id="2YJ-BG-XZW" customClass="PhoneViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="gBZ-vE-QzW">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="568" height="320"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Ready?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wJT-DW-JhL">
@@ -58,8 +58,10 @@
                             <constraint firstItem="wJT-DW-JhL" firstAttribute="leading" secondItem="gBZ-vE-QzW" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="cq1-0K-Sts"/>
                             <constraint firstItem="syB-sN-rjn" firstAttribute="centerX" secondItem="wJT-DW-JhL" secondAttribute="centerX" type="default" id="euU-fq-eue"/>
                         </constraints>
+                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <navigationItem key="navigationItem" id="azo-br-FLo"/>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
                         <segue destination="2" kind="push" identifier="phoneViewToGameViewSegue" id="WYI-9e-ahy"/>
                     </connections>
@@ -73,10 +75,12 @@
             <objects>
                 <viewController storyboardIdentifier="gameViewController" id="2" customClass="GameViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="3" customClass="GLKView">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="568" height="320"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4" sceneMemberID="firstResponder"/>
             </objects>

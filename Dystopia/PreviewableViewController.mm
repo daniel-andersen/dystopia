@@ -137,8 +137,8 @@ PreviewableViewController *previewInstance = nil;
 - (void)addBoardBoundsLayer {
     boardBoundsLayer = [CAShapeLayer layer];
     boardBoundsLayer.frame = self.view.bounds;
-    boardBoundsLayer.fillColor = [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:0.35f].CGColor;
-    boardBoundsLayer.strokeColor = [UIColor colorWithWhite:1.0f alpha:0.75f].CGColor;
+    boardBoundsLayer.fillColor = [UIColor clearColor].CGColor;
+    boardBoundsLayer.strokeColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:1.0f].CGColor;
     boardBoundsLayer.backgroundColor = [UIColor clearColor].CGColor;
     [cameraPreview.layer addSublayer:boardBoundsLayer];
 }
@@ -179,7 +179,6 @@ PreviewableViewController *previewInstance = nil;
             boardBoundsLayer.hidden = YES;
             return;
         }
-        return;
         boardBoundsLayer.hidden = NO;
         [CATransaction begin];
         [CATransaction setAnimationDuration:0.0f];

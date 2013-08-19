@@ -69,15 +69,15 @@
     CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
     CGContextSetStrokeColorWithColor(context, [UIColor whiteColor].CGColor);
     CGContextFillEllipseInRect(context, CGRectMake(70.0f, image.size.height - handSize.height, handSize.width, handSize.height));
-    //CGContextFillEllipseInRect(context, CGRectMake(image.size.width - 90.0f, image.size.height - handSize.height, handSize.width, handSize.height));
-    //CGContextFillEllipseInRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, image.size.height - handSize.height, handSize.width, handSize.height));
+    CGContextFillEllipseInRect(context, CGRectMake(image.size.width - 90.0f, image.size.height - handSize.height, handSize.width, handSize.height));
+    CGContextFillEllipseInRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, image.size.height - handSize.height, handSize.width, handSize.height));
     CGContextFillEllipseInRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, -20.0f, handSize.width, handSize.height));
 
     CGContextSetFillColorWithColor(context, [UIColor blackColor].CGColor);
     CGContextSetStrokeColorWithColor(context, [UIColor blackColor].CGColor);
     CGContextFillRect(context, CGRectMake(70.0f, image.size.height - handSize.height, handSize.width / 2.0f, handSize.height));
-    //CGContextFillRect(context, CGRectMake(image.size.width - 90.0f, image.size.height - handSize.height, handSize.width / 2.0f, handSize.height));
-    //CGContextFillRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, image.size.height - handSize.height, handSize.width / 2.0f, handSize.height));
+    CGContextFillRect(context, CGRectMake(image.size.width - 90.0f, image.size.height - handSize.height, handSize.width / 2.0f, handSize.height));
+    CGContextFillRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, image.size.height - handSize.height, handSize.width / 2.0f, handSize.height));
     CGContextFillRect(context, CGRectMake((image.size.width - handSize.width) / 2.0f, -20.0f, handSize.width / 2.0f, handSize.height));
     
     UIImage *destImage = UIGraphicsGetImageFromCurrentImageContext();
