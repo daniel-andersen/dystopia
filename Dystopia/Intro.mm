@@ -32,8 +32,8 @@
 #define INTRO_TROLLS_AHEAD_FADE_OUT_DURATION 3.0f
 #define INTRO_TROLLS_AHEAD_PRESENT_DURATION 1.0f
 
-#define INTRO_DYSTOPIA_FADE_IN_DURATION 3.0f
-#define INTRO_DYSTOPIA_FADE_OUT_DURATION 3.0f
+#define INTRO_DYSTOPIA_FADE_IN_DURATION 5.0f
+#define INTRO_DYSTOPIA_FADE_OUT_DURATION 4.0f
 #define INTRO_DYSTOPIA_PRESENT_DURATION 0.0f
 
 @interface Intro () {
@@ -111,7 +111,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [UIView animateWithDuration:INTRO_DYSTOPIA_FADE_IN_DURATION animations:^{
             dystopiaView.layer.opacity = 1.0f;
-            dystopiaView.transform = CGAffineTransformMakeScale(0.3f, 0.3f);
+            dystopiaView.transform = CGAffineTransformMakeScale(0.4f, 0.4f);
         } completion:^(BOOL finished) {
             [NSTimer scheduledTimerWithTimeInterval:INTRO_DYSTOPIA_PRESENT_DURATION target:self selector:@selector(hideDystopia) userInfo:nil repeats:NO];
         }];
@@ -122,7 +122,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [UIView animateWithDuration:INTRO_DYSTOPIA_FADE_OUT_DURATION animations:^{
             dystopiaView.layer.opacity = 0.0f;
-            dystopiaView.transform = CGAffineTransformMakeScale(0.2f, 0.2f);
+            dystopiaView.transform = CGAffineTransformMakeScale(0.3f, 0.3f);
         } completion:^(BOOL finished) {
             NSLog(@"Intro ended");
             [delegate introFinished];
