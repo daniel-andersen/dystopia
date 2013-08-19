@@ -28,12 +28,12 @@
 #import "Intro.h"
 #import "ExternalDisplay.h"
 
-#define INTRO_TROLLS_AHEAD_FADE_IN_DURATION 5.0f
-#define INTRO_TROLLS_AHEAD_FADE_OUT_DURATION 5.0f
-#define INTRO_TROLLS_AHEAD_PRESENT_DURATION 2.0f
+#define INTRO_TROLLS_AHEAD_FADE_IN_DURATION 3.0f
+#define INTRO_TROLLS_AHEAD_FADE_OUT_DURATION 3.0f
+#define INTRO_TROLLS_AHEAD_PRESENT_DURATION 1.0f
 
-#define INTRO_DYSTOPIA_FADE_IN_DURATION 5.0f
-#define INTRO_DYSTOPIA_FADE_OUT_DURATION 5.0f
+#define INTRO_DYSTOPIA_FADE_IN_DURATION 3.0f
+#define INTRO_DYSTOPIA_FADE_OUT_DURATION 3.0f
 #define INTRO_DYSTOPIA_PRESENT_DURATION 0.0f
 
 @interface Intro () {
@@ -72,7 +72,7 @@
 - (void)setupDystopiaView {
     dystopiaView = [[UIImageView alloc] initWithFrame:self.bounds];
     dystopiaView.image = [UIImage imageNamed:@"dystopia_logo.png"];
-    dystopiaView.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
+    dystopiaView.transform = CGAffineTransformMakeScale(0.6f, 0.6f);
     dystopiaView.contentMode = UIViewContentModeScaleAspectFit;
     dystopiaView.layer.opacity = 0.0f;
     [self addSubview:dystopiaView];
@@ -122,7 +122,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [UIView animateWithDuration:INTRO_DYSTOPIA_FADE_OUT_DURATION animations:^{
             dystopiaView.layer.opacity = 0.0f;
-            dystopiaView.transform = CGAffineTransformMakeScale(0.15f, 0.15f);
+            dystopiaView.transform = CGAffineTransformMakeScale(0.2f, 0.2f);
         } completion:^(BOOL finished) {
             NSLog(@"Intro ended");
             [delegate introFinished];
