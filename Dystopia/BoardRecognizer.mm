@@ -29,7 +29,8 @@
 #import "CameraUtil.h"
 
 float intersectionAcceptDistanceMin = 0.02f;
-float intersectionAcceptDistanceMax = 1.5f;
+float intersectionAcceptDistanceMax = 5.0f;
+float angleAcceptMax = 0.2f;
 
 typedef struct {
     cv::Point p1;
@@ -71,19 +72,7 @@ typedef struct {
     FourPoints boardPoints = [self findBoardBoundsFromImage:image];
 
     cv::Mat originalImage = [image CVMat];
-    
-    cv::Mat img = [image CVMat];
-    img = [self smooth:img];
-    img = [self grayscale:img];
-    img = [self applyCanny:img];
-    img = [self dilate:img];
 
-    cv::vector<cv::vector<cv::Point>> contours;
-    cv::vector<cv::Vec4i> hierarchy;
-    cv::findContours(img, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
-    cv::vector<LineWithAngle> lines = [self findLinesFromContours:contours minimumLineLength:minLineLength];
-    [self drawLines:lines ontoImage:originalImage];
-    
     if (!boardPoints.defined) {
         return [UIImage imageWithCVMat:originalImage];
     }
@@ -160,6 +149,23 @@ typedef struct {
         }
     }
     return groupedPoints;
+}
+
+- (cv::vector<LineWithAngle>)findLinesFromImage:(cv::Mat)image {
+    cv::vector<LineWithAngle> linesAndAngles = cv::vector<LineWithAngle> (0);
+    
+    cv::vector<cv::Vec4i> lines;
+    cv::HoughLinesP(image, lines, 1, CV_PI / 180.0f, 100.0f, 30);
+    for (int i = 0; i < lines.size(); i++) {
+        LineWithAngle lineWithAngle = {
+            .p1 = cv::Point(lines[i][0], lines[i][1]),
+            .p2 = cv::Point(lines[i][2], lines[i][3])
+        };
+            
+        lineWithAngle.angle = lineAngle(lineWithAngle.p1, lineWithAngle.p2) * 180.0f / M_PI;
+        linesAndAngles.push_back(lineWithAngle);
+    }
+    return linesAndAngles;
 }
 
 - (cv::vector<LineWithAngle>)findLinesFromContours:(cv::vector<cv::vector<cv::Point>>)contours minimumLineLength:(float)minimumLineLength {
@@ -243,11 +249,8 @@ typedef struct {
                 maxT2 = MAX(maxT2, t.y);
             }
         }
-        if ([self isWithinAcceptableDistanceMin:minT1] && [self isWithinAcceptableDistanceMax:maxT1] &&
-            [self isWithinAcceptableDistanceMin:minT2] && [self isWithinAcceptableDistanceMax:maxT2]) {
-            for (int j = 0; j < intersectionPoints.size(); j++) {
-                validIntersections.push_back(intersectionPoints[j]);
-            }
+        for (int j = 0; j < intersectionPoints.size(); j++) {
+            validIntersections.push_back(intersectionPoints[j]);
         }
     }
     return validIntersections;
@@ -300,7 +303,7 @@ typedef struct {
         line[0].push_back(lines[i].p1);
         line[0].push_back(lines[i].p2);
             
-        cv::Scalar color = cv::Scalar(255, 0, 255);
+        cv::Scalar color = cv::Scalar(i % 2 == 0 ? 255 : 0, i % 2 == 1 ? 255 : 0, i % 2 == 0 ? 255 : 0);
         cv::drawContours(image, line, 0, color);
     }
 }
@@ -441,8 +444,8 @@ typedef struct {
     FourPoints boardPoints = {.defined = NO};
     
     // Find all lines that satisfy the minimum length property
-    cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:minLineLength];
-    if (linesAndAngles.size() == 0) {
+    cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromImage:image];
+    if (linesAndAngles.size() < 4) {
         return boardPoints;
     }
     
@@ -451,7 +454,7 @@ typedef struct {
     
     // Find all intersections that are not too far away from original line
     cv::vector<cv::Point> validIntersections = [self findValidIntersectionsBetweenLines:bestTwoLineGroups[0].lines andLines:bestTwoLineGroups[1].lines imageSize:CGSizeMake(image.cols, image.rows)];
-    if (validIntersections.size() == 0) {
+    if (validIntersections.size() < 4) {
         return boardPoints;
     }
     
@@ -532,7 +535,7 @@ typedef struct {
     return (//fabs(cv::arcLength(contour, true)) >= minContourLength &&
             fabs(cv::contourArea(contour)) >= minContourArea &&
             contour.size() == 4 &&
-            [self maxCosineFromContour:contour] <= 0.3f);
+            [self maxCosineFromContour:contour] <= angleAcceptMax);
 }
 
 - (float)maxCosineFromContour:(cv::vector<cv::Point>)contour {
