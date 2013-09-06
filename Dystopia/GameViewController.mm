@@ -94,8 +94,8 @@ extern PreviewableViewController *previewInstance;
     @autoreleasepool {
         [self calibrateBoard:image];
         [self updateGameStateAccordingToFrame];
-        [previewInstance previewFrame:image boardCalibrator:boardCalibrator];
-        //[previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
+        //[previewInstance previewFrame:image boardCalibrator:boardCalibrator];
+        [previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
     }
 }
 

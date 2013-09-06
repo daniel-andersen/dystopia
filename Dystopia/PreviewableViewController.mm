@@ -174,6 +174,7 @@ PreviewableViewController *previewInstance = nil;
 }
 
 - (void)previewBoardBounds:(FourPoints)boardPoints {
+    return; // TODO REMOVE
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!boardPoints.defined) {
             boardBoundsLayer.hidden = YES;
