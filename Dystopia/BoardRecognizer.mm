@@ -45,6 +45,7 @@ typedef struct {
     LineWithAngle average;
     float lineDistance;
     float angle;
+    int direction;
 } LineGroup;
 
 @interface BoardRecognizer () {
@@ -54,6 +55,7 @@ typedef struct {
 
     CGSize imageSize;
     CGSize borderSize;
+    CGSize borderSizePercent;
     
     cv::vector<cv::vector<cv::Point>> approx;
     cv::vector<bool> hasBeenApproxed;
@@ -70,7 +72,8 @@ typedef struct {
     groupRadius = (image.size.width * 0.1f) + (image.size.height * 0.1f);
     
     imageSize = image.size;
-    borderSize = CGSizeMake(imageSize.width / BOARD_WIDTH, imageSize.height / BOARD_HEIGHT);
+    borderSizePercent = [[BoardUtil instance] borderPercentSize];
+    borderSize = CGSizeMake(imageSize.width * borderSizePercent.width * 2.0f, imageSize.height * borderSizePercent.height * 2.0f);
 
     // Prepare image
     cv::Mat img = [image CVMat];
@@ -89,7 +92,8 @@ typedef struct {
     groupRadius = (image.size.width * 0.1f) + (image.size.height * 0.1f);
     
     imageSize = image.size;
-    borderSize = CGSizeMake(imageSize.width / BOARD_WIDTH, imageSize.height / BOARD_HEIGHT);
+    borderSizePercent = [[BoardUtil instance] borderPercentSize];
+    borderSize = CGSizeMake(imageSize.width * borderSizePercent.width * 2.0f, imageSize.height * borderSizePercent.height * 2.0f);
 
     cv::Mat img = [image CVMat];
     img = [self smooth:img];
@@ -124,8 +128,8 @@ typedef struct {
     
     //[self drawLines:linesAndAngles ontoImage:outputImg];
     for (int i = 0; i < 4; i++) {
-        //cv::Scalar color = i == 0 ? cv::Scalar(255, 0, 0) : (i == 1 ? cv::Scalar(0, 255, 0) : (i == 2 ? cv::Scalar(0, 0, 255) : cv::Scalar(255, 0, 255)));
-        cv::Scalar color = cv::Scalar(0, 255, 0);
+        cv::Scalar color = i == 0 ? cv::Scalar(255, 0, 0) : (i == 1 ? cv::Scalar(0, 255, 0) : (i == 2 ? cv::Scalar(0, 0, 255) : cv::Scalar(255, 0, 255)));
+        //cv::Scalar color = cv::Scalar(0, 255, 0);
         for (int j = 0; j < borderLines[i].size(); j++) {
             [self drawLineGroup:borderLines[i][j] ontoImage:outputImg withColor:color];
         }
@@ -207,7 +211,7 @@ typedef struct {
     return [self squarePointsToBoardPoints:bestSquarePoints];
 }
 
-- (FourPoints)squarePointsToBoardPoints:(cv::vector<cv::Point>)points {
+- (FourPoints)squarePointsToBoardPoints:(cv::vector<cv::Point> &)points {
     FourPoints boardPoints = {
         .defined = YES,
         .p1 = CGPointMake(points[0].x, points[0].y),
@@ -218,9 +222,9 @@ typedef struct {
     return boardPoints;
 }
 
-- (bool)areSimpleConditionsSatisfied:(cv::vector<cv::Point>)contour {
+- (bool)areContourConditionsSatisfied:(cv::vector<cv::Point> &)contour {
     return (//fabs(cv::arcLength(contour, true)) >= minContourLength &&
-            fabs(cv::contourArea(contour)) >= minContourArea &&
+            //fabs(cv::contourArea(contour)) >= minContourArea &&
             contour.size() == 4 &&
             [self maxCosineFromContour:contour] <= angleAcceptMax);
 }
@@ -231,7 +235,7 @@ typedef struct {
     return a < 10;
 }
 
-- (float)maxCosineFromContour:(cv::vector<cv::Point>)contour {
+- (float)maxCosineFromContour:(cv::vector<cv::Point> &)contour {
     float maxCosine = 0.0f;
     for (int j = 2; j < contour.size() + 2; j++) {
         float cosine = fabs(angle(contour[j % contour.size()], contour[(j - 2) % contour.size()], contour[(j - 1) % contour.size()]));
@@ -243,7 +247,7 @@ typedef struct {
 }
 
 
-- (cv::vector<cv::Point>)findIntersectionsFromLineGroups:(cv::vector<cv::vector<LineGroup>>)lineGroups {
+- (cv::vector<cv::Point>)findIntersectionsFromLineGroups:(cv::vector<cv::vector<LineGroup>> &)lineGroups {
     cv::vector<cv::Point> intersectionPoints;
     [self addIntersectionsBetweenLineGroups:lineGroups[0] andLineGroups:lineGroups[2] toPoints:intersectionPoints];
     [self addIntersectionsBetweenLineGroups:lineGroups[0] andLineGroups:lineGroups[3] toPoints:intersectionPoints];
@@ -252,12 +256,12 @@ typedef struct {
     return intersectionPoints;
 }
 
-- (cv::vector<cv::Point>)addIntersectionsBetweenLineGroups:(cv::vector<LineGroup>)lineGroups1 andLineGroups:(cv::vector<LineGroup>)lineGroups2 toPoints:(cv::vector<cv::Point> &)intersectionPoints {
+- (cv::vector<cv::Point>)addIntersectionsBetweenLineGroups:(cv::vector<LineGroup> &)lineGroups1 andLineGroups:(cv::vector<LineGroup> &)lineGroups2 toPoints:(cv::vector<cv::Point> &)intersectionPoints {
     for (int i = 0; i < lineGroups1.size(); i++) {
         for (int j = 0; j < lineGroups2.size(); j++) {
             cv::Point r;
             cv::Point2f t;
-            if ([self isAcceptableIntersectionLine1:lineGroups1[i].average line2:lineGroups2[i].average r:r t:t]) {
+            if ([self isAcceptableIntersectionLine1:lineGroups1[i].average line2:lineGroups2[j].average r:r t:t]) {
                 intersectionPoints.push_back(r);
             }
         }
@@ -271,6 +275,7 @@ typedef struct {
             LineGroup &lineGroup = lineGroups[i][j];
             lineGroup.average.p1 = cv::Point(0, 0);
             lineGroup.average.p2 = cv::Point(0, 0);
+            
             for (int k = 0; k < lineGroup.lines.size(); k++) {
                 LineWithAngle line = lineGroup.lines[k];
                 lineGroup.average.p1.x += line.p1.x;
@@ -286,7 +291,7 @@ typedef struct {
     }
 }
 
-- (cv::vector<cv::vector<LineGroup>>)divideLinesIntoGroups:(cv::vector<LineWithAngle>)lines {
+- (cv::vector<cv::vector<LineGroup>>)divideLinesIntoGroups:(cv::vector<LineWithAngle> &)lines {
     cv::vector<cv::vector<LineGroup>> lineGroups = cv::vector<cv::vector<LineGroup>> (4);
     for (int i = 0; i < lines.size(); i++) {
         int direction = [self lineDirection:lines[i]];
@@ -321,7 +326,7 @@ typedef struct {
     return lineGroups;
 }
 
-- (cv::vector<cv::vector<LineGroup>>)removeNonBorderLineGroups:(cv::vector<cv::vector<LineGroup>>)lineGroups {
+- (cv::vector<cv::vector<LineGroup>>)removeNonBorderLineGroups:(cv::vector<cv::vector<LineGroup>> &)lineGroups {
     // Must have 4 lines in group, two for each side of the border
     cv::vector<cv::vector<LineGroup>> borderLines = cv::vector<cv::vector<LineGroup>> (4);
     for (int i = 0; i < 4; i++) {
@@ -335,6 +340,7 @@ typedef struct {
 }
 
 - (LineGroup)newLineGroupWithLine:(LineWithAngle)line {
+    int direction = [self lineDirection:line];
     cv::vector<LineWithAngle> lineGroupLines;
     lineGroupLines.push_back(line);
     LineGroup lineGroup = {
@@ -342,7 +348,8 @@ typedef struct {
         .minLine = line,
         .maxLine = line,
         .lineDistance = 0.0f,
-        .angle = line.angle
+        .angle = line.angle,
+        .direction = direction
     };
     return lineGroup;
 }
@@ -402,7 +409,7 @@ typedef struct {
     return CGPointMake((line.p1.x + line.p2.x) / 2.0f, (line.p1.y + line.p2.y) / 2.0f);
 }
 
-- (cv::vector<LineWithAngle>)findLinesFromContours:(cv::vector<cv::vector<cv::Point>>)contours minimumLineLength:(float)minimumLineLength {
+- (cv::vector<LineWithAngle>)findLinesFromContours:(cv::vector<cv::vector<cv::Point>> &)contours minimumLineLength:(float)minimumLineLength {
     cv::vector<LineWithAngle> linesAndAngles = cv::vector<LineWithAngle> (0);
     cv::vector<cv::Point> approxedContour;
     
@@ -447,7 +454,7 @@ typedef struct {
     }
 }
 
-- (cv::vector<cv::Point>)findBestSquareFromPoints:(cv::vector<cv::Point>)points scoreFunction:(float(^)(cv::vector<cv::Point> hull))scoreFunction {
+- (cv::vector<cv::Point>)findBestSquareFromPoints:(cv::vector<cv::Point> &)points scoreFunction:(float(^)(cv::vector<cv::Point> hull))scoreFunction {
     cv::vector<cv::Point> bestPoints;
     cv::vector<cv::Point> currentPoints = cv::vector<cv::Point> (4);
     cv::vector<cv::Point> hull;
@@ -469,7 +476,7 @@ typedef struct {
                     
                     float score = scoreFunction(hull);
                     
-                    if (score > bestScore && [self areSimpleConditionsSatisfied:hull]) {
+                    if (score > bestScore && [self areContourConditionsSatisfied:hull]) {
                         bestPoints = hull;
                         bestScore = score;
                     }
@@ -501,14 +508,14 @@ typedef struct {
     return t > 1.0f - intersectionAcceptDistanceMin && t < 1.0f + intersectionAcceptDistanceMax;
 }
 
-- (void)drawPoints:(cv::vector<cv::Point>)points image:(cv::Mat)image {
+- (void)drawPoints:(cv::vector<cv::Point> &)points image:(cv::Mat)image {
     for (int i = 0; i < points.size(); i++) {
         cv::Scalar color = cv::Scalar(255, 0, 255);
         cv::circle(image, points[i], 5.0f, color);
     }
 }
 
-- (void)drawBestTwoLineGroups:(cv::vector<LineGroup>)bestTwoLineGroups ontoImage:(cv::Mat)image {
+- (void)drawBestTwoLineGroups:(cv::vector<LineGroup> &)bestTwoLineGroups ontoImage:(cv::Mat)image {
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < bestTwoLineGroups[i].lines.size(); j++) {
             cv::vector<cv::vector<cv::Point>> line = cv::vector<cv::vector<cv::Point>> (1);
@@ -521,7 +528,7 @@ typedef struct {
     }
 }
 
-- (void)drawLines:(cv::vector<LineWithAngle>)lines ontoImage:(cv::Mat)image {
+- (void)drawLines:(cv::vector<LineWithAngle> &)lines ontoImage:(cv::Mat)image {
     for (int i = 0; i < lines.size(); i++) {
         cv::vector<cv::vector<cv::Point>> line = cv::vector<cv::vector<cv::Point>> (1);
         line[0].push_back(lines[i].p1);
@@ -535,7 +542,7 @@ typedef struct {
     }
 }
 
-- (void)drawLineGroup:(LineGroup)lineGroup ontoImage:(cv::Mat)image withColor:(cv::Scalar)color {
+- (void)drawLineGroup:(LineGroup &)lineGroup ontoImage:(cv::Mat)image withColor:(cv::Scalar)color {
     for (int i = 0; i < lineGroup.lines.size(); i++) {
         cv::vector<cv::vector<cv::Point>> line = cv::vector<cv::vector<cv::Point>> (1);
         line[0].push_back(lineGroup.lines[i].p1);

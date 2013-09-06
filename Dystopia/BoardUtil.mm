@@ -97,6 +97,13 @@ BoardUtil *boardUtilInstance = nil;
                       [self brickTypeScreenSize:brickType].height);
 }
 
+- (CGSize)borderPercentSize {
+    int countX = ((BOARD_WIDTH * 2) - 2) / 9;
+    int countY = ((BOARD_HEIGHT * 2)- 2) / 9;
+    
+    return CGSizeMake(1.0f / ((countX * 9) + 2), 1.0f / ((countY * 9) + 2));
+}
+
 - (CGPoint)cvPointToCGPoint:(cv::Point)p {
     return CGPointMake(p.x, p.y);
 }
