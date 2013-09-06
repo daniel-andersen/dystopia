@@ -30,7 +30,7 @@
 
 float intersectionAcceptDistanceMin = 0.02f;
 float intersectionAcceptDistanceMax = 5.0f;
-float angleAcceptMax = 0.2f;
+float angleAcceptMax = 0.1f;
 
 typedef struct {
     cv::Point p1;
@@ -75,15 +75,28 @@ typedef struct {
     borderSizePercent = [[BoardUtil instance] borderPercentSize];
     borderSize = CGSizeMake(imageSize.width * borderSizePercent.width * 2.0f, imageSize.height * borderSizePercent.height * 2.0f);
 
-    // Prepare image
-    cv::Mat img = [image CVMat];
-    img = [self smooth:img];
-    img = [self grayscale:img];
-    img = [self applyCanny:img];
-    img = [self dilate:img];
+    float thresholdMin[3] = {100.0f,  50.0f, 20.0f};
+    float thresholdMax[3] = {300.0f, 150.0f, 30.0f};
     
-    // Find corners
-    return [self findBoardCorners:img];
+    // Prepare image
+    cv::Mat preparedImage = [image CVMat];
+    preparedImage = [self smooth:preparedImage];
+    preparedImage = [self grayscale:preparedImage];
+    
+    // Try different thresholding values for Canny - roughest first
+    for (int i = 0; i < 3; i++) {
+        cv::Mat img = preparedImage.clone();
+        img = [self applyCannyOnImage:img threshold1:thresholdMin[i] threshold2:thresholdMax[i]];
+        img = [self dilate:img];
+    
+        // Find corners
+        FourPoints corners = [self findBoardCorners:img];
+        if (corners.defined) {
+            return corners;
+        }
+    }
+    FourPoints undefinedPoints = {.defined = NO};
+    return undefinedPoints;
 }
 
 - (UIImage *)boardBoundsToImage:(UIImage *)image {
@@ -98,7 +111,7 @@ typedef struct {
     cv::Mat img = [image CVMat];
     img = [self smooth:img];
     img = [self grayscale:img];
-    img = [self applyCanny:img];
+    img = [self applyCannyOnImage:img threshold1:100.0f threshold2:300.0f];
     img = [self dilate:img];
     
     //return [UIImage imageWithCVMat:img];
@@ -113,6 +126,8 @@ typedef struct {
     cv::findContours(img, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
 
     cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:MIN(image.size.width, image.size.height) * 0.02f];
+    [self drawLines:linesAndAngles ontoImage:outputImg];
+
     cv::vector<cv::vector<LineGroup>> lineGroups = [self divideLinesIntoGroups:linesAndAngles];
     cv::vector<cv::vector<LineGroup>> borderLines = [self removeNonBorderLineGroups:lineGroups];
     [self findRepresentingLinesInLineGroups:borderLines];
@@ -126,12 +141,11 @@ typedef struct {
         return [UIImage imageWithCVMat:outputImg];
     }
     
-    //[self drawLines:linesAndAngles ontoImage:outputImg];
     for (int i = 0; i < 4; i++) {
         cv::Scalar color = i == 0 ? cv::Scalar(255, 0, 0) : (i == 1 ? cv::Scalar(0, 255, 0) : (i == 2 ? cv::Scalar(0, 0, 255) : cv::Scalar(255, 0, 255)));
         //cv::Scalar color = cv::Scalar(0, 255, 0);
         for (int j = 0; j < borderLines[i].size(); j++) {
-            [self drawLineGroup:borderLines[i][j] ontoImage:outputImg withColor:color];
+            //[self drawLineGroup:borderLines[i][j] ontoImage:outputImg withColor:color];
         }
     }
     [self drawPoints:bestSquare image:outputImg];
@@ -154,8 +168,9 @@ typedef struct {
     return image;
 }
 
-- (cv::Mat)applyCanny:(cv::Mat)image {
-    cv::Canny(image, image, 100, 300);
+- (cv::Mat)applyCannyOnImage:(cv::Mat)image threshold1:(float)threshold1 threshold2:(float)threshold2 {
+    cv::Canny(image, image, threshold1, threshold2);
+    cv::Canny(image, image, 100.0f, 300.0f);
     //cv::Canny(image, image, 10, 30);
     return image;
 }
@@ -167,7 +182,7 @@ typedef struct {
 }
 
 - (FourPoints)findBoardCorners:(cv::Mat)image {
-    FourPoints boardPoints = {.defined = NO};
+    FourPoints undefinedPoints = {.defined = NO};
     
     cv::vector<cv::vector<cv::Point>> contours;
     cv::vector<cv::Vec4i> hierarchy;
@@ -175,13 +190,13 @@ typedef struct {
     // Find contours
     cv::findContours(image, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
     if (contours.size() == 0) {
-        return boardPoints;
+        return undefinedPoints;
     }
     
     // Find lines from contours
     cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:MIN(imageSize.width, imageSize.height) * 0.02f];
     if (linesAndAngles.size() < 4) {
-        return boardPoints;
+        return undefinedPoints;
     }
     
     // Divide lines into groups - "close" lines divided into horizontal (left and right) and vertical (up and down)
@@ -196,7 +211,7 @@ typedef struct {
     // Find intersections between all lines
     cv::vector<cv::Point> intersectionPoints = [self findIntersectionsFromLineGroups:borderLines];
     if (intersectionPoints.size() < 4) {
-        return boardPoints;
+        return undefinedPoints;
     }
     
     // Find best square points
@@ -204,7 +219,7 @@ typedef struct {
         return cv::contourArea(hull);
     }];
     if (bestSquarePoints.size() < 4) {
-        return boardPoints;
+        return undefinedPoints;
     }
     
     // Convert to FourPoints
@@ -224,7 +239,7 @@ typedef struct {
 
 - (bool)areContourConditionsSatisfied:(cv::vector<cv::Point> &)contour {
     return (//fabs(cv::arcLength(contour, true)) >= minContourLength &&
-            //fabs(cv::contourArea(contour)) >= minContourArea &&
+            fabs(cv::contourArea(contour)) >= minContourArea &&
             contour.size() == 4 &&
             [self maxCosineFromContour:contour] <= angleAcceptMax);
 }
