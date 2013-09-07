@@ -30,7 +30,7 @@
 
 float intersectionAcceptDistanceMin = 0.02f;
 float intersectionAcceptDistanceMax = 5.0f;
-float angleAcceptMax = 0.1f;
+float angleAcceptMax = M_PI * 2.0f / 18.0f;
 
 typedef struct {
     cv::Point p1;
@@ -51,7 +51,6 @@ typedef struct {
 @interface BoardRecognizer () {
     float minContourArea;
     float minLineLength;
-    float groupRadius;
 
     CGSize imageSize;
     CGSize borderSize;
@@ -67,13 +66,7 @@ typedef struct {
 
 - (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
     // Constants
-    minContourArea = (image.size.width * 0.5) * (image.size.height * 0.5f);
-    minLineLength = MIN(image.size.width, image.size.height) * 0.1f;
-    groupRadius = (image.size.width * 0.1f) + (image.size.height * 0.1f);
-    
-    imageSize = image.size;
-    borderSizePercent = [[BoardUtil instance] borderPercentSize];
-    borderSize = CGSizeMake(imageSize.width * borderSizePercent.width * 2.0f, imageSize.height * borderSizePercent.height * 2.0f);
+    [self prepareConstantsFromImage:image];
 
     float thresholdMin[3] = {100.0f,  50.0f, 20.0f};
     float thresholdMax[3] = {300.0f, 150.0f, 30.0f};
@@ -100,13 +93,7 @@ typedef struct {
 }
 
 - (UIImage *)boardBoundsToImage:(UIImage *)image {
-    minContourArea = (image.size.width * 0.5) * (image.size.height * 0.5f);
-    minLineLength = MIN(image.size.width, image.size.height) * 0.1f;
-    groupRadius = (image.size.width * 0.1f) + (image.size.height * 0.1f);
-    
-    imageSize = image.size;
-    borderSizePercent = [[BoardUtil instance] borderPercentSize];
-    borderSize = CGSizeMake(imageSize.width * borderSizePercent.width * 2.0f, imageSize.height * borderSizePercent.height * 2.0f);
+    [self prepareConstantsFromImage:image];
 
     cv::Mat img = [image CVMat];
     img = [self smooth:img];
@@ -151,6 +138,16 @@ typedef struct {
     [self drawPoints:bestSquare image:outputImg];
 
     return [UIImage imageWithCVMat:outputImg];
+}
+
+- (void)prepareConstantsFromImage:(UIImage *)image {
+    imageSize = image.size;
+    
+    minContourArea = (imageSize.width * 0.5) * (imageSize.height * 0.5f);
+    minLineLength = MIN(imageSize.width, imageSize.height) * 0.1f;
+    
+    borderSizePercent = [[BoardUtil instance] borderPercentSize];
+    borderSize = CGSizeMake(imageSize.width * borderSizePercent.width * 1.5f, imageSize.height * borderSizePercent.height * 1.5f);
 }
 
 - (cv::Mat)filterAndThreshold:(cv::Mat)image {
@@ -204,6 +201,9 @@ typedef struct {
     
     // Remove lines that cannot be border lines. Must have at least 4 "close" lines in group
     cv::vector<cv::vector<LineGroup>> borderLines = [self removeNonBorderLineGroups:lineGroups];
+    if (borderLines[0].size() == 0 || borderLines[1].size() == 0 || borderLines[2].size() == 0 || borderLines[3].size() == 0) {
+        return undefinedPoints;
+    }
     
     // Find average lines that represent each group
     [self findRepresentingLinesInLineGroups:borderLines];
@@ -247,7 +247,7 @@ typedef struct {
 - (bool)isAngleVerticalOrHorizontal:(float)angle {
     int a1 = (int)angle % 90;
     int a = MIN(ABS(a1), ABS(90 - a1));
-    return a < 10;
+    return a < angleAcceptMax * 180.0f / M_PI;
 }
 
 - (float)maxCosineFromContour:(cv::vector<cv::Point> &)contour {
@@ -475,7 +475,7 @@ typedef struct {
     cv::vector<cv::Point> hull;
     
     float bestScore = -1.0f;
-    
+
     for (int i1 = 0; i1 < points.size(); i1++) {
         currentPoints[0] = points[i1];
 
