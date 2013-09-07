@@ -67,7 +67,7 @@ typedef struct {
 
 - (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
     // Constants
-    minContourArea = (image.size.width * 0.7) * (image.size.height * 0.5f);
+    minContourArea = (image.size.width * 0.5) * (image.size.height * 0.5f);
     minLineLength = MIN(image.size.width, image.size.height) * 0.1f;
     groupRadius = (image.size.width * 0.1f) + (image.size.height * 0.1f);
     
@@ -100,7 +100,7 @@ typedef struct {
 }
 
 - (UIImage *)boardBoundsToImage:(UIImage *)image {
-    minContourArea = (image.size.width * 0.7) * (image.size.height * 0.5f);
+    minContourArea = (image.size.width * 0.5) * (image.size.height * 0.5f);
     minLineLength = MIN(image.size.width, image.size.height) * 0.1f;
     groupRadius = (image.size.width * 0.1f) + (image.size.height * 0.1f);
     
