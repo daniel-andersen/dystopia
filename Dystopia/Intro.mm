@@ -80,7 +80,8 @@
 
 - (void)show {
     if ([ExternalDisplay instance].externalDisplayFound) {
-        [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(showTrollsAhead) userInfo:nil repeats:NO];
+        [delegate introFinished];
+        //[NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(showTrollsAhead) userInfo:nil repeats:NO];
     } else {
         [delegate introFinished];
     }
