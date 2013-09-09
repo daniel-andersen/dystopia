@@ -78,4 +78,21 @@
     return cv::getPerspectiveTransform(srcCvPoints, dstCvPoints);
 }
 
++ (UIInterfaceOrientation)interfaceOrientation {
+    return [UIApplication sharedApplication].statusBarOrientation;
+}
+
++ (UIImageOrientation)interfaceOrientationToImageOrientation {
+    switch ([self interfaceOrientation]) {
+        case UIInterfaceOrientationLandscapeLeft:
+            return UIImageOrientationDown;
+        case UIInterfaceOrientationLandscapeRight:
+            return UIImageOrientationUp;
+        case UIInterfaceOrientationPortraitUpsideDown:
+            return UIImageOrientationLeft;
+        default:
+            return UIImageOrientationRight;
+    }
+}
+
 @end

@@ -38,4 +38,8 @@
 
 + (cv::Mat)findPerspectiveTransformationSrcPoints:(FourPoints)srcPoints dstPoints:(FourPoints)dstPoints;
 
++ (UIInterfaceOrientation)interfaceOrientation;
+
++ (UIImageOrientation)interfaceOrientationToImageOrientation;
+
 @end

@@ -27,10 +27,13 @@
 #import "UIImage+OpenCV.h"
 #import "BoardUtil.h"
 #import "CameraUtil.h"
+#import "ExternalDisplay.h"
 
 float intersectionAcceptDistanceMin = 0.02f;
 float intersectionAcceptDistanceMax = 5.0f;
-float angleAcceptMax = M_PI * 2.0f / 18.0f;
+float squareAngleAcceptMax = 5.0f;
+float lineGroupAngleAcceptMax = 15.0f;
+float aspectRatioAcceptMax = 0.1f;
 
 typedef struct {
     cv::Point p1;
@@ -56,6 +59,8 @@ typedef struct {
     CGSize borderSize;
     CGSize borderSizePercent;
     
+    float boardAspectRatio;
+    
     cv::vector<cv::vector<cv::Point>> approx;
     cv::vector<bool> hasBeenApproxed;
 }
@@ -65,7 +70,6 @@ typedef struct {
 @implementation BoardRecognizer
 
 - (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
-    // Constants
     [self prepareConstantsFromImage:image];
 
     float thresholdMin[3] = {100.0f,  50.0f, 20.0f};
@@ -101,12 +105,9 @@ typedef struct {
     img = [self applyCannyOnImage:img threshold1:100.0f threshold2:300.0f];
     img = [self dilate:img];
     
-    //return [UIImage imageWithCVMat:img];
-
-    //cv::Mat outputImg = cv::Mat(img.size(), img.type());
-    //cv::Mat outputImg = cv::Mat(img);
-    //cv::cvtColor(outputImg, outputImg, CV_GRAY2RGB);
-    cv::Mat outputImg = [image CVMat];
+    cv::Mat outputImg = cv::Mat(img);
+    cv::cvtColor(outputImg, outputImg, CV_GRAY2RGB);
+    //cv::Mat outputImg = [image CVMat];
 
     cv::vector<cv::vector<cv::Point>> contours;
     cv::vector<cv::Vec4i> hierarchy;
@@ -148,6 +149,12 @@ typedef struct {
     
     borderSizePercent = [[BoardUtil instance] borderPercentSize];
     borderSize = CGSizeMake(imageSize.width * borderSizePercent.width * 1.5f, imageSize.height * borderSizePercent.height * 1.5f);
+    
+    if ([ExternalDisplay instance].externalDisplayFound) {
+        boardAspectRatio = [ExternalDisplay instance].widescreenBounds.size.width / [ExternalDisplay instance].widescreenBounds.size.height;
+    } else {
+        boardAspectRatio = 1.5f;
+    }
 }
 
 - (cv::Mat)filterAndThreshold:(cv::Mat)image {
@@ -167,8 +174,6 @@ typedef struct {
 
 - (cv::Mat)applyCannyOnImage:(cv::Mat)image threshold1:(float)threshold1 threshold2:(float)threshold2 {
     cv::Canny(image, image, threshold1, threshold2);
-    cv::Canny(image, image, 100.0f, 300.0f);
-    //cv::Canny(image, image, 10, 30);
     return image;
 }
 
@@ -238,16 +243,39 @@ typedef struct {
 }
 
 - (bool)areContourConditionsSatisfied:(cv::vector<cv::Point> &)contour {
-    return (//fabs(cv::arcLength(contour, true)) >= minContourLength &&
-            fabs(cv::contourArea(contour)) >= minContourArea &&
-            contour.size() == 4 &&
-            [self maxCosineFromContour:contour] <= angleAcceptMax);
+    if (contour.size() != 4) {
+        return NO;
+    }
+    if (fabs(cv::contourArea(contour)) < minContourArea) {
+        return NO;
+    }
+    if ([self maxCosineFromContour:contour] > squareAngleAcceptMax * M_PI / 180.0f) {
+        return NO;
+    }
+    if (![self hasCorrectAspectRatio:contour]) {
+        return NO;
+    }
+    return YES;
+}
+
+- (bool)hasCorrectAspectRatio:(cv::vector<cv::Point> &)contour {
+    float maxWidth = 0.0f;
+    float maxHeight = 0.0f;
+    for (int i = 0; i < contour.size(); i++) {
+        cv::Point p1 = contour[(i + 0) % contour.size()];
+        cv::Point p2 = contour[(i + 1) % contour.size()];
+
+        maxWidth = MAX(ABS(p1.x - p2.x), maxWidth);
+        maxHeight = MAX(ABS(p1.y - p2.y), maxHeight);
+    }
+    float aspectRatio = MAX(maxWidth, maxHeight) / MIN(maxWidth, maxHeight);
+    return aspectRatio >= boardAspectRatio - aspectRatioAcceptMax && aspectRatio <= boardAspectRatio + aspectRatioAcceptMax;
 }
 
 - (bool)isAngleVerticalOrHorizontal:(float)angle {
-    int a1 = (int)angle % 90;
-    int a = MIN(ABS(a1), ABS(90 - a1));
-    return a < angleAcceptMax * 180.0f / M_PI;
+    int a1 = ABS((int)angle % 90);
+    int a = MIN(a1, 90 - a1);
+    return a < lineGroupAngleAcceptMax;
 }
 
 - (float)maxCosineFromContour:(cv::vector<cv::Point> &)contour {
@@ -260,7 +288,6 @@ typedef struct {
     }
     return maxCosine;
 }
-
 
 - (cv::vector<cv::Point>)findIntersectionsFromLineGroups:(cv::vector<cv::vector<LineGroup>> &)lineGroups {
     cv::vector<cv::Point> intersectionPoints;
