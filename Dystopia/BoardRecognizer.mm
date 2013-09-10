@@ -228,18 +228,35 @@ typedef struct {
     }
     
     // Convert to FourPoints
-    return [self squarePointsToBoardPoints:bestSquarePoints];
+    return [self squarePointsToSortedBoardPoints:bestSquarePoints];
 }
 
-- (FourPoints)squarePointsToBoardPoints:(cv::vector<cv::Point> &)points {
+- (FourPoints)squarePointsToSortedBoardPoints:(cv::vector<cv::Point> &)points {
+    cv::Point p1 = [self extractSortedPointFromPoints:points referencePoint:CGPointMake(0.0f,            0.0f            )];
+    cv::Point p2 = [self extractSortedPointFromPoints:points referencePoint:CGPointMake(imageSize.width, 0.0f            )];
+    cv::Point p3 = [self extractSortedPointFromPoints:points referencePoint:CGPointMake(imageSize.width, imageSize.height)];
+    cv::Point p4 = [self extractSortedPointFromPoints:points referencePoint:CGPointMake(0.0f,            imageSize.height)];
     FourPoints boardPoints = {
         .defined = YES,
-        .p1 = CGPointMake(points[0].x, points[0].y),
-        .p2 = CGPointMake(points[1].x, points[1].y),
-        .p3 = CGPointMake(points[2].x, points[2].y),
-        .p4 = CGPointMake(points[3].x, points[3].y),
+        .p1 = CGPointMake(p1.x, p1.y),
+        .p2 = CGPointMake(p2.x, p2.y),
+        .p3 = CGPointMake(p3.x, p3.y),
+        .p4 = CGPointMake(p4.x, p4.y),
     };
     return boardPoints;
+}
+
+- (cv::Point)extractSortedPointFromPoints:(cv::vector<cv::Point> &)points referencePoint:(CGPoint)referencePoint {
+    int minIndex = -1;
+    float minDistance = 0.0f;
+    for (int i = 0; i < points.size(); i++) {
+        float score = ABS(points[i].x - referencePoint.x) * ABS(points[i].y - referencePoint.y);
+        if (score < minDistance || minIndex == -1) {
+            minDistance = score;
+            minIndex = i;
+        }
+    }
+    return points[minIndex];
 }
 
 - (bool)areContourConditionsSatisfied:(cv::vector<cv::Point> &)contour {
