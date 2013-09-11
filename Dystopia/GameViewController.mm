@@ -107,11 +107,12 @@ extern PreviewableViewController *previewInstance;
 }
 
 - (void)setFrameUpdateIntervalAccordingToGameState {
-    if (boardCalibrator.state != BOARD_CALIBRATION_STATE_CALIBRATED) {
+    cameraSession.delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_FAST;
+    /*if (boardCalibrator.state != BOARD_CALIBRATION_STATE_CALIBRATED) {
         cameraSession.delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_FAST;
     } else {
         cameraSession.delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_DEFAULT;
-    }
+    }*/
 }
 
 - (void)startIntro {

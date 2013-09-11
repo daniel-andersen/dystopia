@@ -31,9 +31,10 @@
 PreviewableViewController *previewInstance = nil;
 
 @interface PreviewableViewController () {
-    UIImageView *cameraPreview;
     CAShapeLayer *boardBoundsLayer;
+    CAShapeLayer *boardGridLayer;
     
+    UIImageView *cameraPreview;
     UIImageView *boardPreview;
     
     UIButton *boardButton;
@@ -56,6 +57,7 @@ PreviewableViewController *previewInstance = nil;
     boardPreview.frame = self.view.bounds;
     cameraPreview.frame = self.view.bounds;
     boardBoundsLayer.frame = self.view.bounds;
+    boardGridLayer.frame = self.view.bounds;
     
     [self setButtonFrame:boardButton x:75.0f];
     [self setButtonFrame:cameraPreviewButton x:(self.view.bounds.size.width - 75.0f)];
@@ -78,6 +80,8 @@ PreviewableViewController *previewInstance = nil;
     [overlayView addSubview:boardPreview];
 
     [self addBoardBoundsLayer];
+    [self addBoardGridLayer];
+
     [self addCameraPreviewLabel];
     [self addBoardPreviewLabel];
 
@@ -141,6 +145,27 @@ PreviewableViewController *previewInstance = nil;
     boardBoundsLayer.strokeColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:1.0f].CGColor;
     boardBoundsLayer.backgroundColor = [UIColor clearColor].CGColor;
     [cameraPreview.layer addSublayer:boardBoundsLayer];
+}
+
+- (void)addBoardGridLayer {
+    boardGridLayer = [CAShapeLayer layer];
+    boardGridLayer.frame = self.view.bounds;
+    boardGridLayer.fillColor = [UIColor clearColor].CGColor;
+    boardGridLayer.strokeColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:1.0f].CGColor;
+    boardGridLayer.backgroundColor = [UIColor clearColor].CGColor;
+    [boardPreview.layer addSublayer:boardGridLayer];
+
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    CGSize singleBrickSize = CGSizeMake([UIScreen mainScreen].bounds.size.width / BOARD_WIDTH, [UIScreen mainScreen].bounds.size.height / BOARD_HEIGHT);
+    for (int i = 0; i < BOARD_WIDTH; i++) {
+        [path moveToPoint:CGPointMake(i * singleBrickSize.width, 0.0f)];
+        [path addLineToPoint:CGPointMake(i * singleBrickSize.width, self.view.bounds.size.height)];
+    }
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        [path moveToPoint:CGPointMake(0.0f, i * singleBrickSize.height)];
+        [path addLineToPoint:CGPointMake(self.view.bounds.size.width, i * singleBrickSize.height)];
+    }
+    boardGridLayer.path = path.CGPath;
 }
 
 - (void)previewFrame:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
