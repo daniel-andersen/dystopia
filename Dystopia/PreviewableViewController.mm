@@ -161,8 +161,6 @@ PreviewableViewController *previewInstance = nil;
     if (boardPreview.hidden == NO) {
         if (boardCalibrator.boardBounds.defined) {
             boardPreview.image = [boardCalibrator perspectiveCorrectImage:image];
-        } else {
-            boardPreview.image = image;
         }
     }
 }
