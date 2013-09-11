@@ -70,7 +70,7 @@
     int countX = ((BOARD_WIDTH * 2) - 2) / 9;
     int countY = ((BOARD_HEIGHT * 2)- 2) / 9;
     
-    CGSize singleSize = CGSizeMake(self.bounds.size.width / ((countX * 9) + 2), self.bounds.size.height / ((countY * 9) + 2));
+    CGSize singleSize = [[BoardUtil instance] borderSizeFromBoardSize:self.bounds.size];
     CGSize stripSize = CGSizeMake(singleSize.width * 9.0f, singleSize.height * 9.0f);
 
     UIGraphicsBeginImageContextWithOptions(self.bounds.size, NO, [ExternalDisplay instance].screen.scale);

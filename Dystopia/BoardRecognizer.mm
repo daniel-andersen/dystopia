@@ -29,6 +29,11 @@
 #import "CameraUtil.h"
 #import "ExternalDisplay.h"
 
+#define LINE_DIRECTION_HORIZONTAL_UP   0
+#define LINE_DIRECTION_HORIZONTAL_DOWN 1
+#define LINE_DIRECTION_VERTICAL_LEFT   2
+#define LINE_DIRECTION_VERTICAL_RIGHT  3
+
 float intersectionAcceptDistanceMin = 0.02f;
 float intersectionAcceptDistanceMax = 5.0f;
 float squareAngleAcceptMax = 5.0f;
@@ -96,6 +101,32 @@ typedef struct {
     return undefinedPoints;
 }
 
+- (UIImage *)perspectiveCorrectImage:(UIImage *)image fromBoardBounds:(FourPoints)boardBounds {
+    cv::Mat transformation = [self findTransformationFromBoardBounds:boardBounds];
+    return [CameraUtil perspectiveTransformImage:image withTransformation:transformation toSize:[self approxBoardSizeFromBounds:boardBounds]];
+}
+
+- (cv::Mat)findTransformationFromBoardBounds:(FourPoints)boardBounds {
+    CGSize approxBoardSize = [self approxBoardSizeFromBounds:boardBounds];
+    CGSize approxBorderSize = [[BoardUtil instance] borderSizeFromBoardSize:approxBoardSize];
+    FourPoints dstPoints = {
+        .p1 = CGPointMake(                        (approxBorderSize.width / 2.0f),                          (approxBorderSize.height / 2.0f)),
+        .p2 = CGPointMake(approxBoardSize.width - (approxBorderSize.width / 2.0f),                          (approxBorderSize.height / 2.0f)),
+        .p3 = CGPointMake(approxBoardSize.width - (approxBorderSize.width / 2.0f), approxBoardSize.height - (approxBorderSize.height / 2.0f)),
+        .p4 = CGPointMake(                        (approxBorderSize.width / 2.0f), approxBoardSize.height - (approxBorderSize.height / 2.0f))};
+    return [CameraUtil findPerspectiveTransformationSrcPoints:boardBounds dstPoints:dstPoints];
+}
+
+- (CGSize)approxBoardSizeFromBounds:(FourPoints)boardBounds {
+    cv::vector<cv::Point> bounds;
+    bounds.push_back(cv::Point(boardBounds.p1.x, boardBounds.p1.y));
+    bounds.push_back(cv::Point(boardBounds.p2.x, boardBounds.p2.y));
+    bounds.push_back(cv::Point(boardBounds.p3.x, boardBounds.p3.y));
+    bounds.push_back(cv::Point(boardBounds.p4.x, boardBounds.p4.y));
+    cv::Rect rect = cv::boundingRect(bounds);
+    return CGSizeMake(rect.width, rect.height);
+}
+
 - (UIImage *)boardBoundsToImage:(UIImage *)image {
     [self prepareConstantsFromImage:image];
 
@@ -147,8 +178,9 @@ typedef struct {
     minContourArea = (imageSize.width * 0.5) * (imageSize.height * 0.5f);
     minLineLength = MIN(imageSize.width, imageSize.height) * 0.1f;
     
-    borderSizePercent = [[BoardUtil instance] borderPercentSize];
-    borderSize = CGSizeMake(imageSize.width * borderSizePercent.width * 1.5f, imageSize.height * borderSizePercent.height * 1.5f);
+    borderSize = [[BoardUtil instance] borderSizeFromBoardSize:imageSize];
+    borderSize.width *= 1.5f;
+    borderSize.height *= 1.5f;
     
     if ([ExternalDisplay instance].externalDisplayFound) {
         boardAspectRatio = [ExternalDisplay instance].widescreenBounds.size.width / [ExternalDisplay instance].widescreenBounds.size.height;
@@ -212,7 +244,7 @@ typedef struct {
     
     // Find average lines that represent each group
     [self findRepresentingLinesInLineGroups:borderLines];
-    
+
     // Find intersections between all lines
     cv::vector<cv::Point> intersectionPoints = [self findIntersectionsFromLineGroups:borderLines];
     if (intersectionPoints.size() < 4) {
@@ -250,7 +282,9 @@ typedef struct {
     int minIndex = -1;
     float minDistance = 0.0f;
     for (int i = 0; i < points.size(); i++) {
-        float score = ABS(points[i].x - referencePoint.x) * ABS(points[i].y - referencePoint.y);
+        float deltaX = ABS(points[i].x - referencePoint.x);
+        float deltaY = ABS(points[i].y - referencePoint.y);
+        float score = deltaX * deltaX + deltaY * deltaY;
         if (score < minDistance || minIndex == -1) {
             minDistance = score;
             minIndex = i;

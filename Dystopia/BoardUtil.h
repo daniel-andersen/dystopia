@@ -50,7 +50,7 @@
 - (CGPoint)brickScreenPosition:(CGPoint)brickBoardPosition;
 - (CGRect)brickTypeFrame:(int)brickType position:(CGPoint)position;
 
-- (CGSize)borderPercentSize;
+- (CGSize)borderSizeFromBoardSize:(CGSize)size;
 
 - (CGPoint)cvPointToCGPoint:(cv::Point)p;
 

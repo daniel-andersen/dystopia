@@ -47,7 +47,6 @@
 @synthesize state;
 @synthesize boardBounds;
 @synthesize screenPoints;
-@synthesize boardCameraToScreenTransformation;
 
 - (id)initWithFrame:(CGRect)frame cameraSession:(CameraSession *)session {
     if (self = [super initWithFrame:frame]) {
@@ -67,7 +66,7 @@
 - (void)updateBoundsWithImage:(UIImage *)image {
     boardBounds = [boardRecognizer findBoardBoundsFromImage:image];
     if (boardBounds.defined) {
-        [self findCameraToScreenTransformation];
+        state = BOARD_CALIBRATION_STATE_CALIBRATED;
         //[cameraSession lock];
     } else {
         state = BOARD_CALIBRATION_STATE_CALIBRATING;
@@ -79,15 +78,8 @@
         });
     }
 }
-
-- (void)findCameraToScreenTransformation {
-    CGSize screenSize = [ExternalDisplay instance].widescreenBounds.size;
-    FourPoints dstPoints = {.p1 = CGPointMake(0.0f, 0.0f), .p2 = CGPointMake(screenSize.width, 0.0f), .p3 = CGPointMake(screenSize.width, screenSize.height), .p4 = CGPointMake(0.0f, screenSize.height)};
-    boardCameraToScreenTransformation = [CameraUtil findPerspectiveTransformationSrcPoints:boardBounds dstPoints:dstPoints];
-}
-
-- (void)success {
-    state = BOARD_CALIBRATION_STATE_CALIBRATED;
+- (UIImage *)perspectiveCorrectImage:(UIImage *)image {
+    return [boardRecognizer perspectiveCorrectImage:image fromBoardBounds:boardBounds];
 }
 
 - (void)addCalibrationStateView {

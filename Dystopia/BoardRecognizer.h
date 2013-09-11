@@ -30,6 +30,7 @@
 @interface BoardRecognizer : NSObject
 
 - (FourPoints)findBoardBoundsFromImage:(UIImage *)image;
+- (UIImage *)perspectiveCorrectImage:(UIImage *)image fromBoardBounds:(FourPoints)boardBounds;
 
 - (UIImage *)boardBoundsToImage:(UIImage *)image;
 

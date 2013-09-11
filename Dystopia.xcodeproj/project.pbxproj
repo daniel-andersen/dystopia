@@ -63,7 +63,6 @@
 		65B930B817806D1400312B88 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B717806D1400312B88 /* CoreVideo.framework */; };
 		65EA26461780C54B00E84BA4 /* UIImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */; };
 		65EA26481780C6D700E84BA4 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA26471780C6D700E84BA4 /* libz.dylib */; };
-		65EA264E1780C90300E84BA4 /* FingerRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA264D1780C90300E84BA4 /* FingerRecognizer.mm */; };
 		65EA26551781608600E84BA4 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA26541781608600E84BA4 /* opencv2.framework */; };
 		65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA26771782038800E84BA4 /* BoardRecognizer.mm */; };
 		65EA267F1783520900E84BA4 /* ExternalDisplay.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA267E1783520900E84BA4 /* ExternalDisplay.m */; };
@@ -148,8 +147,6 @@
 		65EA26441780C54B00E84BA4 /* UIImage+OpenCV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+OpenCV.h"; sourceTree = "<group>"; };
 		65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+OpenCV.mm"; sourceTree = "<group>"; };
 		65EA26471780C6D700E84BA4 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		65EA264C1780C90300E84BA4 /* FingerRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FingerRecognizer.h; sourceTree = "<group>"; };
-		65EA264D1780C90300E84BA4 /* FingerRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FingerRecognizer.mm; sourceTree = "<group>"; };
 		65EA26541781608600E84BA4 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		65EA26761782038800E84BA4 /* BoardRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardRecognizer.h; sourceTree = "<group>"; };
 		65EA26771782038800E84BA4 /* BoardRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BoardRecognizer.mm; sourceTree = "<group>"; };
@@ -365,8 +362,6 @@
 				65EA26771782038800E84BA4 /* BoardRecognizer.mm */,
 				650D4238178DDF6700D89CEB /* BoardCalibrator.h */,
 				650D4239178DDF6700D89CEB /* BoardCalibrator.mm */,
-				65EA264C1780C90300E84BA4 /* FingerRecognizer.h */,
-				65EA264D1780C90300E84BA4 /* FingerRecognizer.mm */,
 			);
 			name = Recognizers;
 			sourceTree = "<group>";
@@ -492,7 +487,6 @@
 				65EA26461780C54B00E84BA4 /* UIImage+OpenCV.mm in Sources */,
 				65B9309A17806B4500312B88 /* GameViewController.mm in Sources */,
 				65B930A717806B9900312B88 /* BoardGame.mm in Sources */,
-				65EA264E1780C90300E84BA4 /* FingerRecognizer.mm in Sources */,
 				65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */,
 				65EA267F1783520900E84BA4 /* ExternalDisplay.m in Sources */,
 				65EA2684178361E300E84BA4 /* PhoneViewController.mm in Sources */,

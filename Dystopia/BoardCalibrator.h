@@ -39,10 +39,10 @@
 
 - (void)updateBoundsWithImage:(UIImage *)image;
 
+- (UIImage *)perspectiveCorrectImage:(UIImage *)image;
+
 @property (readonly) int state;
 @property (readonly) FourPoints boardBounds;
 @property (readonly) FourPoints screenPoints;
-
-@property (readwrite) cv::Mat boardCameraToScreenTransformation;
 
 @end
