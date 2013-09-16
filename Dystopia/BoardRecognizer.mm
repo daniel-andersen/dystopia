@@ -72,7 +72,18 @@ typedef struct {
 
 @end
 
+BoardRecognizer *boardRecognizerInstance = nil;
+
 @implementation BoardRecognizer
+
++ (BoardRecognizer *)instance {
+    @synchronized(self) {
+        if (boardRecognizerInstance == nil) {
+            boardRecognizerInstance = [[BoardRecognizer alloc] init];
+        }
+        return boardRecognizerInstance;
+    }
+}
 
 - (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
     [self prepareConstantsFromImage:image];
@@ -127,49 +138,112 @@ typedef struct {
     return CGSizeMake(rect.width, rect.height);
 }
 
-- (UIImage *)boardBoundsToImage:(UIImage *)image {
+- (NSArray *)boardBoundsToImages:(UIImage *)image {
+    NSMutableArray *images = [NSMutableArray array];
+    cv::Mat outputImg;
+    
     [self prepareConstantsFromImage:image];
 
     cv::Mat img = [image CVMat];
-    img = [self smooth:img];
-    img = [self grayscale:img];
-    img = [self applyCannyOnImage:img threshold1:100.0f threshold2:300.0f];
-    img = [self dilate:img];
-    
-    cv::Mat outputImg = cv::Mat(img);
-    cv::cvtColor(outputImg, outputImg, CV_GRAY2RGB);
-    //cv::Mat outputImg = [image CVMat];
+    {
+        [images addObject:[UIImage imageWithCVMat:img]];
+    }
 
+    img = [self smooth:img];
+    {
+        [images addObject:[UIImage imageWithCVMat:img]];
+    }
+
+    img = [self grayscale:img];
+    {
+        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        [images addObject:[UIImage imageWithCVMat:outputImg]];
+    }
+
+    img = [self applyCannyOnImage:img threshold1:100.0f threshold2:300.0f];
+    {
+        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        [images addObject:[UIImage imageWithCVMat:outputImg]];
+    }
+
+    img = [self dilate:img];
+    {
+        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        [images addObject:[UIImage imageWithCVMat:outputImg]];
+    }
+    
     cv::vector<cv::vector<cv::Point>> contours;
     cv::vector<cv::Vec4i> hierarchy;
     cv::findContours(img, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
 
     cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:MIN(image.size.width, image.size.height) * 0.02f];
-    [self drawLines:linesAndAngles ontoImage:outputImg];
+    {
+        cv::Scalar color = cv::Scalar(255, 0, 255);
+        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        [self drawLines:linesAndAngles ontoImage:outputImg color:color];
+        [images addObject:[UIImage imageWithCVMat:outputImg]];
+    }
 
     cv::vector<cv::vector<LineGroup>> lineGroups = [self divideLinesIntoGroups:linesAndAngles];
+    {
+        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        for (int i = 0; i < lineGroups.size(); i++) {
+            for (int j = 0; j < lineGroups[i].size(); j++) {
+                cv::Scalar color = cv::Scalar(((i + 0) * 50) % 255, ((i + 100) * 150) % 255, ((i + 0) * 20) % 255);
+                [self drawLineGroup:lineGroups[i][j] ontoImage:outputImg withColor:color];
+            }
+        }
+        [images addObject:[UIImage imageWithCVMat:outputImg]];
+    }
+
     cv::vector<cv::vector<LineGroup>> borderLines = [self removeNonBorderLineGroups:lineGroups];
+    {
+        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        for (int i = 0; i < borderLines.size(); i++) {
+            for (int j = 0; j < borderLines[i].size(); j++) {
+                cv::Scalar color = cv::Scalar(((i + 0) * 50) % 255, ((i + 100) * 150) % 255, ((i + 0) * 20) % 255);
+                [self drawLineGroup:borderLines[i][j] ontoImage:outputImg withColor:color];
+            }
+        }
+        [images addObject:[UIImage imageWithCVMat:outputImg]];
+    }
+
     [self findRepresentingLinesInLineGroups:borderLines];
+    {
+        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        for (int i = 0; i < borderLines.size(); i++) {
+            for (int j = 0; j < borderLines[i].size(); j++) {
+                cv::vector<LineWithAngle> lines;
+                lines.push_back(borderLines[i][j].average);
+                cv::Scalar color = cv::Scalar(((i + 0) * 50) % 255, ((i + 100) * 150) % 255, ((i + 0) * 20) % 255);
+                [self drawLines:lines ontoImage:outputImg color:color];
+            }
+        }
+        [images addObject:[UIImage imageWithCVMat:outputImg]];
+    }
 
     cv::vector<cv::Point> intersectionPoints = [self findIntersectionsFromLineGroups:borderLines];
+    {
+        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        cv::Scalar color = cv::Scalar(255, 0, 255);
+        [self drawPoints:intersectionPoints image:outputImg color:color];
+        [images addObject:[UIImage imageWithCVMat:outputImg]];
+    }
 
     cv::vector<cv::Point> bestSquare = [self findBestSquareFromPoints:intersectionPoints scoreFunction:^float(cv::vector<cv::Point> hull) {
         return cv::contourArea(hull);
     }];
     if (bestSquare.size() < 4) {
-        return [UIImage imageWithCVMat:outputImg];
+        return images;
     }
-    
-    for (int i = 0; i < 4; i++) {
-        cv::Scalar color = i == 0 ? cv::Scalar(255, 0, 0) : (i == 1 ? cv::Scalar(0, 255, 0) : (i == 2 ? cv::Scalar(0, 0, 255) : cv::Scalar(255, 0, 255)));
-        //cv::Scalar color = cv::Scalar(0, 255, 0);
-        for (int j = 0; j < borderLines[i].size(); j++) {
-            //[self drawLineGroup:borderLines[i][j] ontoImage:outputImg withColor:color];
-        }
-    }
-    [self drawPoints:bestSquare image:outputImg];
 
-    return [UIImage imageWithCVMat:outputImg];
+    {
+        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        cv::Scalar color = cv::Scalar(255, 0, 255);
+        [self drawPoints:bestSquare image:outputImg color:color];
+        [images addObject:[UIImage imageWithCVMat:outputImg]];
+        return images;
+    }
 }
 
 - (void)prepareConstantsFromImage:(UIImage *)image {
@@ -601,9 +675,8 @@ typedef struct {
     return t > 1.0f - intersectionAcceptDistanceMin && t < 1.0f + intersectionAcceptDistanceMax;
 }
 
-- (void)drawPoints:(cv::vector<cv::Point> &)points image:(cv::Mat)image {
+- (void)drawPoints:(cv::vector<cv::Point> &)points image:(cv::Mat)image color:(cv::Scalar)color {
     for (int i = 0; i < points.size(); i++) {
-        cv::Scalar color = cv::Scalar(255, 0, 255);
         cv::circle(image, points[i], 5.0f, color);
     }
 }
@@ -621,7 +694,7 @@ typedef struct {
     }
 }
 
-- (void)drawLines:(cv::vector<LineWithAngle> &)lines ontoImage:(cv::Mat)image {
+- (void)drawLines:(cv::vector<LineWithAngle> &)lines ontoImage:(cv::Mat)image color:(cv::Scalar)color {
     for (int i = 0; i < lines.size(); i++) {
         cv::vector<cv::vector<cv::Point>> line = cv::vector<cv::vector<cv::Point>> (1);
         line[0].push_back(lines[i].p1);
@@ -629,8 +702,8 @@ typedef struct {
             
         //cv::Scalar color = cv::Scalar(i % 2 == 0 ? 255 : 0, i % 2 == 1 ? 255 : 0, i % 2 == 0 ? 255 : 0);
         //cv::Scalar color = cv::Scalar(lines[i].angle < 45 ? 255 : 0, lines[i].angle < 45 ? 0 : 255, lines[i].angle < 45 ? 255 : 0);
-        int c = [self isLineHorizontal:lines[i]] ? 255 : 0;
-        cv::Scalar color = cv::Scalar(c, 255 - c, c);
+        //int c = [self isLineHorizontal:lines[i]] ? 255 : 0;
+        //cv::Scalar color = cv::Scalar(c, 255 - c, c);
         cv::drawContours(image, line, 0, color);
     }
 }

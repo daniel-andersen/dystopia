@@ -30,8 +30,6 @@
 #import "BoardUtil.h"
 
 @interface BoardCalibrator () {
-    BoardRecognizer *boardRecognizer;
-    
     CameraSession *cameraSession;
     
     UIView *calibrationStateView;
@@ -57,14 +55,13 @@
 }
 
 - (void)initialize {
-    boardRecognizer = [[BoardRecognizer alloc] init];
     state = BOARD_CALIBRATION_STATE_UNCALIBRATED;
     boardBounds.defined = NO;
     [self addCalibrationStateView];
 }
 
 - (void)updateBoundsWithImage:(UIImage *)image {
-    boardBounds = [boardRecognizer findBoardBoundsFromImage:image];
+    boardBounds = [[BoardRecognizer instance] findBoardBoundsFromImage:image];
     if (boardBounds.defined) {
         state = BOARD_CALIBRATION_STATE_CALIBRATED;
         //[cameraSession lock];
@@ -79,7 +76,7 @@
     }
 }
 - (UIImage *)perspectiveCorrectImage:(UIImage *)image {
-    return [boardRecognizer perspectiveCorrectImage:image fromBoardBounds:boardBounds];
+    return [[BoardRecognizer instance] perspectiveCorrectImage:image fromBoardBounds:boardBounds];
 }
 
 - (void)addCalibrationStateView {

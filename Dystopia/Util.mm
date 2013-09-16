@@ -23,29 +23,33 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef Dystopia_Util_h
-#define Dystopia_Util_h
+#import "Util.h"
 
-#import <UIKit/UIKit.h>
+@implementation Util
 
-#define DEBUG 1
++ (UIInterfaceOrientation)interfaceOrientation {
+    return [UIApplication sharedApplication].statusBarOrientation;
+}
 
-typedef struct {
-    CGPoint p1;
-    CGPoint p2;
-    CGPoint p3;
-    CGPoint p4;
-    bool defined;
-} FourPoints;
++ (bool)isLandscapeOrientation {
+    return UIInterfaceOrientationIsLandscape([self interfaceOrientation]);
+}
 
-#endif
++ (bool)isPortraitOrientation {
+    return UIInterfaceOrientationIsPortrait([self interfaceOrientation]);
+}
 
-@interface Util : NSObject
-
-+ (UIInterfaceOrientation)interfaceOrientation;
-+ (bool)isLandscapeOrientation;
-+ (bool)isPortraitOrientation;
-
-+ (void)saveImage:(UIImage *)image toDocumentsFolderWithPrefix:(NSString *)prefix;
++ (void)saveImage:(UIImage *)image toDocumentsFolderWithPrefix:(NSString *)prefix {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"yyyy-MM-dd_HH-mm-ss";
+    
+    NSString *filename = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"screenshot_%@_%@.png", prefix, [formatter stringFromDate:[NSDate date]]]];
+    
+    NSData *imageData = UIImagePNGRepresentation(image);
+    [imageData writeToFile:filename atomically:NO];
+}
 
 @end

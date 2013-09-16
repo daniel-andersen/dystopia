@@ -52,11 +52,11 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="wJT-DW-JhL" firstAttribute="top" secondItem="gBZ-vE-QzW" secondAttribute="top" constant="273" id="4Km-0D-VHh"/>
                             <constraint firstAttribute="trailing" secondItem="wJT-DW-JhL" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="ROt-NY-nmN"/>
-                            <constraint firstAttribute="bottom" secondItem="syB-sN-rjn" secondAttribute="bottom" constant="129" id="bc7-EB-pgm"/>
+                            <constraint firstItem="wJT-DW-JhL" firstAttribute="top" secondItem="gBZ-vE-QzW" secondAttribute="top" constant="119" id="bLn-eA-IO2"/>
                             <constraint firstItem="wJT-DW-JhL" firstAttribute="leading" secondItem="gBZ-vE-QzW" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="cq1-0K-Sts"/>
                             <constraint firstItem="syB-sN-rjn" firstAttribute="centerX" secondItem="wJT-DW-JhL" secondAttribute="centerX" type="default" id="euU-fq-eue"/>
+                            <constraint firstItem="syB-sN-rjn" firstAttribute="top" secondItem="wJT-DW-JhL" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="mTp-ex-bIZ"/>
                         </constraints>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>

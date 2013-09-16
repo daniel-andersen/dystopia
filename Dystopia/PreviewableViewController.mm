@@ -27,6 +27,7 @@
 #import "ExternalDisplay.h"
 #import "BoardUtil.h"
 #import "CameraUtil.h"
+#import "Util.h"
 
 PreviewableViewController *previewInstance = nil;
 
@@ -39,6 +40,9 @@ PreviewableViewController *previewInstance = nil;
     
     UIButton *boardButton;
     UIButton *cameraPreviewButton;
+    UIButton *takeScreenshotButton;
+    
+    bool takeScreenshot;
 }
 
 @end
@@ -50,6 +54,7 @@ PreviewableViewController *previewInstance = nil;
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupPreview];
+    takeScreenshot = NO;
 }
 
 - (void)viewWillLayoutSubviews {
@@ -61,6 +66,7 @@ PreviewableViewController *previewInstance = nil;
     
     [self setButtonFrame:boardButton x:75.0f];
     [self setButtonFrame:cameraPreviewButton x:(self.view.bounds.size.width - 75.0f)];
+    [self setButtonFrame:takeScreenshotButton x:(self.view.bounds.size.width / 2.0f)];
 }
 
 - (void)setupPreview {
@@ -87,9 +93,11 @@ PreviewableViewController *previewInstance = nil;
 
     boardButton = [self addButtonWithText:@"Board"];
     cameraPreviewButton = [self addButtonWithText:@"Camera"];
+    takeScreenshotButton = [self addButtonWithText:@"Screenshot"];
     
     [boardButton addTarget:self action:@selector(boardButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [cameraPreviewButton addTarget:self action:@selector(cameraPreviewButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [takeScreenshotButton addTarget:self action:@selector(takeScreenshotButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     cameraPreviewButton.enabled = NO;
 }
 
@@ -98,6 +106,7 @@ PreviewableViewController *previewInstance = nil;
     cameraPreview.hidden = YES;
     boardButton.enabled = NO;
     cameraPreviewButton.enabled = YES;
+    boardGridLayer.path = [self calculateBoardGrid].CGPath;
 }
 
 - (void)cameraPreviewButtonPressed:(id)sender {
@@ -105,6 +114,10 @@ PreviewableViewController *previewInstance = nil;
     cameraPreview.hidden = NO;
     boardButton.enabled = YES;
     cameraPreviewButton.enabled = NO;
+}
+
+- (void)takeScreenshotButtonPressed:(id)sender {
+    takeScreenshot = YES;
 }
 
 - (UIButton *)addButtonWithText:(NSString *)text {
@@ -154,22 +167,28 @@ PreviewableViewController *previewInstance = nil;
     boardGridLayer.strokeColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:1.0f].CGColor;
     boardGridLayer.backgroundColor = [UIColor clearColor].CGColor;
     [boardPreview.layer addSublayer:boardGridLayer];
+}
 
-    UIBezierPath *path = [UIBezierPath bezierPath];
-    CGSize singleBrickSize = CGSizeMake([UIScreen mainScreen].bounds.size.width / BOARD_WIDTH, [UIScreen mainScreen].bounds.size.height / BOARD_HEIGHT);
+- (UIBezierPath *)calculateBoardGrid {
+    UIBezierPath *boardGridPath = [UIBezierPath bezierPath];
+    CGSize brickSizeHorizontal = CGSizeMake(self.view.bounds.size.width / BOARD_WIDTH, self.view.bounds.size.height / BOARD_HEIGHT);
     for (int i = 0; i < BOARD_WIDTH; i++) {
-        [path moveToPoint:CGPointMake(i * singleBrickSize.width, 0.0f)];
-        [path addLineToPoint:CGPointMake(i * singleBrickSize.width, self.view.bounds.size.height)];
+        [boardGridPath moveToPoint:CGPointMake(i * brickSizeHorizontal.width, 0.0f)];
+        [boardGridPath addLineToPoint:CGPointMake(i * brickSizeHorizontal.width, self.view.bounds.size.height)];
     }
     for (int i = 0; i < BOARD_HEIGHT; i++) {
-        [path moveToPoint:CGPointMake(0.0f, i * singleBrickSize.height)];
-        [path addLineToPoint:CGPointMake(self.view.bounds.size.width, i * singleBrickSize.height)];
+        [boardGridPath moveToPoint:CGPointMake(0.0f, i * brickSizeHorizontal.height)];
+        [boardGridPath addLineToPoint:CGPointMake(self.view.bounds.size.width, i * brickSizeHorizontal.height)];
     }
-    boardGridLayer.path = path.CGPath;
+    return boardGridPath;
 }
 
 - (void)previewFrame:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (takeScreenshot) {
+            [self takeScreenshotFromImage:image];
+            takeScreenshot = NO;
+        }
         [self previewCamera:image];
         [self previewBoard:image boardCalibrator:boardCalibrator];
         [self previewBoardBounds:boardCalibrator.boardBounds];
@@ -216,6 +235,14 @@ PreviewableViewController *previewInstance = nil;
         boardBoundsLayer.path = path.CGPath;
         [CATransaction commit];
     });
+}
+
+- (void)takeScreenshotFromImage:(UIImage *)image {
+    NSArray *images = [[BoardRecognizer instance] boardBoundsToImages:image];
+    for (int i = 0; i < images.count; i++) {
+        [Util saveImage:((UIImage *)[images objectAtIndex:i]) toDocumentsFolderWithPrefix:[NSString stringWithFormat:@"%i", i]];
+    }
+    NSLog(@"Screenshots saved!");
 }
 
 - (CGPoint)scalePointToScreen:(CGPoint)p {
