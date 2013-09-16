@@ -78,6 +78,10 @@ BoardUtil *boardUtilInstance = nil;
     return CGSizeMake([ExternalDisplay instance].widescreenBounds.size.width / BOARD_WIDTH, [ExternalDisplay instance].widescreenBounds.size.height / BOARD_HEIGHT);
 }
 
+- (CGSize)singleBrickScreenSizeFromBoardSize:(CGSize)size {
+    return CGSizeMake(size.width / BOARD_WIDTH, size.height / BOARD_HEIGHT);
+}
+
 - (CGSize)brickTypeBoardSize:(int)type {
     return brickSizes[type];
 }

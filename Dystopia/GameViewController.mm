@@ -28,6 +28,7 @@
 #import "UIImage+CaptureScreen.h"
 #import "FakeCameraUtil.h"
 #import "ExternalDislayCalibrationBorderView.h"
+#import "BrickRecognizer.h"
 
 extern PreviewableViewController *previewInstance;
 
@@ -96,6 +97,7 @@ extern PreviewableViewController *previewInstance;
         [self updateGameStateAccordingToFrame];
         [previewInstance previewFrame:image boardCalibrator:boardCalibrator];
         //[previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
+        NSLog(@"%f", [[BrickRecognizer instance] probabilityOfBrickAtLocation:cv::Point(3, 3) inUIImage:image]);
     }
 }
 

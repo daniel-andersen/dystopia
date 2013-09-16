@@ -25,35 +25,14 @@
 
 #import <Foundation/Foundation.h>
 
-#ifndef __BOARD_UTIL__
-#define __BOARD_UTIL__
+#import "BoardUtil.h"
 
-    #define BOARD_WIDTH 30
-    #define BOARD_HEIGHT 20
+@interface BrickRecognizer : NSObject
 
-    #define BRICK_IMAGES_COUNT 10
++ (BrickRecognizer *)instance;
 
-#endif
-
-@interface BoardUtil : NSObject
-
-+ (BoardUtil *)instance;
-
-- (id)init;
-
-- (UIImage *)brickImageOfType:(int)type;
-
-- (CGSize)singleBrickScreenSize;
-- (CGSize)singleBrickScreenSizeFromBoardSize:(CGSize)size;
-
-- (CGSize)brickTypeBoardSize:(int)type;
-- (CGSize)brickTypeScreenSize:(int)type;
-
-- (CGPoint)brickScreenPosition:(CGPoint)brickBoardPosition;
-- (CGRect)brickTypeFrame:(int)brickType position:(CGPoint)position;
-
-- (CGSize)borderSizeFromBoardSize:(CGSize)size;
-
-- (CGPoint)cvPointToCGPoint:(cv::Point)p;
+- (cv::vector<float>)probabilitiesOfBrickAtLocations:(cv::vector<cv::Point>)locations inImage:(UIImage *)image ;
+- (float)probabilityOfBrickAtLocation:(cv::Point)location inUIImage:(UIImage *)image;
+- (float)probabilityOfBrickAtLocation:(cv::Point)location inImage:(cv::Mat)image;
 
 @end

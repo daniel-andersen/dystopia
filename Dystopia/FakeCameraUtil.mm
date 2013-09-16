@@ -64,7 +64,7 @@
 }
 
 + (UIImage *)putHandsInImage:(UIImage *)image {
-    CGSize handSize = CGSizeMake(30.0f, 100.0f);
+    //CGSize handSize = CGSizeMake(30.0f, 100.0f);
     
     UIGraphicsBeginImageContext(image.size);
     [image drawAtPoint:CGPointZero];

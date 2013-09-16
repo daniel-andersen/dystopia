@@ -69,6 +69,7 @@
 		65EA2684178361E300E84BA4 /* PhoneViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA2683178361E300E84BA4 /* PhoneViewController.mm */; };
 		65F5E2B817C1460F00303009 /* ExternalDislayCalibrationBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65F5E2B717C1460F00303009 /* ExternalDislayCalibrationBorderView.m */; };
 		65F6109417E2074700D8C0DF /* Util.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65F6109317E2074700D8C0DF /* Util.mm */; };
+		65F6109717E787EE00D8C0DF /* BrickRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65F6109617E787EE00D8C0DF /* BrickRecognizer.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -158,6 +159,8 @@
 		65F5E2B617C1460F00303009 /* ExternalDislayCalibrationBorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExternalDislayCalibrationBorderView.h; sourceTree = "<group>"; };
 		65F5E2B717C1460F00303009 /* ExternalDislayCalibrationBorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExternalDislayCalibrationBorderView.m; sourceTree = "<group>"; };
 		65F6109317E2074700D8C0DF /* Util.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Util.mm; sourceTree = "<group>"; };
+		65F6109517E787EE00D8C0DF /* BrickRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrickRecognizer.h; sourceTree = "<group>"; };
+		65F6109617E787EE00D8C0DF /* BrickRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BrickRecognizer.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -364,6 +367,8 @@
 				65EA26771782038800E84BA4 /* BoardRecognizer.mm */,
 				650D4238178DDF6700D89CEB /* BoardCalibrator.h */,
 				650D4239178DDF6700D89CEB /* BoardCalibrator.mm */,
+				65F6109517E787EE00D8C0DF /* BrickRecognizer.h */,
+				65F6109617E787EE00D8C0DF /* BrickRecognizer.mm */,
 			);
 			name = Recognizers;
 			sourceTree = "<group>";
@@ -506,6 +511,7 @@
 				6552706517B177B300784CD7 /* BorderView.mm in Sources */,
 				65F5E2B817C1460F00303009 /* ExternalDislayCalibrationBorderView.m in Sources */,
 				65F6109417E2074700D8C0DF /* Util.mm in Sources */,
+				65F6109717E787EE00D8C0DF /* BrickRecognizer.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
