@@ -44,9 +44,9 @@ BrickRecognizer *brickRecognizerInstance = nil;
     }
 }
 
-- (cv::vector<float>)probabilitiesOfBrickAtLocations:(cv::vector<cv::Point>)locations inImage:(UIImage *)image {
-    cv::vector<float> probabilities;
+- (cv::vector<float>)probabilitiesOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(UIImage *)image {
     cv::Mat img = [self prepareImage:image];
+    cv::vector<float> probabilities;
     for (int i = 0; i < locations.size(); i++) {
         probabilities.push_back([self probabilityOfBrickAtLocation:locations[i] inImage:img]);
     }
@@ -99,6 +99,7 @@ BrickRecognizer *brickRecognizerInstance = nil;
 - (cv::Mat)prepareImage:(UIImage *)image {
     cv::Mat img = [image CVMat];
     cv::cvtColor(img, img, CV_RGB2GRAY);
+    cv::equalizeHist(img, img);
     return img;
 }
 

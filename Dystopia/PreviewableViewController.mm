@@ -224,8 +224,8 @@ PreviewableViewController *previewInstance = nil;
             brickProbabilityLayer.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:1.0f].CGColor;
         }
         
-        [CATransaction commit];
         //brickProbabilityLayer.contents = (id)[[BrickRecognizer instance] extractBrickUIImageFromLocation:cv::Point(x, y) image:boardImage].CGImage;
+        [CATransaction commit];
     });
 }
 

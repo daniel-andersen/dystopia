@@ -106,17 +106,25 @@ extern PreviewableViewController *previewInstance;
     if (boardCalibrator.boardImage == nil) {
         return;
     }
+    cv::vector<cv::Point> bricks;
+    for (int y = 15; y < 15 + 3; y++) {
+        for (int x = 6; x < 6 + 3; x++) {
+            bricks.push_back(cv::Point(x, y));
+        }
+    }
+    cv::vector<float> probs = [[BrickRecognizer instance] probabilitiesOfBricksAtLocations:bricks inImage:boardCalibrator.boardImage];
     int bestX = -1;
     int bestY = -1;
     float bestProb = -1.0f;
+    int idx = 0;
     for (int y = 15; y < 15 + 3; y++) {
         for (int x = 6; x < 6 + 3; x++) {
-            float prob = [[BrickRecognizer instance] probabilityOfBrickAtLocation:cv::Point(x, y) inUIImage:boardCalibrator.boardImage];
-            if (prob > bestProb) {
-                bestProb = prob;
+            if (probs[idx] > bestProb) {
+                bestProb = probs[idx];
                 bestX = x;
                 bestY = y;
             }
+            idx++;
         }
     }
     [previewInstance previewProbabilityOfBrick:bestProb x:bestX y:bestY boardImage:boardCalibrator.boardImage];
