@@ -36,7 +36,7 @@
 
 float intersectionAcceptDistanceMin = 0.02f;
 float intersectionAcceptDistanceMax = 5.0f;
-float squareAngleAcceptMax = 5.0f;
+float squareAngleAcceptMax = 2.0f;
 float lineGroupAngleAcceptMax = 15.0f;
 float aspectRatioAcceptMax = 0.1f;
 
