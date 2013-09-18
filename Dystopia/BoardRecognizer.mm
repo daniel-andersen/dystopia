@@ -140,7 +140,6 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
 - (NSArray *)boardBoundsToImages:(UIImage *)image {
     NSMutableArray *images = [NSMutableArray array];
-    cv::Mat outputImg;
     
     [self prepareConstantsFromImage:image];
 
@@ -156,18 +155,21 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     img = [self grayscale:img];
     {
+        cv::Mat outputImg;
         cv::cvtColor(img, outputImg, CV_GRAY2RGB);
         [images addObject:[UIImage imageWithCVMat:outputImg]];
     }
 
     img = [self applyCannyOnImage:img threshold1:100.0f threshold2:300.0f];
     {
+        cv::Mat outputImg;
         cv::cvtColor(img, outputImg, CV_GRAY2RGB);
         [images addObject:[UIImage imageWithCVMat:outputImg]];
     }
 
     img = [self dilate:img];
     {
+        cv::Mat outputImg;
         cv::cvtColor(img, outputImg, CV_GRAY2RGB);
         [images addObject:[UIImage imageWithCVMat:outputImg]];
     }
@@ -178,6 +180,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:MIN(image.size.width, image.size.height) * 0.02f];
     {
+        cv::Mat outputImg;
         cv::Scalar color = cv::Scalar(255, 0, 255);
         cv::cvtColor(img, outputImg, CV_GRAY2RGB);
         [self drawLines:linesAndAngles ontoImage:outputImg color:color];
@@ -186,6 +189,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     cv::vector<cv::vector<LineGroup>> lineGroups = [self divideLinesIntoGroups:linesAndAngles];
     {
+        cv::Mat outputImg;
         cv::cvtColor(img, outputImg, CV_GRAY2RGB);
         for (int i = 0; i < lineGroups.size(); i++) {
             for (int j = 0; j < lineGroups[i].size(); j++) {
@@ -198,6 +202,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     cv::vector<cv::vector<LineGroup>> borderLines = [self removeNonBorderLineGroups:lineGroups];
     {
+        cv::Mat outputImg;
         cv::cvtColor(img, outputImg, CV_GRAY2RGB);
         for (int i = 0; i < borderLines.size(); i++) {
             for (int j = 0; j < borderLines[i].size(); j++) {
@@ -210,6 +215,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     [self findRepresentingLinesInLineGroups:borderLines];
     {
+        cv::Mat outputImg;
         cv::cvtColor(img, outputImg, CV_GRAY2RGB);
         for (int i = 0; i < borderLines.size(); i++) {
             for (int j = 0; j < borderLines[i].size(); j++) {
@@ -224,6 +230,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     cv::vector<cv::Point> intersectionPoints = [self findIntersectionsFromLineGroups:borderLines];
     {
+        cv::Mat outputImg;
         cv::cvtColor(img, outputImg, CV_GRAY2RGB);
         cv::Scalar color = cv::Scalar(255, 0, 255);
         [self drawPoints:intersectionPoints image:outputImg color:color];
@@ -238,6 +245,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     }
 
     {
+        cv::Mat outputImg;
         cv::cvtColor(img, outputImg, CV_GRAY2RGB);
         cv::Scalar color = cv::Scalar(255, 0, 255);
         [self drawPoints:bestSquare image:outputImg color:color];
@@ -261,11 +269,6 @@ BoardRecognizer *boardRecognizerInstance = nil;
     } else {
         boardAspectRatio = 1.5f;
     }
-}
-
-- (cv::Mat)filterAndThreshold:(cv::Mat)image {
-    image = [self smooth:image];
-    return image;
 }
 
 - (cv::Mat)smooth:(cv::Mat)image {

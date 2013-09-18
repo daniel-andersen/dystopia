@@ -96,7 +96,8 @@ extern PreviewableViewController *previewInstance;
         [self calibrateBoard:image];
         [self updateGameStateAccordingToFrame];
         [previewInstance previewFrame:image boardCalibrator:boardCalibrator];
-        //[previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
+        //NSArray *images = [[BoardRecognizer instance] boardBoundsToImages:image];
+        //[previewInstance previewFrame:[images objectAtIndex:4] boardCalibrator:boardCalibrator];
         [self testBrickProbability];
     }
 }

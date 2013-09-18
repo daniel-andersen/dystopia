@@ -159,7 +159,7 @@ PreviewableViewController *previewInstance = nil;
 - (void)addBoardBoundsLayer {
     boardBoundsLayer = [CAShapeLayer layer];
     boardBoundsLayer.frame = self.view.bounds;
-    boardBoundsLayer.fillColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:0.25f].CGColor;
+    boardBoundsLayer.fillColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:0.35f].CGColor;
     boardBoundsLayer.strokeColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:1.0f].CGColor;
     boardBoundsLayer.backgroundColor = [UIColor clearColor].CGColor;
     [cameraPreview.layer addSublayer:boardBoundsLayer];
@@ -214,12 +214,17 @@ PreviewableViewController *previewInstance = nil;
 
 - (void)previewProbabilityOfBrick:(float)probability x:(int)x y:(int)y boardImage:(UIImage *)boardImage {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [CATransaction begin];
+        [CATransaction setAnimationDuration:0.0f];
+
         brickProbabilityLayer.frame = [self gridRectAtX:x y:y];
         if (probability > 0.2f) {
             brickProbabilityLayer.backgroundColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:probability].CGColor;
         } else {
             brickProbabilityLayer.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:1.0f].CGColor;
         }
+        
+        [CATransaction commit];
         //brickProbabilityLayer.contents = (id)[[BrickRecognizer instance] extractBrickUIImageFromLocation:cv::Point(x, y) image:boardImage].CGImage;
     });
 }
