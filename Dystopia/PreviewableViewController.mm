@@ -215,7 +215,11 @@ PreviewableViewController *previewInstance = nil;
 - (void)previewProbabilityOfBrick:(float)probability x:(int)x y:(int)y boardImage:(UIImage *)boardImage {
     dispatch_async(dispatch_get_main_queue(), ^{
         brickProbabilityLayer.frame = [self gridRectAtX:x y:y];
-        brickProbabilityLayer.backgroundColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:probability].CGColor;
+        if (probability > 0.2f) {
+            brickProbabilityLayer.backgroundColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:probability].CGColor;
+        } else {
+            brickProbabilityLayer.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:1.0f].CGColor;
+        }
         //brickProbabilityLayer.contents = (id)[[BrickRecognizer instance] extractBrickUIImageFromLocation:cv::Point(x, y) image:boardImage].CGImage;
     });
 }
