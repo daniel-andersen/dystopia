@@ -45,6 +45,7 @@
 @synthesize state;
 @synthesize boardBounds;
 @synthesize screenPoints;
+@synthesize boardImage;
 
 - (id)initWithFrame:(CGRect)frame cameraSession:(CameraSession *)session {
     if (self = [super initWithFrame:frame]) {
@@ -64,6 +65,7 @@
     boardBounds = [[BoardRecognizer instance] findBoardBoundsFromImage:image];
     if (boardBounds.defined) {
         state = BOARD_CALIBRATION_STATE_CALIBRATED;
+        boardImage = [self perspectiveCorrectImage:image];
         //[cameraSession lock];
     } else {
         state = BOARD_CALIBRATION_STATE_CALIBRATING;

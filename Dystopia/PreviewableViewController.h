@@ -31,6 +31,7 @@
 @interface PreviewableViewController : UIViewController
 
 - (void)previewFrame:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator;
+- (void)previewProbabilityOfBrick:(float)probability x:(int)x y:(int)y boardImage:(UIImage *)boardImage;
 
 @property (readonly) UIView *overlayView;
 

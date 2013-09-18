@@ -97,8 +97,28 @@ extern PreviewableViewController *previewInstance;
         [self updateGameStateAccordingToFrame];
         [previewInstance previewFrame:image boardCalibrator:boardCalibrator];
         //[previewInstance previewFrame:[[[BoardRecognizer alloc] init] boardBoundsToImage:image] boardCalibrator:boardCalibrator];
-        NSLog(@"%f", [[BrickRecognizer instance] probabilityOfBrickAtLocation:cv::Point(3, 3) inUIImage:image]);
+        [self testBrickProbability];
     }
+}
+
+- (void)testBrickProbability {
+    if (boardCalibrator.boardImage == nil) {
+        return;
+    }
+    int bestX = -1;
+    int bestY = -1;
+    float bestProb = -1.0f;
+    for (int y = 15; y < 15 + 3; y++) {
+        for (int x = 6; x < 6 + 3; x++) {
+            float prob = [[BrickRecognizer instance] probabilityOfBrickAtLocation:cv::Point(x, y) inUIImage:boardCalibrator.boardImage];
+            if (prob > bestProb) {
+                bestProb = prob;
+                bestX = x;
+                bestY = y;
+            }
+        }
+    }
+    [previewInstance previewProbabilityOfBrick:bestProb x:bestX y:bestY boardImage:boardCalibrator.boardImage];
 }
 
 - (void)updateGameStateAccordingToFrame {

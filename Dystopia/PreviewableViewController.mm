@@ -29,11 +29,15 @@
 #import "CameraUtil.h"
 #import "Util.h"
 
+#import "BrickRecognizer.h"
+
 PreviewableViewController *previewInstance = nil;
 
 @interface PreviewableViewController () {
     CAShapeLayer *boardBoundsLayer;
     CAShapeLayer *boardGridLayer;
+    
+    CALayer *brickProbabilityLayer;
     
     UIImageView *cameraPreview;
     UIImageView *boardPreview;
@@ -87,6 +91,7 @@ PreviewableViewController *previewInstance = nil;
 
     [self addBoardBoundsLayer];
     [self addBoardGridLayer];
+    [self addBrickProbabilityLayer];
 
     [self addCameraPreviewLabel];
     [self addBoardPreviewLabel];
@@ -164,23 +169,35 @@ PreviewableViewController *previewInstance = nil;
     boardGridLayer = [CAShapeLayer layer];
     boardGridLayer.frame = self.view.bounds;
     boardGridLayer.fillColor = [UIColor clearColor].CGColor;
-    boardGridLayer.strokeColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:1.0f].CGColor;
+    boardGridLayer.strokeColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:0.25f].CGColor;
     boardGridLayer.backgroundColor = [UIColor clearColor].CGColor;
     [boardPreview.layer addSublayer:boardGridLayer];
 }
 
+- (void)addBrickProbabilityLayer {
+    brickProbabilityLayer = [CALayer layer];
+    brickProbabilityLayer.frame = self.view.bounds;
+    brickProbabilityLayer.backgroundColor = [UIColor clearColor].CGColor;
+    [boardPreview.layer addSublayer:brickProbabilityLayer];
+}
+
 - (UIBezierPath *)calculateBoardGrid {
     UIBezierPath *boardGridPath = [UIBezierPath bezierPath];
-    CGSize brickSizeHorizontal = CGSizeMake(self.view.bounds.size.width / BOARD_WIDTH, self.view.bounds.size.height / BOARD_HEIGHT);
+    CGSize brickSize = CGSizeMake(self.view.bounds.size.width / BOARD_WIDTH, self.view.bounds.size.height / BOARD_HEIGHT);
     for (int i = 0; i < BOARD_WIDTH; i++) {
-        [boardGridPath moveToPoint:CGPointMake(i * brickSizeHorizontal.width, 0.0f)];
-        [boardGridPath addLineToPoint:CGPointMake(i * brickSizeHorizontal.width, self.view.bounds.size.height)];
+        [boardGridPath moveToPoint:CGPointMake(i * brickSize.width, 0.0f)];
+        [boardGridPath addLineToPoint:CGPointMake(i * brickSize.width, self.view.bounds.size.height)];
     }
     for (int i = 0; i < BOARD_HEIGHT; i++) {
-        [boardGridPath moveToPoint:CGPointMake(0.0f, i * brickSizeHorizontal.height)];
-        [boardGridPath addLineToPoint:CGPointMake(self.view.bounds.size.width, i * brickSizeHorizontal.height)];
+        [boardGridPath moveToPoint:CGPointMake(0.0f, i * brickSize.height)];
+        [boardGridPath addLineToPoint:CGPointMake(self.view.bounds.size.width, i * brickSize.height)];
     }
     return boardGridPath;
+}
+
+- (CGRect)gridRectAtX:(int)x y:(int)y {
+    CGSize brickSize = CGSizeMake(self.view.bounds.size.width / BOARD_WIDTH, self.view.bounds.size.height / BOARD_HEIGHT);
+    return CGRectMake(x * brickSize.width, y * brickSize.height, brickSize.width, brickSize.height);
 }
 
 - (void)previewFrame:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
@@ -195,6 +212,14 @@ PreviewableViewController *previewInstance = nil;
     });
 }
 
+- (void)previewProbabilityOfBrick:(float)probability x:(int)x y:(int)y boardImage:(UIImage *)boardImage {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        brickProbabilityLayer.frame = [self gridRectAtX:x y:y];
+        brickProbabilityLayer.backgroundColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:probability].CGColor;
+        //brickProbabilityLayer.contents = (id)[[BrickRecognizer instance] extractBrickUIImageFromLocation:cv::Point(x, y) image:boardImage].CGImage;
+    });
+}
+
 - (void)previewCamera:(UIImage *)image {
     if (cameraPreview.hidden == NO) {
         cameraPreview.image = image;
@@ -203,9 +228,7 @@ PreviewableViewController *previewInstance = nil;
 
 - (void)previewBoard:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
     if (boardPreview.hidden == NO) {
-        if (boardCalibrator.boardBounds.defined) {
-            boardPreview.image = [boardCalibrator perspectiveCorrectImage:image];
-        }
+        boardPreview.image = boardCalibrator.boardImage;
     }
 }
 

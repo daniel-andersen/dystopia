@@ -23,10 +23,13 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+//#include <stdio.h>
+//#include <stdlib.h>
+
 #import "BrickRecognizer.h"
 #import "UIImage+OpenCV.h"
 
-#define HISTOGRAM_BIN_COUNT (256 / 8)
+#define HISTOGRAM_BIN_COUNT 8
 
 BrickRecognizer *brickRecognizerInstance = nil;
 
@@ -57,7 +60,8 @@ BrickRecognizer *brickRecognizerInstance = nil;
 - (float)probabilityOfBrickAtLocation:(cv::Point)location inImage:(cv::Mat)image {
     cv::Mat brickImage = [self extractBrickImageFromLocation:location image:image];
     cv::Mat histogram = [self calculateHistogramFromImage:brickImage];
-    return histogram.at<float>(0);
+    //std::cout << "Histogram: " << std::endl << histogram << std::endl;
+    return histogram.at<float>(0) / (float)(brickImage.rows * brickImage.cols);
 }
 
 - (cv::Mat)calculateHistogramFromImage:(cv::Mat)image {
@@ -67,6 +71,14 @@ BrickRecognizer *brickRecognizerInstance = nil;
     const float *histRange = {range};
     cv::calcHist(&image, 1, 0, cv::Mat(), histogram, 1, &binCount, &histRange);
     return histogram;
+}
+
+- (UIImage *)extractBrickUIImageFromLocation:(cv::Point)location image:(UIImage *)image {
+    cv::Mat img = [self prepareImage:image];
+    cv::Rect rect = [self boardRectFromLocation:location inImage:img];
+    img = cv::Mat(img, rect);
+    cv::cvtColor(img, img, CV_GRAY2RGB);
+    return [UIImage imageWithCVMat:img];
 }
 
 - (cv::Mat)extractBrickImageFromLocation:(cv::Point)location image:(cv::Mat)image {
