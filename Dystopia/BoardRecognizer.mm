@@ -121,10 +121,10 @@ BoardRecognizer *boardRecognizerInstance = nil;
     CGSize approxBoardSize = [self approxBoardSizeFromBounds:boardBounds];
     CGSize approxBorderSize = [[BoardUtil instance] borderSizeFromBoardSize:approxBoardSize];
     FourPoints dstPoints = {
-        .p1 = CGPointMake(                        (approxBorderSize.width / 2.0f),                          (approxBorderSize.height / 2.0f)),
-        .p2 = CGPointMake(approxBoardSize.width - (approxBorderSize.width / 2.0f),                          (approxBorderSize.height / 2.0f)),
-        .p3 = CGPointMake(approxBoardSize.width - (approxBorderSize.width / 2.0f), approxBoardSize.height - (approxBorderSize.height / 2.0f)),
-        .p4 = CGPointMake(                        (approxBorderSize.width / 2.0f), approxBoardSize.height - (approxBorderSize.height / 2.0f))};
+        .p1 = CGPointMake(                        (approxBorderSize.width *0 / 1.0f),                          (approxBorderSize.height *0 / 1.0f)),
+        .p2 = CGPointMake(approxBoardSize.width - (approxBorderSize.width *0 / 1.0f),                          (approxBorderSize.height *0 / 1.0f)),
+        .p3 = CGPointMake(approxBoardSize.width - (approxBorderSize.width *0 / 1.0f), approxBoardSize.height - (approxBorderSize.height *0 / 1.0f)),
+        .p4 = CGPointMake(                        (approxBorderSize.width *0 / 1.0f), approxBoardSize.height - (approxBorderSize.height *0 / 1.0f))};
     return [CameraUtil findPerspectiveTransformationSrcPoints:boardBounds dstPoints:dstPoints];
 }
 
@@ -261,8 +261,8 @@ BoardRecognizer *boardRecognizerInstance = nil;
     minLineLength = MIN(imageSize.width, imageSize.height) * 0.1f;
     
     borderSize = [[BoardUtil instance] borderSizeFromBoardSize:imageSize];
-    borderSize.width *= 1.5f;
-    borderSize.height *= 1.5f;
+    borderSize.width *= 1.2f;
+    borderSize.height *= 1.2f;
     
     if ([ExternalDisplay instance].externalDisplayFound) {
         boardAspectRatio = [ExternalDisplay instance].widescreenBounds.size.width / [ExternalDisplay instance].widescreenBounds.size.height;
@@ -442,21 +442,41 @@ BoardRecognizer *boardRecognizerInstance = nil;
 - (void)findRepresentingLinesInLineGroups:(cv::vector<cv::vector<LineGroup>> &)lineGroups {
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < lineGroups[i].size(); j++) {
+            cv::vector<cv::Point> points;
             LineGroup &lineGroup = lineGroups[i][j];
-            lineGroup.average.p1 = cv::Point(0, 0);
-            lineGroup.average.p2 = cv::Point(0, 0);
-            
             for (int k = 0; k < lineGroup.lines.size(); k++) {
                 LineWithAngle line = lineGroup.lines[k];
-                lineGroup.average.p1.x += line.p1.x;
-                lineGroup.average.p1.y += line.p1.y;
-                lineGroup.average.p2.x += line.p2.x;
-                lineGroup.average.p2.y += line.p2.y;
+                points.push_back(line.p1);
+                points.push_back(line.p2);
             }
-            lineGroup.average.p1.x /= lineGroup.lines.size();
-            lineGroup.average.p1.y /= lineGroup.lines.size();
-            lineGroup.average.p2.x /= lineGroup.lines.size();
-            lineGroup.average.p2.y /= lineGroup.lines.size();
+            cv::vector<cv::Point> hull;
+            cv::convexHull(points, hull);
+
+            cv::RotatedRect box = cv::minAreaRect(cv::Mat(hull));
+            if (box.angle < -45.0f) {
+                std::swap(box.size.width, box.size.height);
+                box.angle += 90.0f;
+            }
+            
+            cv::Point2f vertices[4];
+            box.points(vertices);
+            
+            if (i == LINE_DIRECTION_HORIZONTAL_UP) {
+                lineGroup.average.p1 = vertices[1];
+                lineGroup.average.p2 = vertices[2];
+            }
+            if (i == LINE_DIRECTION_HORIZONTAL_DOWN) {
+                lineGroup.average.p1 = vertices[0];
+                lineGroup.average.p2 = vertices[3];
+            }
+            if (i == LINE_DIRECTION_VERTICAL_LEFT) {
+                lineGroup.average.p1 = vertices[1];
+                lineGroup.average.p2 = vertices[0];
+            }
+            if (i == LINE_DIRECTION_VERTICAL_RIGHT) {
+                lineGroup.average.p1 = vertices[2];
+                lineGroup.average.p2 = vertices[3];
+            }
         }
     }
 }
