@@ -62,7 +62,6 @@ typedef struct {
 
     CGSize imageSize;
     CGSize borderSize;
-    CGSize borderSizePercent;
     
     float boardAspectRatio;
     
@@ -85,7 +84,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     }
 }
 
-- (FourPoints)findBoardBoundsFromImage:(UIImage *)image {
+- (BoardBounds)findBoardBoundsFromImage:(UIImage *)image {
     [self prepareConstantsFromImage:image];
 
     float thresholdMin[3] = {100.0f,  50.0f, 20.0f};
@@ -97,19 +96,36 @@ BoardRecognizer *boardRecognizerInstance = nil;
     preparedImage = [self grayscale:preparedImage];
     
     // Try different thresholding values for Canny - roughest first
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 1/*3*/; i++) {
         cv::Mat img = preparedImage.clone();
         img = [self applyCannyOnImage:img threshold1:thresholdMin[i] threshold2:thresholdMax[i]];
         img = [self dilate:img];
-    
-        // Find corners
-        FourPoints corners = [self findBoardCorners:img];
+
+        // Find contours
+        cv::vector<cv::vector<cv::Point>> contours;
+        cv::vector<cv::Vec4i> hierarchy;
+
+        cv::findContours(img, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+        if (contours.size() == 0) {
+            continue;
+        }
+
+        // Find non-obstructed bounds
+        FourPoints corners = [self findNonObstructedBoardCornersFromImage:img contours:contours hierarchy:hierarchy];
         if (corners.defined) {
-            return corners;
+            BoardBounds bounds = {.bounds = corners, .isBoundsObstructed = NO};
+            return bounds;
+        }
+
+        // Find obstructed bounds
+        corners = [self findObstructedBoardCornersFromImage:img contours:contours];
+        if (corners.defined) {
+            BoardBounds bounds = {.bounds = corners, .isBoundsObstructed = YES};
+            return bounds;
         }
     }
-    FourPoints undefinedPoints = {.defined = NO};
-    return undefinedPoints;
+    BoardBounds undefinedBounds = {.bounds = {.defined = NO}};
+    return undefinedBounds;
 }
 
 - (UIImage *)perspectiveCorrectImage:(UIImage *)image fromBoardBounds:(FourPoints)boardBounds {
@@ -119,12 +135,11 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
 - (cv::Mat)findTransformationFromBoardBounds:(FourPoints)boardBounds {
     CGSize approxBoardSize = [self approxBoardSizeFromBounds:boardBounds];
-    CGSize approxBorderSize = [[BoardUtil instance] borderSizeFromBoardSize:approxBoardSize];
     FourPoints dstPoints = {
-        .p1 = CGPointMake(                        (approxBorderSize.width *0 / 1.0f),                          (approxBorderSize.height *0 / 1.0f)),
-        .p2 = CGPointMake(approxBoardSize.width - (approxBorderSize.width *0 / 1.0f),                          (approxBorderSize.height *0 / 1.0f)),
-        .p3 = CGPointMake(approxBoardSize.width - (approxBorderSize.width *0 / 1.0f), approxBoardSize.height - (approxBorderSize.height *0 / 1.0f)),
-        .p4 = CGPointMake(                        (approxBorderSize.width *0 / 1.0f), approxBoardSize.height - (approxBorderSize.height *0 / 1.0f))};
+        .p1 = CGPointMake(                 0.0f,                   0.0f),
+        .p2 = CGPointMake(approxBoardSize.width,                   0.0f),
+        .p3 = CGPointMake(approxBoardSize.width, approxBoardSize.height),
+        .p4 = CGPointMake(                 0.0f, approxBoardSize.height)};
     return [CameraUtil findPerspectiveTransformationSrcPoints:boardBounds dstPoints:dstPoints];
 }
 
@@ -147,6 +162,8 @@ BoardRecognizer *boardRecognizerInstance = nil;
     {
         [images addObject:[UIImage imageWithCVMat:img]];
     }
+
+    cv::Mat origImage = cv::Mat(img);
 
     img = [self smooth:img];
     {
@@ -177,20 +194,28 @@ BoardRecognizer *boardRecognizerInstance = nil;
     cv::vector<cv::vector<cv::Point>> contours;
     cv::vector<cv::Vec4i> hierarchy;
     cv::findContours(img, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+    {
+        cv::Mat outputImg = cv::Mat(origImage);
+        cv::Scalar color = cv::Scalar(255, 0, 255);
+        for (int i = 0; i < contours.size(); i++) {
+            cv::vector<cv::Point> approxed;
+            cv::approxPolyDP(cv::Mat(contours[i]), approxed, cv::arcLength(cv::Mat(contours[i]), true) * 0.01f, true);
+            [self drawContour:approxed ontoImage:outputImg withColor:color];
+        }
+        [images addObject:[UIImage imageWithCVMat:outputImg]];
+    }
 
     cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:MIN(image.size.width, image.size.height) * 0.02f];
     {
-        cv::Mat outputImg;
+        cv::Mat outputImg = cv::Mat(origImage);
         cv::Scalar color = cv::Scalar(255, 0, 255);
-        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
         [self drawLines:linesAndAngles ontoImage:outputImg color:color];
         [images addObject:[UIImage imageWithCVMat:outputImg]];
     }
 
     cv::vector<cv::vector<LineGroup>> lineGroups = [self divideLinesIntoGroups:linesAndAngles];
     {
-        cv::Mat outputImg;
-        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        cv::Mat outputImg = cv::Mat(origImage);
         for (int i = 0; i < lineGroups.size(); i++) {
             for (int j = 0; j < lineGroups[i].size(); j++) {
                 cv::Scalar color = cv::Scalar(((i + 0) * 50) % 255, ((i + 100) * 150) % 255, ((i + 0) * 20) % 255);
@@ -202,8 +227,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     cv::vector<cv::vector<LineGroup>> borderLines = [self removeNonBorderLineGroups:lineGroups];
     {
-        cv::Mat outputImg;
-        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        cv::Mat outputImg = cv::Mat(origImage);
         for (int i = 0; i < borderLines.size(); i++) {
             for (int j = 0; j < borderLines[i].size(); j++) {
                 cv::Scalar color = cv::Scalar(((i + 0) * 50) % 255, ((i + 100) * 150) % 255, ((i + 0) * 20) % 255);
@@ -215,8 +239,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     [self findRepresentingLinesInLineGroups:borderLines];
     {
-        cv::Mat outputImg;
-        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        cv::Mat outputImg = cv::Mat(origImage);
         for (int i = 0; i < borderLines.size(); i++) {
             for (int j = 0; j < borderLines[i].size(); j++) {
                 cv::vector<LineWithAngle> lines;
@@ -230,8 +253,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     cv::vector<cv::Point> intersectionPoints = [self findIntersectionsFromLineGroups:borderLines];
     {
-        cv::Mat outputImg;
-        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        cv::Mat outputImg = cv::Mat(origImage);
         cv::Scalar color = cv::Scalar(255, 0, 255);
         [self drawPoints:intersectionPoints image:outputImg color:color];
         [images addObject:[UIImage imageWithCVMat:outputImg]];
@@ -245,8 +267,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     }
 
     {
-        cv::Mat outputImg;
-        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        cv::Mat outputImg = cv::Mat(origImage);
         cv::Scalar color = cv::Scalar(255, 0, 255);
         [self drawPoints:bestSquare image:outputImg color:color];
         [images addObject:[UIImage imageWithCVMat:outputImg]];
@@ -292,17 +313,92 @@ BoardRecognizer *boardRecognizerInstance = nil;
     return image;
 }
 
-- (FourPoints)findBoardCorners:(cv::Mat)image {
+- (FourPoints)findNonObstructedBoardCornersFromImage:(cv::Mat)image contours:(cv::vector<cv::vector<cv::Point>> &)contours hierarchy:(cv::vector<cv::Vec4i> &)hierarchy {
     FourPoints undefinedPoints = {.defined = NO};
+
+    cv::vector<cv::vector<cv::Point>> approxedContours;
     
-    cv::vector<cv::vector<cv::Point>> contours;
-    cv::vector<cv::Vec4i> hierarchy;
-    
-    // Find contours
-    cv::findContours(image, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-    if (contours.size() == 0) {
-        return undefinedPoints;
+    for (int i = 0; i < contours.size(); i++) {
+        cv::vector<cv::Point> approxed;
+        cv::approxPolyDP(cv::Mat(contours[i]), approxed, cv::arcLength(cv::Mat(contours[i]), true) * 0.01f, true);
+        approxedContours.push_back(approxed);
     }
+
+    // Find best contour
+    int bestContourIndex = [self findBestContourIndex:approxedContours hierarchy:hierarchy];
+    if (bestContourIndex == -1) {
+        return undefinedPoints;
+    } else {
+        return [self squarePointsToSortedBoardPoints:approxedContours[bestContourIndex]];
+    }
+}
+
+- (int)findBestContourIndex:(cv::vector<cv::vector<cv::Point>> &)contours hierarchy:(cv::vector<cv::Vec4i> &)hierarchy {
+    // Find all contours that satisfy simple contour properties
+    cv::vector<int> contourIndices;
+    for (int i = 0; i < contours.size(); i++) {
+        if ([self areContourConditionsSatisfied:contours[i]]) {
+            contourIndices.push_back(i);
+        }
+    }
+
+    // Find valid contours - that is, must have three "nearby" children
+    cv::vector<int> validContourIndices;
+    for (int i = 0; i < contourIndices.size(); i++) {
+        float contourArea = cv::contourArea(contours[contourIndices[i]]);
+        if ([self hasExactlyFourValidChildren:contours hierarchy:hierarchy validIndices:contourIndices index:contourIndices[i] parentArea:contourArea count:4]) {
+            validContourIndices.push_back(contourIndices[i]);
+        }
+    }
+
+    // Select best contour among the valid ones
+    float bestScore = 1000.0f;
+    int bestScoreIndex = -1;
+    for (int i = 0; i < validContourIndices.size(); i++) {
+        float score = [self maxCosineFromContour:contours[validContourIndices[i]]];
+        if (score < bestScore) {
+            bestScore = score;
+            bestScoreIndex = validContourIndices[i];
+        }
+    }
+    return bestScoreIndex;
+}
+
+- (bool)hasExactlyFourValidChildren:(cv::vector<cv::vector<cv::Point>> &)contours hierarchy:(cv::vector<cv::Vec4i> &)hierarchy validIndices:(cv::vector<int> &)validIndices index:(int)index parentArea:(float)parentArea count:(int)count {
+    // Check if it is contour at all
+    if (index == -1) {
+        return NO;
+    }
+    
+    // Check if among valid contours
+    bool isValid = NO;
+    for (int i = 0; i < validIndices.size(); i++) {
+        if (validIndices[i] == index) {
+            isValid = YES;
+        }
+    }
+    if (!isValid) {
+        return NO;
+    }
+
+    // Must have contour size "border"-close to outmost parent contour
+    if (parentArea / cv::contourArea(contours[index]) > 1.2f) {
+        return NO;
+    }
+    
+    // Children must also be valid
+    int i = hierarchy[index][2];
+    while (i != -1) {
+        if ([self hasExactlyFourValidChildren:contours hierarchy:hierarchy validIndices:validIndices index:i parentArea:parentArea count:(count - 1)]) {
+            return YES;
+        }
+        i = hierarchy[i][0];
+    }
+    return count == 1; // Return true if count is one - last child must not have valid children!
+}
+
+- (FourPoints)findObstructedBoardCornersFromImage:(cv::Mat)image contours:(cv::vector<cv::vector<cv::Point>> &)contours {
+    FourPoints undefinedPoints = {.defined = NO};
     
     // Find lines from contours
     cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:MIN(imageSize.width, imageSize.height) * 0.02f];
@@ -387,16 +483,18 @@ BoardRecognizer *boardRecognizerInstance = nil;
 }
 
 - (bool)hasCorrectAspectRatio:(cv::vector<cv::Point> &)contour {
-    float maxWidth = 0.0f;
-    float maxHeight = 0.0f;
+    float averageWidth = 0.0f;
+    float averageHeight = 0.0f;
     for (int i = 0; i < contour.size(); i++) {
         cv::Point p1 = contour[(i + 0) % contour.size()];
         cv::Point p2 = contour[(i + 1) % contour.size()];
 
-        maxWidth = MAX(ABS(p1.x - p2.x), maxWidth);
-        maxHeight = MAX(ABS(p1.y - p2.y), maxHeight);
+        averageWidth += ABS(p1.x - p2.x);
+        averageHeight += ABS(p1.y - p2.y);
     }
-    float aspectRatio = MAX(maxWidth, maxHeight) / MIN(maxWidth, maxHeight);
+    averageWidth /= (float)contour.size();
+    averageHeight /= (float)contour.size();
+    float aspectRatio = MAX(averageWidth, averageHeight) / MIN(averageWidth, averageHeight);
     return aspectRatio >= boardAspectRatio - aspectRatioAcceptMax && aspectRatio <= boardAspectRatio + aspectRatioAcceptMax;
 }
 
@@ -745,6 +843,13 @@ BoardRecognizer *boardRecognizerInstance = nil;
     
     cv::Scalar color2 = cv::Scalar(255, 0, 255);
     cv::drawContours(image, line2, 0, color2);
+}
+
+- (void)drawContour:(cv::vector<cv::Point> &)contour ontoImage:(cv::Mat)image withColor:(cv::Scalar)color {
+    cv::vector<cv::vector<cv::Point>> contours;
+    contours.push_back(contour);
+    
+    cv::drawContours(image, contours, 0, color);
 }
 
 float angle(cv::Point pt1, cv::Point pt2, cv::Point pt0) {

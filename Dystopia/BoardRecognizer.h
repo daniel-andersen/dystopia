@@ -26,12 +26,13 @@
 #import <UIKit/UIKit.h>
 
 #import "Util.h"
+#import "BoardUtil.h"
 
 @interface BoardRecognizer : NSObject
 
 + (BoardRecognizer *)instance;
 
-- (FourPoints)findBoardBoundsFromImage:(UIImage *)image;
+- (BoardBounds)findBoardBoundsFromImage:(UIImage *)image;
 - (UIImage *)perspectiveCorrectImage:(UIImage *)image fromBoardBounds:(FourPoints)boardBounds;
 
 - (NSArray *)boardBoundsToImages:(UIImage *)image;

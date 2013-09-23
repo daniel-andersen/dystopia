@@ -25,6 +25,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "Util.h"
+
 #ifndef __BOARD_UTIL__
 #define __BOARD_UTIL__
 
@@ -32,6 +34,11 @@
     #define BOARD_HEIGHT 20
 
     #define BRICK_IMAGES_COUNT 10
+
+    typedef struct {
+        FourPoints bounds;
+        bool isBoundsObstructed;
+    } BoardBounds;
 
 #endif
 

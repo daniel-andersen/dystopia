@@ -247,9 +247,9 @@ PreviewableViewController *previewInstance = nil;
     });
 }
 
-- (void)previewBoardBounds:(FourPoints)boardPoints {
+- (void)previewBoardBounds:(BoardBounds)boardPoints {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (!boardPoints.defined) {
+        if (!boardPoints.bounds.defined) {
             boardBoundsLayer.hidden = YES;
             return;
         }
@@ -258,13 +258,14 @@ PreviewableViewController *previewInstance = nil;
         [CATransaction setAnimationDuration:0.0f];
 
         UIBezierPath *path = [UIBezierPath bezierPath];
-        [path moveToPoint:[self scalePointToScreen:boardPoints.p1]];
-        [path addLineToPoint:[self scalePointToScreen:boardPoints.p2]];
-        [path addLineToPoint:[self scalePointToScreen:boardPoints.p3]];
-        [path addLineToPoint:[self scalePointToScreen:boardPoints.p4]];
+        [path moveToPoint:[self scalePointToScreen:boardPoints.bounds.p1]];
+        [path addLineToPoint:[self scalePointToScreen:boardPoints.bounds.p2]];
+        [path addLineToPoint:[self scalePointToScreen:boardPoints.bounds.p3]];
+        [path addLineToPoint:[self scalePointToScreen:boardPoints.bounds.p4]];
         [path closePath];
 
         boardBoundsLayer.path = path.CGPath;
+        boardBoundsLayer.fillColor = boardPoints.isBoundsObstructed ? [UIColor colorWithRed:0.5f green:0.0f blue:1.0f alpha:0.35f].CGColor : [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:0.35f].CGColor;
         [CATransaction commit];
     });
 }

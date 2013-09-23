@@ -42,7 +42,7 @@
 - (UIImage *)perspectiveCorrectImage:(UIImage *)image;
 
 @property (readonly) int state;
-@property (readonly) FourPoints boardBounds;
+@property (readonly) BoardBounds boardBounds;
 @property (readonly) UIImage *boardImage;
 @property (readonly) FourPoints screenPoints;
 

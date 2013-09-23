@@ -57,13 +57,13 @@
 
 - (void)initialize {
     state = BOARD_CALIBRATION_STATE_UNCALIBRATED;
-    boardBounds.defined = NO;
+    boardBounds.bounds.defined = NO;
     [self addCalibrationStateView];
 }
 
 - (void)updateBoundsWithImage:(UIImage *)image {
     boardBounds = [[BoardRecognizer instance] findBoardBoundsFromImage:image];
-    if (boardBounds.defined) {
+    if (boardBounds.bounds.defined) {
         state = BOARD_CALIBRATION_STATE_CALIBRATED;
         boardImage = [self perspectiveCorrectImage:image];
         //[cameraSession lock];
@@ -73,12 +73,12 @@
     }
     if (DEBUG) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            calibrationStateView.backgroundColor = boardBounds.defined ? [UIColor greenColor] : [UIColor redColor];
+            calibrationStateView.backgroundColor = boardBounds.bounds.defined ? [UIColor greenColor] : [UIColor redColor];
         });
     }
 }
 - (UIImage *)perspectiveCorrectImage:(UIImage *)image {
-    return [[BoardRecognizer instance] perspectiveCorrectImage:image fromBoardBounds:boardBounds];
+    return [[BoardRecognizer instance] perspectiveCorrectImage:image fromBoardBounds:boardBounds.bounds];
 }
 
 - (void)addCalibrationStateView {
