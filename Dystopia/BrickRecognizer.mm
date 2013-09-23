@@ -93,7 +93,8 @@ BrickRecognizer *brickRecognizerInstance = nil;
 }
 
 - (cv::Mat)prepareImage:(cv::Mat)image {
-    cv::equalizeHist(image, image);
+    cv::Mat outputImage;
+    cv::equalizeHist(image, outputImage);
     return image;
 }
 

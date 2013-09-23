@@ -85,17 +85,18 @@ BoardRecognizer *boardRecognizerInstance = nil;
 }
 
 - (BoardBounds)findBoardBoundsFromImage:(cv::Mat)image {
-    [self prepareConstantsFromImage:image];
+    cv::Mat copiedImage = image.clone();
+    [self prepareConstantsFromImage:copiedImage];
 
     float thresholdMin[3] = {100.0f,  50.0f, 20.0f};
     float thresholdMax[3] = {300.0f, 150.0f, 30.0f};
     
     // Prepare image
-    cv::Mat preparedImage = [self smooth:image];
+    cv::Mat preparedImage = [self smooth:copiedImage];
     
     // Try different thresholding values for Canny - roughest first
     for (int i = 0; i < 1/*3*/; i++) {
-        cv::Mat img = cv::Mat(preparedImage);
+        cv::Mat img = preparedImage.clone();
         img = [self applyCannyOnImage:img threshold1:thresholdMin[i] threshold2:thresholdMax[i]];
         img = [self dilate:img];
 
@@ -161,7 +162,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
         [images addObject:[UIImage imageWithCVMat:image]];
     }
 
-    cv::Mat origImage = cv::Mat(image);
+    cv::Mat origImage = image.clone();
 
     image = [self smooth:image];
     {
@@ -193,7 +194,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     cv::vector<cv::Vec4i> hierarchy;
     cv::findContours(image, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
     {
-        cv::Mat outputImg = cv::Mat(origImage);
+        cv::Mat outputImg = origImage.clone();
         cv::Scalar color = cv::Scalar(255, 0, 255);
         for (int i = 0; i < contours.size(); i++) {
             cv::vector<cv::Point> approxed;
@@ -205,7 +206,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:MIN(imageSize.width, imageSize.height) * 0.02f];
     {
-        cv::Mat outputImg = cv::Mat(origImage);
+        cv::Mat outputImg = origImage.clone();
         cv::Scalar color = cv::Scalar(255, 0, 255);
         [self drawLines:linesAndAngles ontoImage:outputImg color:color];
         [images addObject:[UIImage imageWithCVMat:outputImg]];
@@ -213,7 +214,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     cv::vector<cv::vector<LineGroup>> lineGroups = [self divideLinesIntoGroups:linesAndAngles];
     {
-        cv::Mat outputImg = cv::Mat(origImage);
+        cv::Mat outputImg = origImage.clone();
         for (int i = 0; i < lineGroups.size(); i++) {
             for (int j = 0; j < lineGroups[i].size(); j++) {
                 cv::Scalar color = cv::Scalar(((i + 0) * 50) % 255, ((i + 100) * 150) % 255, ((i + 0) * 20) % 255);
@@ -225,7 +226,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     cv::vector<cv::vector<LineGroup>> borderLines = [self removeNonBorderLineGroups:lineGroups];
     {
-        cv::Mat outputImg = cv::Mat(origImage);
+        cv::Mat outputImg = origImage.clone();
         for (int i = 0; i < borderLines.size(); i++) {
             for (int j = 0; j < borderLines[i].size(); j++) {
                 cv::Scalar color = cv::Scalar(((i + 0) * 50) % 255, ((i + 100) * 150) % 255, ((i + 0) * 20) % 255);
@@ -237,7 +238,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     [self findRepresentingLinesInLineGroups:borderLines];
     {
-        cv::Mat outputImg = cv::Mat(origImage);
+        cv::Mat outputImg = origImage.clone();
         for (int i = 0; i < borderLines.size(); i++) {
             for (int j = 0; j < borderLines[i].size(); j++) {
                 cv::vector<LineWithAngle> lines;
@@ -251,7 +252,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 
     cv::vector<cv::Point> intersectionPoints = [self findIntersectionsFromLineGroups:borderLines];
     {
-        cv::Mat outputImg = cv::Mat(origImage);
+        cv::Mat outputImg = origImage.clone();
         cv::Scalar color = cv::Scalar(255, 0, 255);
         [self drawPoints:intersectionPoints image:outputImg color:color];
         [images addObject:[UIImage imageWithCVMat:outputImg]];
@@ -265,7 +266,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     }
 
     {
-        cv::Mat outputImg = cv::Mat(origImage);
+        cv::Mat outputImg = origImage.clone();
         cv::Scalar color = cv::Scalar(255, 0, 255);
         [self drawPoints:bestSquare image:outputImg color:color];
         [images addObject:[UIImage imageWithCVMat:outputImg]];

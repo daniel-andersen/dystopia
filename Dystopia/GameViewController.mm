@@ -94,12 +94,10 @@ extern PreviewableViewController *previewInstance;
 
 - (void)processFrame:(UIImage *)image {
     @autoreleasepool {
-        cv::Mat grayscaledImage;
-        cv::Mat normalizedGrayscaledImage;
-
         cv::Mat img = [image CVMat];
+
+        cv::Mat grayscaledImage;
         cv::cvtColor(img, grayscaledImage, CV_RGB2GRAY);
-        cv::equalizeHist(grayscaledImage, normalizedGrayscaledImage);
         
         [self calibrateBoard:grayscaledImage];
         [self updateGameStateAccordingToFrame];

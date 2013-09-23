@@ -238,7 +238,9 @@ PreviewableViewController *previewInstance = nil;
 
 - (void)previewBoard:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
     if (boardPreview.hidden == NO) {
-        boardPreview.image = [UIImage imageWithCVMat:boardCalibrator.boardImage];
+        cv::Mat coloredImage;
+        cv::cvtColor(boardCalibrator.boardImage, coloredImage, CV_GRAY2RGB);
+        boardPreview.image = [UIImage imageWithCVMat:coloredImage];
     }
 }
 

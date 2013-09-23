@@ -77,6 +77,7 @@
         });
     }
 }
+
 - (cv::Mat)perspectiveCorrectImage:(cv::Mat)image {
     return [[BoardRecognizer instance] perspectiveCorrectImage:image fromBoardBounds:boardBounds.bounds];
 }
