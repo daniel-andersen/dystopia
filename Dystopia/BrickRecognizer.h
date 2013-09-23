@@ -31,11 +31,10 @@
 
 + (BrickRecognizer *)instance;
 
-- (cv::vector<float>)probabilitiesOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(UIImage *)image ;
-- (float)probabilityOfBrickAtLocation:(cv::Point)location inImage:(cv::Mat)image;
+- (cv::vector<float>)probabilitiesOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image ;
+- (float)probabilityOfBrickAtLocation:(cv::Point)location inGrayscaledNormalizedImage:(cv::Mat)image;
 
 // TMP!
-- (float)probabilityOfBrickAtLocation:(cv::Point)location inUIImage:(UIImage *)image;
-- (UIImage *)extractBrickUIImageFromLocation:(cv::Point)location image:(UIImage *)image;
+- (UIImage *)extractBrickUIImageFromLocation:(cv::Point)location image:(cv::Mat)image;
 
 @end

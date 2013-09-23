@@ -37,13 +37,13 @@
 
 - (id)initWithFrame:(CGRect)frame cameraSession:(CameraSession *)session;
 
-- (void)updateBoundsWithImage:(UIImage *)image;
+- (void)updateBoundsWithImage:(cv::Mat)image;
 
-- (UIImage *)perspectiveCorrectImage:(UIImage *)image;
+- (cv::Mat)perspectiveCorrectImage:(cv::Mat)image;
 
 @property (readonly) int state;
 @property (readonly) BoardBounds boardBounds;
-@property (readonly) UIImage *boardImage;
+@property (readonly) cv::Mat boardImage;
 @property (readonly) FourPoints screenPoints;
 
 @end

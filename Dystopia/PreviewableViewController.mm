@@ -28,6 +28,7 @@
 #import "BoardUtil.h"
 #import "CameraUtil.h"
 #import "Util.h"
+#import "UIImage+OpenCV.h"
 
 #import "BrickRecognizer.h"
 
@@ -212,7 +213,7 @@ PreviewableViewController *previewInstance = nil;
     });
 }
 
-- (void)previewProbabilityOfBrick:(float)probability x:(int)x y:(int)y boardImage:(UIImage *)boardImage {
+- (void)previewProbabilityOfBrick:(float)probability x:(int)x y:(int)y boardImage:(cv::Mat)boardImage {
     dispatch_async(dispatch_get_main_queue(), ^{
         [CATransaction begin];
         [CATransaction setAnimationDuration:0.0f];
@@ -237,7 +238,7 @@ PreviewableViewController *previewInstance = nil;
 
 - (void)previewBoard:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
     if (boardPreview.hidden == NO) {
-        boardPreview.image = boardCalibrator.boardImage;
+        boardPreview.image = [UIImage imageWithCVMat:boardCalibrator.boardImage];
     }
 }
 

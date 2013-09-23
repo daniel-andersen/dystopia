@@ -31,10 +31,8 @@
 
 + (UIImage *)imageFromPixelBuffer:(CVImageBufferRef)pixelBuffer;
 
-+ (UIImage *)perspectiveTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation;
-+ (UIImage *)perspectiveTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation toSize:(CGSize)size;
-
-+ (cv::Mat)perspectiveTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation toSize:(CGSize)size;
++ (cv::Mat)perspectiveTransformImage:(cv::Mat)image withTransformation:(cv::Mat)transformation;
++ (cv::Mat)perspectiveTransformImage:(cv::Mat)src withTransformation:(cv::Mat)transformation toSize:(CGSize)toSize;
 
 + (cv::Mat)findPerspectiveTransformationSrcPoints:(FourPoints)srcPoints dstPoints:(FourPoints)dstPoints;
 

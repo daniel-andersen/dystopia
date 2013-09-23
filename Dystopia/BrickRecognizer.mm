@@ -44,20 +44,16 @@ BrickRecognizer *brickRecognizerInstance = nil;
     }
 }
 
-- (cv::vector<float>)probabilitiesOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(UIImage *)image {
-    cv::Mat img = [self prepareImage:image];
+- (cv::vector<float>)probabilitiesOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image {
+    image = [self prepareImage:image];
     cv::vector<float> probabilities;
     for (int i = 0; i < locations.size(); i++) {
-        probabilities.push_back([self probabilityOfBrickAtLocation:locations[i] inImage:img]);
+        probabilities.push_back([self probabilityOfBrickAtLocation:locations[i] inGrayscaledNormalizedImage:image]);
     }
     return probabilities;
 }
 
-- (float)probabilityOfBrickAtLocation:(cv::Point)location inUIImage:(UIImage *)image {
-    return [self probabilityOfBrickAtLocation:location inImage:[self prepareImage:image]];
-}
-
-- (float)probabilityOfBrickAtLocation:(cv::Point)location inImage:(cv::Mat)image {
+- (float)probabilityOfBrickAtLocation:(cv::Point)location inGrayscaledNormalizedImage:(cv::Mat)image {
     cv::Mat brickImage = [self extractBrickImageFromLocation:location image:image];
     cv::Mat histogram = [self calculateHistogramFromImage:brickImage];
     //std::cout << "Histogram: " << std::endl << histogram << std::endl;
@@ -73,12 +69,12 @@ BrickRecognizer *brickRecognizerInstance = nil;
     return histogram;
 }
 
-- (UIImage *)extractBrickUIImageFromLocation:(cv::Point)location image:(UIImage *)image {
-    cv::Mat img = [self prepareImage:image];
-    cv::Rect rect = [self boardRectFromLocation:location inImage:img];
-    img = cv::Mat(img, rect);
-    cv::cvtColor(img, img, CV_GRAY2RGB);
-    return [UIImage imageWithCVMat:img];
+- (UIImage *)extractBrickUIImageFromLocation:(cv::Point)location image:(cv::Mat)image {
+    image = [self prepareImage:image];
+    cv::Rect rect = [self boardRectFromLocation:location inImage:image];
+    image = cv::Mat(image, rect);
+    cv::cvtColor(image, image, CV_GRAY2RGB);
+    return [UIImage imageWithCVMat:image];
 }
 
 - (cv::Mat)extractBrickImageFromLocation:(cv::Point)location image:(cv::Mat)image {
@@ -96,11 +92,9 @@ BrickRecognizer *brickRecognizerInstance = nil;
     return rect;
 }
 
-- (cv::Mat)prepareImage:(UIImage *)image {
-    cv::Mat img = [image CVMat];
-    cv::cvtColor(img, img, CV_RGB2GRAY);
-    cv::equalizeHist(img, img);
-    return img;
+- (cv::Mat)prepareImage:(cv::Mat)image {
+    cv::equalizeHist(image, image);
+    return image;
 }
 
 @end

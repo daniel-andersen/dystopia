@@ -61,7 +61,7 @@
     [self addCalibrationStateView];
 }
 
-- (void)updateBoundsWithImage:(UIImage *)image {
+- (void)updateBoundsWithImage:(cv::Mat)image {
     boardBounds = [[BoardRecognizer instance] findBoardBoundsFromImage:image];
     if (boardBounds.bounds.defined) {
         state = BOARD_CALIBRATION_STATE_CALIBRATED;
@@ -77,7 +77,7 @@
         });
     }
 }
-- (UIImage *)perspectiveCorrectImage:(UIImage *)image {
+- (cv::Mat)perspectiveCorrectImage:(cv::Mat)image {
     return [[BoardRecognizer instance] perspectiveCorrectImage:image fromBoardBounds:boardBounds.bounds];
 }
 

@@ -32,9 +32,9 @@
 
 + (BoardRecognizer *)instance;
 
-- (BoardBounds)findBoardBoundsFromImage:(UIImage *)image;
-- (UIImage *)perspectiveCorrectImage:(UIImage *)image fromBoardBounds:(FourPoints)boardBounds;
+- (BoardBounds)findBoardBoundsFromImage:(cv::Mat)image;
+- (cv::Mat)perspectiveCorrectImage:(cv::Mat)image fromBoardBounds:(FourPoints)boardBounds;
 
-- (NSArray *)boardBoundsToImages:(UIImage *)image;
+- (NSArray *)boardBoundsToImages:(UIImage *)img;
 
 @end

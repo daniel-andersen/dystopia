@@ -43,7 +43,8 @@
         .p4 = CGPointMake(15.0f, image.size.height - 25.0f)
     };
     cv::Mat transformation = [CameraUtil findPerspectiveTransformationSrcPoints:srcPoints dstPoints:dstPoints];
-    return [CameraUtil perspectiveTransformImage:image withTransformation:transformation toSize:image.size];
+    cv::Mat outputImg = [CameraUtil perspectiveTransformImage:[image CVMat] withTransformation:transformation toSize:image.size];
+    return [UIImage imageWithCVMat:outputImg];
 }
 
 + (UIImage *)distortImage:(UIImage *)image {

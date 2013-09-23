@@ -24,6 +24,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import "GameViewController.h"
+#import "UIImage+OpenCV.h"
 #import "ExternalDisplay.h"
 #import "UIImage+CaptureScreen.h"
 #import "FakeCameraUtil.h"
@@ -93,7 +94,14 @@ extern PreviewableViewController *previewInstance;
 
 - (void)processFrame:(UIImage *)image {
     @autoreleasepool {
-        [self calibrateBoard:image];
+        cv::Mat grayscaledImage;
+        cv::Mat normalizedGrayscaledImage;
+
+        cv::Mat img = [image CVMat];
+        cv::cvtColor(img, grayscaledImage, CV_RGB2GRAY);
+        cv::equalizeHist(grayscaledImage, normalizedGrayscaledImage);
+        
+        [self calibrateBoard:grayscaledImage];
         [self updateGameStateAccordingToFrame];
         [previewInstance previewFrame:image boardCalibrator:boardCalibrator];
         //NSArray *images = [[BoardRecognizer instance] boardBoundsToImages:image];
@@ -103,7 +111,7 @@ extern PreviewableViewController *previewInstance;
 }
 
 - (void)testBrickProbability {
-    if (boardCalibrator.boardImage == nil) {
+    if (!boardCalibrator.boardBounds.bounds.defined) {
         return;
     }
     cv::vector<cv::Point> bricks;
@@ -169,7 +177,7 @@ extern PreviewableViewController *previewInstance;
     NSLog(@"Board game finished!");
 }
 
-- (void)calibrateBoard:(UIImage *)image {
+- (void)calibrateBoard:(cv::Mat)image {
     [boardCalibrator updateBoundsWithImage:image];
 }
 

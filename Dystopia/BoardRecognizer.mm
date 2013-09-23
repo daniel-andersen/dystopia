@@ -84,20 +84,18 @@ BoardRecognizer *boardRecognizerInstance = nil;
     }
 }
 
-- (BoardBounds)findBoardBoundsFromImage:(UIImage *)image {
+- (BoardBounds)findBoardBoundsFromImage:(cv::Mat)image {
     [self prepareConstantsFromImage:image];
 
     float thresholdMin[3] = {100.0f,  50.0f, 20.0f};
     float thresholdMax[3] = {300.0f, 150.0f, 30.0f};
     
     // Prepare image
-    cv::Mat preparedImage = [image CVMat];
-    preparedImage = [self smooth:preparedImage];
-    preparedImage = [self grayscale:preparedImage];
+    cv::Mat preparedImage = [self smooth:image];
     
     // Try different thresholding values for Canny - roughest first
     for (int i = 0; i < 1/*3*/; i++) {
-        cv::Mat img = preparedImage.clone();
+        cv::Mat img = cv::Mat(preparedImage);
         img = [self applyCannyOnImage:img threshold1:thresholdMin[i] threshold2:thresholdMax[i]];
         img = [self dilate:img];
 
@@ -128,7 +126,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     return undefinedBounds;
 }
 
-- (UIImage *)perspectiveCorrectImage:(UIImage *)image fromBoardBounds:(FourPoints)boardBounds {
+- (cv::Mat)perspectiveCorrectImage:(cv::Mat)image fromBoardBounds:(FourPoints)boardBounds {
     cv::Mat transformation = [self findTransformationFromBoardBounds:boardBounds];
     return [CameraUtil perspectiveTransformImage:image withTransformation:transformation toSize:[self approxBoardSizeFromBounds:boardBounds]];
 }
@@ -153,47 +151,47 @@ BoardRecognizer *boardRecognizerInstance = nil;
     return CGSizeMake(rect.width, rect.height);
 }
 
-- (NSArray *)boardBoundsToImages:(UIImage *)image {
+- (NSArray *)boardBoundsToImages:(UIImage *)img {
     NSMutableArray *images = [NSMutableArray array];
-    
+
+    cv::Mat image = [img CVMat];
     [self prepareConstantsFromImage:image];
 
-    cv::Mat img = [image CVMat];
     {
-        [images addObject:[UIImage imageWithCVMat:img]];
+        [images addObject:[UIImage imageWithCVMat:image]];
     }
 
-    cv::Mat origImage = cv::Mat(img);
+    cv::Mat origImage = cv::Mat(image);
 
-    img = [self smooth:img];
+    image = [self smooth:image];
     {
-        [images addObject:[UIImage imageWithCVMat:img]];
+        [images addObject:[UIImage imageWithCVMat:image]];
     }
 
-    img = [self grayscale:img];
+    image = [self grayscale:image];
     {
         cv::Mat outputImg;
-        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        cv::cvtColor(image, outputImg, CV_GRAY2RGB);
         [images addObject:[UIImage imageWithCVMat:outputImg]];
     }
 
-    img = [self applyCannyOnImage:img threshold1:100.0f threshold2:300.0f];
+    image = [self applyCannyOnImage:image threshold1:100.0f threshold2:300.0f];
     {
         cv::Mat outputImg;
-        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        cv::cvtColor(image, outputImg, CV_GRAY2RGB);
         [images addObject:[UIImage imageWithCVMat:outputImg]];
     }
 
-    img = [self dilate:img];
+    image = [self dilate:image];
     {
         cv::Mat outputImg;
-        cv::cvtColor(img, outputImg, CV_GRAY2RGB);
+        cv::cvtColor(image, outputImg, CV_GRAY2RGB);
         [images addObject:[UIImage imageWithCVMat:outputImg]];
     }
     
     cv::vector<cv::vector<cv::Point>> contours;
     cv::vector<cv::Vec4i> hierarchy;
-    cv::findContours(img, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+    cv::findContours(image, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
     {
         cv::Mat outputImg = cv::Mat(origImage);
         cv::Scalar color = cv::Scalar(255, 0, 255);
@@ -205,7 +203,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
         [images addObject:[UIImage imageWithCVMat:outputImg]];
     }
 
-    cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:MIN(image.size.width, image.size.height) * 0.02f];
+    cv::vector<LineWithAngle> linesAndAngles = [self findLinesFromContours:contours minimumLineLength:MIN(imageSize.width, imageSize.height) * 0.02f];
     {
         cv::Mat outputImg = cv::Mat(origImage);
         cv::Scalar color = cv::Scalar(255, 0, 255);
@@ -275,8 +273,8 @@ BoardRecognizer *boardRecognizerInstance = nil;
     }
 }
 
-- (void)prepareConstantsFromImage:(UIImage *)image {
-    imageSize = image.size;
+- (void)prepareConstantsFromImage:(cv::Mat)image {
+    imageSize = CGSizeMake(image.cols, image.rows);
     
     minContourArea = (imageSize.width * 0.5) * (imageSize.height * 0.5f);
     minLineLength = MIN(imageSize.width, imageSize.height) * 0.1f;

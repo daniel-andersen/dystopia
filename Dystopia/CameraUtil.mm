@@ -45,17 +45,11 @@
     return uiImage;
 }
 
-+ (UIImage *)perspectiveTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation {
++ (cv::Mat)perspectiveTransformImage:(cv::Mat)image withTransformation:(cv::Mat)transformation {
     return [self perspectiveTransformImage:image withTransformation:transformation toSize:[ExternalDisplay instance].widescreenBounds.size];
 }
 
-+ (UIImage *)perspectiveTransformImage:(UIImage *)image withTransformation:(cv::Mat)transformation toSize:(CGSize)size {
-    cv::Mat srcImage = [image CVMat];
-    cv::Mat transformedImage = [self perspectiveTransformCvMat:srcImage withTransformation:transformation toSize:size];
-    return [UIImage imageWithCVMat:transformedImage];
-}
-
-+ (cv::Mat)perspectiveTransformCvMat:(cv::Mat)src withTransformation:(cv::Mat)transformation toSize:(CGSize)toSize {
++ (cv::Mat)perspectiveTransformImage:(cv::Mat)src withTransformation:(cv::Mat)transformation toSize:(CGSize)toSize {
     cv::Mat dst;
     cv::Size size = cv::Size(toSize.width, toSize.height);
     cv::warpPerspective(src, dst, transformation, size);
