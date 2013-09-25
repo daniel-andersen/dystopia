@@ -28,7 +28,6 @@
 @interface FakeCameraUtil : NSObject
 
 + (UIImage *)fakePerspectiveOnImage:(UIImage *)image;
-+ (UIImage *)distortImage:(UIImage *)image;
-+ (UIImage *)putHandsInImage:(UIImage *)image;
++ (UIImage *)rotateImageToLandscapeMode:(UIImage *)image;
 
 @end

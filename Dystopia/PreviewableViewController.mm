@@ -184,6 +184,17 @@ PreviewableViewController *previewInstance = nil;
 
 - (UIBezierPath *)calculateBoardGrid {
     UIBezierPath *boardGridPath = [UIBezierPath bezierPath];
+#if TARGET_IPHONE_SIMULATOR
+    CGSize brickSize = CGSizeMake(self.view.bounds.size.width / BOARD_HEIGHT, self.view.bounds.size.height / BOARD_WIDTH);
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        [boardGridPath moveToPoint:CGPointMake(i * brickSize.width, 0.0f)];
+        [boardGridPath addLineToPoint:CGPointMake(i * brickSize.width, self.view.bounds.size.height)];
+    }
+    for (int i = 0; i < BOARD_WIDTH; i++) {
+        [boardGridPath moveToPoint:CGPointMake(0.0f, i * brickSize.height)];
+        [boardGridPath addLineToPoint:CGPointMake(self.view.bounds.size.width, i * brickSize.height)];
+    }
+#else
     CGSize brickSize = CGSizeMake(self.view.bounds.size.width / BOARD_WIDTH, self.view.bounds.size.height / BOARD_HEIGHT);
     for (int i = 0; i < BOARD_WIDTH; i++) {
         [boardGridPath moveToPoint:CGPointMake(i * brickSize.width, 0.0f)];
@@ -193,12 +204,18 @@ PreviewableViewController *previewInstance = nil;
         [boardGridPath moveToPoint:CGPointMake(0.0f, i * brickSize.height)];
         [boardGridPath addLineToPoint:CGPointMake(self.view.bounds.size.width, i * brickSize.height)];
     }
+#endif
     return boardGridPath;
 }
 
 - (CGRect)gridRectAtX:(int)x y:(int)y {
+#if TARGET_IPHONE_SIMULATOR
+    CGSize brickSize = CGSizeMake(self.view.bounds.size.width / BOARD_HEIGHT, self.view.bounds.size.height / BOARD_WIDTH);
+    return CGRectMake(y * brickSize.width, x * brickSize.height, brickSize.width, brickSize.height);
+#else
     CGSize brickSize = CGSizeMake(self.view.bounds.size.width / BOARD_WIDTH, self.view.bounds.size.height / BOARD_HEIGHT);
     return CGRectMake(x * brickSize.width, y * brickSize.height, brickSize.width, brickSize.height);
+#endif
 }
 
 - (void)previewFrame:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {

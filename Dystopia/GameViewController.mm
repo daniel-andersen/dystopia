@@ -183,8 +183,6 @@ extern PreviewableViewController *previewInstance;
     super.overlayView.hidden = YES;
     UIImage *image = [UIImage imageWithView:self.view];
     image = [FakeCameraUtil fakePerspectiveOnImage:image];
-    image = [FakeCameraUtil distortImage:image];
-    image = [FakeCameraUtil putHandsInImage:image];
     super.overlayView.hidden = NO;
     return image;
 }
