@@ -45,16 +45,17 @@ BrickRecognizer *brickRecognizerInstance = nil;
 }
 
 - (cv::vector<float>)probabilitiesOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image {
-    image = [self prepareImage:image];
+    CGSize brickSize = [[BoardUtil instance] singleBrickScreenSizeFromBoardSize:CGSizeMake(image.cols, image.rows)];
+    image = [self prepareImage:image withLocations:locations brickSize:brickSize];
     cv::vector<float> probabilities;
     for (int i = 0; i < locations.size(); i++) {
-        probabilities.push_back([self probabilityOfBrickAtLocation:locations[i] inGrayscaledNormalizedImage:image]);
+        probabilities.push_back([self probabilityOfBrickAtIndex:i inTiledImage:image brickSize:brickSize]);
     }
     return probabilities;
 }
 
-- (float)probabilityOfBrickAtLocation:(cv::Point)location inGrayscaledNormalizedImage:(cv::Mat)image {
-    cv::Mat brickImage = [self extractBrickImageFromLocation:location image:image];
+- (float)probabilityOfBrickAtIndex:(int)index inTiledImage:(cv::Mat)image brickSize:(CGSize)brickSize {
+    cv::Mat brickImage = [self extractBrickImageFromIndex:index inTiledImage:image brickSize:brickSize];
     cv::Mat histogram = [self calculateHistogramFromImage:brickImage];
     //std::cout << "Histogram: " << std::endl << histogram << std::endl;
     return histogram.at<float>(0) / (float)(brickImage.rows * brickImage.cols);
@@ -70,20 +71,27 @@ BrickRecognizer *brickRecognizerInstance = nil;
 }
 
 - (UIImage *)extractBrickUIImageFromLocation:(cv::Point)location image:(cv::Mat)image {
-    image = [self prepareImage:image];
-    cv::Rect rect = [self boardRectFromLocation:location inImage:image];
+    CGSize brickSize = [[BoardUtil instance] singleBrickScreenSizeFromBoardSize:CGSizeMake(image.cols, image.rows)];
+    cv::vector<cv::Point> locations;
+    locations.push_back(location);
+    image = [self prepareImage:image withLocations:locations brickSize:brickSize];
+    cv::Rect rect = [self boardRectFromLocation:location inImage:image brickSize:brickSize];
     image = cv::Mat(image, rect);
     cv::cvtColor(image, image, CV_GRAY2RGB);
     return [UIImage imageWithCVMat:image];
 }
 
-- (cv::Mat)extractBrickImageFromLocation:(cv::Point)location image:(cv::Mat)image {
-    cv::Rect rect = [self boardRectFromLocation:location inImage:image];
+- (cv::Mat)extractBrickImageFromLocation:(cv::Point)location image:(cv::Mat)image brickSize:(CGSize)brickSize {
+    cv::Rect rect = [self boardRectFromLocation:location inImage:image brickSize:brickSize];
     return cv::Mat(image, rect);
 }
 
-- (cv::Rect)boardRectFromLocation:(cv::Point)location inImage:(cv::Mat)image {
-    CGSize brickSize = [[BoardUtil instance] singleBrickScreenSizeFromBoardSize:CGSizeMake(image.cols, image.rows)];
+- (cv::Mat)extractBrickImageFromIndex:(int)index inTiledImage:(cv::Mat)image brickSize:(CGSize)brickSize {
+    cv::Rect rect = cv::Rect((int)brickSize.width * index, 0, (int)brickSize.width, (int)brickSize.height);
+    return cv::Mat(image, rect);
+}
+
+- (cv::Rect)boardRectFromLocation:(cv::Point)location inImage:(cv::Mat)image brickSize:(CGSize)brickSize {
     cv::Rect rect;
     rect.x = (float)location.x * brickSize.width;
     rect.y = (float)location.y * brickSize.height;
@@ -92,10 +100,16 @@ BrickRecognizer *brickRecognizerInstance = nil;
     return rect;
 }
 
-- (cv::Mat)prepareImage:(cv::Mat)image {
+- (cv::Mat)prepareImage:(cv::Mat)image withLocations:(cv::vector<cv::Point>)locations brickSize:(CGSize)brickSize {
+    cv::Mat tiledImage = cv::Mat((int)brickSize.height, (int)brickSize.width * locations.size(), image.type());
+    for (int i = 0; i < locations.size(); i++) {
+        cv::Mat brickImage = [self extractBrickImageFromLocation:locations[i] image:image brickSize:brickSize];
+        cv::Rect roi(cv::Point((int)brickSize.width * i, 0), brickImage.size());
+        brickImage.copyTo(tiledImage(roi));
+    }
     cv::Mat outputImage;
-    cv::equalizeHist(image, outputImage);
-    return image;
+    cv::equalizeHist(tiledImage, outputImage);
+    return outputImage;
 }
 
 @end
