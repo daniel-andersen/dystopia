@@ -34,8 +34,6 @@
 
     BorderView *borderView;
     
-    NSMutableArray *boardContours;
-    
     int level;
 }
 
@@ -78,13 +76,14 @@
 
 - (void)setupBrickViews {
     brickViewsCount = 0;
-    [self addBrickOfType:0 atPosition:CGPointMake(5, 5)];
-    [self addBrickOfType:1 atPosition:CGPointMake(8, 5)];
-    [self addBrickOfType:2 atPosition:CGPointMake(5, 8)];
-    [self addBrickOfType:5 atPosition:CGPointMake(11, 6)];
-    [self addBrickOfType:5 atPosition:CGPointMake(14, 6)];
-    [self addBrickOfType:3 atPosition:CGPointMake(17, 5)];
-    [self calculateVisibleBoardContour];
+    [self addBrickOfType:2 atPosition:CGPointMake(6, 3)];
+    [self addBrickOfType:8 atPosition:CGPointMake(7, 6)];
+    [self addBrickOfType:8 atPosition:CGPointMake(7, 9)];
+    [self addBrickOfType:8 atPosition:CGPointMake(7, 12)];
+    [self addBrickOfType:2 atPosition:CGPointMake(6, 15)];
+    [self addBrickOfType:5 atPosition:CGPointMake(8, 10)];
+    [self addBrickOfType:5 atPosition:CGPointMake(11, 10)];
+    [self addBrickOfType:1 atPosition:CGPointMake(14, 9)];
     for (int i = 0; i < brickViewsCount; i++) {
         [self addSubview:brickViews[i]];
     }
@@ -98,11 +97,6 @@
             bricks[i + (int)position.y][j + (int)position.x] = type;
         }
     }
-}
-
-- (void)calculateVisibleBoardContour {
-    boardContours = [NSMutableArray array];
-    //boardContour = [[BoardContour alloc] init];
 }
 
 @end

@@ -70,6 +70,7 @@
 		65F5E2B817C1460F00303009 /* ExternalDislayCalibrationBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65F5E2B717C1460F00303009 /* ExternalDislayCalibrationBorderView.m */; };
 		65F6109417E2074700D8C0DF /* Util.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65F6109317E2074700D8C0DF /* Util.mm */; };
 		65F6109717E787EE00D8C0DF /* BrickRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65F6109617E787EE00D8C0DF /* BrickRecognizer.mm */; };
+		65F8D2E517F363F400FE41DF /* bricks9.png in Resources */ = {isa = PBXBuildFile; fileRef = 65F8D2E417F363F400FE41DF /* bricks9.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -161,6 +162,7 @@
 		65F6109317E2074700D8C0DF /* Util.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Util.mm; sourceTree = "<group>"; };
 		65F6109517E787EE00D8C0DF /* BrickRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrickRecognizer.h; sourceTree = "<group>"; };
 		65F6109617E787EE00D8C0DF /* BrickRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BrickRecognizer.mm; sourceTree = "<group>"; };
+		65F8D2E417F363F400FE41DF /* bricks9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bricks9.png; path = bricks/bricks9.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -223,6 +225,7 @@
 				650D4289178F365F00D89CEB /* bricks6.png */,
 				650D428A178F365F00D89CEB /* bricks7.png */,
 				650D428B178F365F00D89CEB /* bricks8.png */,
+				65F8D2E417F363F400FE41DF /* bricks9.png */,
 				650D428C178F365F00D89CEB /* exit.png */,
 				650D428D178F365F00D89CEB /* trap.png */,
 			);
@@ -479,6 +482,7 @@
 				6552706117B1733F00784CD7 /* border_top_right.png in Resources */,
 				6552706217B1733F00784CD7 /* border_top.png in Resources */,
 				65AAD04017C2468B003BFC4C /* dystopia_logo.png in Resources */,
+				65F8D2E517F363F400FE41DF /* bricks9.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

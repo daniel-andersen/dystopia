@@ -58,16 +58,17 @@ BoardUtil *boardUtilInstance = nil;
 }
 
 - (void)loadBricks {
-    brickImages[0] = [UIImage imageNamed:@"bricks1.png"]; brickSizes[0] = CGSizeMake(3.0f, 3.0f);
-    brickImages[1] = [UIImage imageNamed:@"bricks2.png"]; brickSizes[1] = CGSizeMake(3.0f, 3.0f);
-    brickImages[2] = [UIImage imageNamed:@"bricks3.png"]; brickSizes[2] = CGSizeMake(3.0f, 3.0f);
-    brickImages[3] = [UIImage imageNamed:@"bricks4.png"]; brickSizes[3] = CGSizeMake(3.0f, 3.0f);
-    brickImages[4] = [UIImage imageNamed:@"bricks5.png"]; brickSizes[4] = CGSizeMake(3.0f, 2.0f);
-    brickImages[5] = [UIImage imageNamed:@"bricks6.png"]; brickSizes[5] = CGSizeMake(3.0f, 1.0f);
-    brickImages[6] = [UIImage imageNamed:@"bricks7.png"]; brickSizes[6] = CGSizeMake(2.0f, 1.0f);
-    brickImages[7] = [UIImage imageNamed:@"bricks8.png"]; brickSizes[7] = CGSizeMake(1.0f, 1.0f);
-    brickImages[8] = [UIImage imageNamed:@"exit.png"];    brickSizes[8] = CGSizeMake(2.0f, 2.0f);
-    brickImages[9] = [UIImage imageNamed:@"trap.png"];    brickSizes[9] = CGSizeMake(1.0f, 1.0f);
+    brickImages[ 0] = [UIImage imageNamed:@"bricks1.png"]; brickSizes[ 0] = CGSizeMake(3.0f, 3.0f);
+    brickImages[ 1] = [UIImage imageNamed:@"bricks2.png"]; brickSizes[ 1] = CGSizeMake(3.0f, 3.0f);
+    brickImages[ 2] = [UIImage imageNamed:@"bricks3.png"]; brickSizes[ 2] = CGSizeMake(3.0f, 3.0f);
+    brickImages[ 3] = [UIImage imageNamed:@"bricks4.png"]; brickSizes[ 3] = CGSizeMake(3.0f, 3.0f);
+    brickImages[ 4] = [UIImage imageNamed:@"bricks5.png"]; brickSizes[ 4] = CGSizeMake(3.0f, 2.0f);
+    brickImages[ 5] = [UIImage imageNamed:@"bricks6.png"]; brickSizes[ 5] = CGSizeMake(3.0f, 1.0f);
+    brickImages[ 6] = [UIImage imageNamed:@"bricks7.png"]; brickSizes[ 6] = CGSizeMake(2.0f, 1.0f);
+    brickImages[ 7] = [UIImage imageNamed:@"bricks8.png"]; brickSizes[ 7] = CGSizeMake(1.0f, 1.0f);
+    brickImages[ 8] = [UIImage imageNamed:@"bricks9.png"]; brickSizes[ 8] = CGSizeMake(1.0f, 3.0f);
+    brickImages[ 9] = [UIImage imageNamed:@"exit.png"];    brickSizes[ 9] = CGSizeMake(2.0f, 2.0f);
+    brickImages[10] = [UIImage imageNamed:@"trap.png"];    brickSizes[10] = CGSizeMake(1.0f, 1.0f);
 }
 
 - (UIImage *)brickImageOfType:(int)type {
@@ -87,11 +88,11 @@ BoardUtil *boardUtilInstance = nil;
 }
 
 - (CGSize)brickTypeScreenSize:(int)type {
-    return CGSizeMake(brickSizes[type].width * [self singleBrickScreenSize].width, brickSizes[type].height * [self singleBrickScreenSize].height);
+    return CGSizeMake((int)(brickSizes[type].width * [self singleBrickScreenSize].width) + 1.0f, (int)(brickSizes[type].height * [self singleBrickScreenSize].height) + 1.0f);
 }
 
 - (CGPoint)brickScreenPosition:(CGPoint)brickBoardPosition {
-    return CGPointMake(brickBoardPosition.x * [self singleBrickScreenSize].width, brickBoardPosition.y * [self singleBrickScreenSize].height);
+    return CGPointMake((int)(brickBoardPosition.x * [self singleBrickScreenSize].width) + 1.0f, (int)(brickBoardPosition.y * [self singleBrickScreenSize].height) + 1.0f);
 }
 
 - (CGRect)brickTypeFrame:(int)brickType position:(CGPoint)position {
