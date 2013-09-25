@@ -36,7 +36,7 @@
 
 float intersectionAcceptDistanceMin = 0.02f;
 float intersectionAcceptDistanceMax = 5.0f;
-float squareAngleAcceptMax = 2.0f;
+float squareAngleAcceptMax = 15.0f;
 float lineGroupAngleAcceptMax = 15.0f;
 float aspectRatioAcceptMax = 0.1f;
 
@@ -109,6 +109,8 @@ BoardRecognizer *boardRecognizerInstance = nil;
     float centerThreshold = (minIndex + maxIndex) / 2.0f;
     float thresholdMin = centerThreshold * 0.666666f;
     float thresholdMax = centerThreshold * 1.333333f;
+    
+    //NSLog(@"%f vs %f", thresholdMin, thresholdMax);
     
     // Canny image
     img = [self applyCannyOnImage:img threshold1:thresholdMin threshold2:thresholdMax];

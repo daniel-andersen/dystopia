@@ -219,7 +219,7 @@ PreviewableViewController *previewInstance = nil;
         [CATransaction setAnimationDuration:0.0f];
 
         brickProbabilityLayer.frame = [self gridRectAtX:x y:y];
-        if (probability > 0.2f) {
+        if (probability > 0.5f) {
             brickProbabilityLayer.backgroundColor = [UIColor colorWithRed:1.0f green:0.0f blue:1.0f alpha:probability].CGColor;
         } else {
             brickProbabilityLayer.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:1.0f].CGColor;

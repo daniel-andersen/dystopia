@@ -29,7 +29,7 @@
 #import "BrickRecognizer.h"
 #import "UIImage+OpenCV.h"
 
-#define HISTOGRAM_BIN_COUNT 8
+#define HISTOGRAM_BIN_COUNT 4
 
 BrickRecognizer *brickRecognizerInstance = nil;
 
