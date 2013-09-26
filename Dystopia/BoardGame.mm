@@ -24,6 +24,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import "BoardGame.h"
+#import "BoardCalibrator.h"
+#import "BrickRecognizer.h"
 
 @interface BoardGame () {
     int level;
@@ -32,6 +34,8 @@
     Board *board;
 
     UIView *boardRecognizedView;
+    
+    UIView *tmpBrickPositionView;
 }
 
 @end
@@ -49,15 +53,67 @@
 - (void)initialize {
     board = [[Board alloc] initWithFrame:self.bounds];
     [self addSubview:board];
+    
+    tmpBrickPositionView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, [[BoardUtil instance] singleBrickScreenSize].width * 2.0f, [[BoardUtil instance] singleBrickScreenSize].height * 2.0f)];
+    tmpBrickPositionView.layer.contents = (id)[UIImage imageNamed:@"brick_marker.png"].CGImage;
+    tmpBrickPositionView.hidden = YES;
+    [self addSubview:tmpBrickPositionView];
 }
 
 - (void)startWithLevel:(int)l {
     level = l;
     [board loadLevel:level];
+    [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(update) userInfo:nil repeats:YES];
     NSLog(@"Level %i started", level + 1);
 }
 
 - (void)update {
+    [self calculateBrickPosition];
+}
+
+- (void)calculateBrickPosition {
+    if (![BoardCalibrator instance].boardBounds.bounds.defined || [BoardCalibrator instance].boardBounds.isBoundsObstructed) {
+        return;
+    }
+    cv::vector<cv::Point> bricks;
+    for (int y = 0; y < BOARD_HEIGHT; y++) {
+        for (int x = 0; x < BOARD_WIDTH; x++) {
+            if ([board hasBrickAtPosition:cv::Point(x, y)]) {
+                bricks.push_back(cv::Point(x, y));
+            }
+        }
+    }
+    cv::vector<float> probs = [[BrickRecognizer instance] probabilitiesOfBricksAtLocations:bricks inImage:[BoardCalibrator instance].boardImage];
+    int bestX = -1;
+    int bestY = -1;
+    float bestProb = -1.0f;
+    int idx = 0;
+    for (int y = 15; y < 15 + 3; y++) {
+        for (int x = 6; x < 6 + 3; x++) {
+            if ([board hasBrickAtPosition:cv::Point(x, y)]) {
+                if (probs[idx] > bestProb) {
+                    bestProb = probs[idx];
+                    bestX = x;
+                    bestY = y;
+                }
+                idx++;
+            }
+        }
+    }
+    if (bestX == -1 || bestY == -1) {
+        tmpBrickPositionView.hidden = YES;
+        return;
+    }
+    tmpBrickPositionView.hidden = NO;
+
+    cv::Point pos = cv::Point(bestX, bestY);
+    CGPoint p = [[BoardUtil instance] brickScreenPosition:pos];
+    p.x -= (tmpBrickPositionView.frame.size.width - [[BoardUtil instance] singleBrickScreenSize].width) / 2.0f;
+    p.y -= (tmpBrickPositionView.frame.size.height - [[BoardUtil instance] singleBrickScreenSize].height) / 2.0f;
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:0.0f];
+    tmpBrickPositionView.frame = CGRectMake(p.x, p.y, tmpBrickPositionView.frame.size.width, tmpBrickPositionView.frame.size.height);
+    [CATransaction commit];
 }
 
 @end

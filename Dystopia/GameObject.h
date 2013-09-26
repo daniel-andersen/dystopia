@@ -23,19 +23,14 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
-#import "BrickView.h"
-#import "BoardUtil.h"
+@interface GameObject : UIView
 
-#define BOARD_BRICK_VIEWS_COUNT 50
+@end
 
-@interface Board : UIView
+@interface MoveableGameObject : GameObject
 
-- (id)initWithFrame:(CGRect)frame;
-
-- (void)loadLevel:(int)l;
-
-- (bool)hasBrickAtPosition:(cv::Point)position;
+- (cv::vector<cv::Point>)moveablePositions;
 
 @end

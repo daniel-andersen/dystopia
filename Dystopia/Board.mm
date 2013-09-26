@@ -76,20 +76,20 @@
 
 - (void)setupBrickViews {
     brickViewsCount = 0;
-    [self addBrickOfType:2 atPosition:CGPointMake(6, 3)];
-    [self addBrickOfType:8 atPosition:CGPointMake(7, 6)];
-    [self addBrickOfType:8 atPosition:CGPointMake(7, 9)];
-    [self addBrickOfType:8 atPosition:CGPointMake(7, 12)];
-    [self addBrickOfType:2 atPosition:CGPointMake(6, 15)];
-    [self addBrickOfType:5 atPosition:CGPointMake(8, 10)];
-    [self addBrickOfType:5 atPosition:CGPointMake(11, 10)];
-    [self addBrickOfType:1 atPosition:CGPointMake(14, 9)];
+    [self addBrickOfType:2 atPosition:cv::Point(6, 3)];
+    [self addBrickOfType:8 atPosition:cv::Point(7, 6)];
+    [self addBrickOfType:8 atPosition:cv::Point(7, 9)];
+    [self addBrickOfType:8 atPosition:cv::Point(7, 12)];
+    [self addBrickOfType:2 atPosition:cv::Point(6, 15)];
+    [self addBrickOfType:5 atPosition:cv::Point(8, 10)];
+    [self addBrickOfType:5 atPosition:cv::Point(11, 10)];
+    [self addBrickOfType:1 atPosition:cv::Point(14, 9)];
     for (int i = 0; i < brickViewsCount; i++) {
         [self addSubview:brickViews[i]];
     }
 }
 
-- (void)addBrickOfType:(int)type atPosition:(CGPoint)position {
+- (void)addBrickOfType:(int)type atPosition:(cv::Point)position {
     brickViews[brickViewsCount++] = [[BrickView alloc] initWithFrame:[[BoardUtil instance] brickTypeFrame:type position:position] brickType:type];
     CGSize size = [[BoardUtil instance] brickTypeBoardSize:type];
     for (int i = 0; i < size.height; i++) {
@@ -97,6 +97,10 @@
             bricks[i + (int)position.y][j + (int)position.x] = type;
         }
     }
+}
+
+- (bool)hasBrickAtPosition:(cv::Point)position {
+    return position.x >= 0 && position.y >= 0 && position.x < BOARD_WIDTH && position.y < BOARD_HEIGHT && bricks[position.y][position.x] != -1;
 }
 
 @end

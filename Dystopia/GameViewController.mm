@@ -38,7 +38,6 @@ extern PreviewableViewController *previewInstance;
 
     ExternalDislayCalibrationBorderView *externalDislayCalibrationBorderView;
     
-    BoardCalibrator *boardCalibrator;
     BoardGame *boardGame;
     Intro *intro;
     
@@ -60,7 +59,7 @@ extern PreviewableViewController *previewInstance;
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    [self.view bringSubviewToFront:boardCalibrator];
+    [self.view bringSubviewToFront:[BoardCalibrator instance]];
     [self.view bringSubviewToFront:super.overlayView];
     if (externalDislayCalibrationBorderView != nil) {
         [self.view bringSubviewToFront:externalDislayCalibrationBorderView];
@@ -77,8 +76,8 @@ extern PreviewableViewController *previewInstance;
     
     cameraSession = [[CameraSession alloc] initWithDelegate:self];
 
-    boardCalibrator = [[BoardCalibrator alloc] initWithFrame:self.view.bounds cameraSession:cameraSession];
-    [self.view addSubview:boardCalibrator];
+    [[BoardCalibrator instance] initializeWithFrame:self.view.bounds cameraSession:cameraSession];
+    [self.view addSubview:[BoardCalibrator instance]];
 
     externalDislayCalibrationBorderView = [[ExternalDislayCalibrationBorderView alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:externalDislayCalibrationBorderView];
@@ -94,6 +93,9 @@ extern PreviewableViewController *previewInstance;
 
 - (void)processFrame:(UIImage *)image {
     @autoreleasepool {
+        if (gameState < GAME_STATE_GAME) {
+            return;
+        }
         cv::Mat img = [image CVMat];
 
         cv::Mat grayscaledImage;
@@ -101,39 +103,10 @@ extern PreviewableViewController *previewInstance;
         
         [self calibrateBoard:grayscaledImage];
         [self updateGameStateAccordingToFrame];
-        [previewInstance previewFrame:image boardCalibrator:boardCalibrator];
+        [previewInstance previewFrame:image boardCalibrator:[BoardCalibrator instance]];
         //NSArray *images = [[BoardRecognizer instance] boardBoundsToImages:image];
         //[previewInstance previewFrame:[images objectAtIndex:5] boardCalibrator:boardCalibrator];
-        [self testBrickProbability];
     }
-}
-
-- (void)testBrickProbability {
-    if (!boardCalibrator.boardBounds.bounds.defined) {
-        return;
-    }
-    cv::vector<cv::Point> bricks;
-    for (int y = 15; y < 15 + 3; y++) {
-        for (int x = 6; x < 6 + 3; x++) {
-            bricks.push_back(cv::Point(x, y));
-        }
-    }
-    cv::vector<float> probs = [[BrickRecognizer instance] probabilitiesOfBricksAtLocations:bricks inImage:boardCalibrator.boardImage];
-    int bestX = -1;
-    int bestY = -1;
-    float bestProb = -1.0f;
-    int idx = 0;
-    for (int y = 15; y < 15 + 3; y++) {
-        for (int x = 6; x < 6 + 3; x++) {
-            if (probs[idx] > bestProb) {
-                bestProb = probs[idx];
-                bestX = x;
-                bestY = y;
-            }
-            idx++;
-        }
-    }
-    [previewInstance previewProbabilityOfBrick:bestProb x:bestX y:bestY boardImage:boardCalibrator.boardImage];
 }
 
 - (void)updateGameStateAccordingToFrame {
@@ -176,7 +149,7 @@ extern PreviewableViewController *previewInstance;
 }
 
 - (void)calibrateBoard:(cv::Mat)image {
-    [boardCalibrator updateBoundsWithImage:image];
+    [[BoardCalibrator instance] updateBoundsWithImage:image];
 }
 
 - (UIImage *)requestSimulatedImageIfNoCamera {

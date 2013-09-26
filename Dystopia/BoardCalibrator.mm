@@ -40,6 +40,8 @@
 
 @end
 
+BoardCalibrator *boardCalibratorInstance = nil;
+
 @implementation BoardCalibrator
 
 @synthesize state;
@@ -47,12 +49,18 @@
 @synthesize screenPoints;
 @synthesize boardImage;
 
-- (id)initWithFrame:(CGRect)frame cameraSession:(CameraSession *)session {
-    if (self = [super initWithFrame:frame]) {
-        cameraSession = session;
-        [self initialize];
++ (BoardCalibrator *)instance {
+    @synchronized(self) {
+        if (boardCalibratorInstance == nil) {
+            boardCalibratorInstance = [[BoardCalibrator alloc] init];
+        }
+        return boardCalibratorInstance;
     }
-    return self;
+}
+
+- (void)initializeWithFrame:(CGRect)frame cameraSession:(CameraSession *)session {
+    cameraSession = session;
+    [self initialize];
 }
 
 - (void)initialize {

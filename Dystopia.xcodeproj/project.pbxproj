@@ -71,6 +71,8 @@
 		65F6109417E2074700D8C0DF /* Util.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65F6109317E2074700D8C0DF /* Util.mm */; };
 		65F6109717E787EE00D8C0DF /* BrickRecognizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65F6109617E787EE00D8C0DF /* BrickRecognizer.mm */; };
 		65F8D2E517F363F400FE41DF /* bricks9.png in Resources */ = {isa = PBXBuildFile; fileRef = 65F8D2E417F363F400FE41DF /* bricks9.png */; };
+		65F8D2E817F4184100FE41DF /* GameObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65F8D2E717F4184000FE41DF /* GameObject.mm */; };
+		65F8D2EC17F41F7B00FE41DF /* brick_marker.png in Resources */ = {isa = PBXBuildFile; fileRef = 65F8D2EB17F41F7B00FE41DF /* brick_marker.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -163,6 +165,9 @@
 		65F6109517E787EE00D8C0DF /* BrickRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrickRecognizer.h; sourceTree = "<group>"; };
 		65F6109617E787EE00D8C0DF /* BrickRecognizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BrickRecognizer.mm; sourceTree = "<group>"; };
 		65F8D2E417F363F400FE41DF /* bricks9.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = bricks9.png; path = bricks/bricks9.png; sourceTree = "<group>"; };
+		65F8D2E617F4184000FE41DF /* GameObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
+		65F8D2E717F4184000FE41DF /* GameObject.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GameObject.mm; sourceTree = "<group>"; };
+		65F8D2EB17F41F7B00FE41DF /* brick_marker.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = brick_marker.png; path = markers/brick_marker.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -304,6 +309,7 @@
 				65EA264B1780C89500E84BA4 /* Recognizers */,
 				65B930BA17806D6600312B88 /* View Controllers */,
 				650D423E178DE8C800D89CEB /* Game Engine */,
+				65F8D2E917F4184700FE41DF /* Game Objects */,
 			);
 			path = Dystopia;
 			sourceTree = "<group>";
@@ -326,6 +332,7 @@
 			children = (
 				6552705117B1733000784CD7 /* Board */,
 				650D4298178F366700D89CEB /* Bricks */,
+				65F8D2EA17F41F7200FE41DF /* Markers */,
 				650D4283178F365200D89CEB /* Intro */,
 			);
 			path = Images;
@@ -401,6 +408,23 @@
 				65F5E2B717C1460F00303009 /* ExternalDislayCalibrationBorderView.m */,
 			);
 			name = Util;
+			sourceTree = "<group>";
+		};
+		65F8D2E917F4184700FE41DF /* Game Objects */ = {
+			isa = PBXGroup;
+			children = (
+				65F8D2E617F4184000FE41DF /* GameObject.h */,
+				65F8D2E717F4184000FE41DF /* GameObject.mm */,
+			);
+			name = "Game Objects";
+			sourceTree = "<group>";
+		};
+		65F8D2EA17F41F7200FE41DF /* Markers */ = {
+			isa = PBXGroup;
+			children = (
+				65F8D2EB17F41F7B00FE41DF /* brick_marker.png */,
+			);
+			name = Markers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -483,6 +507,7 @@
 				6552706217B1733F00784CD7 /* border_top.png in Resources */,
 				65AAD04017C2468B003BFC4C /* dystopia_logo.png in Resources */,
 				65F8D2E517F363F400FE41DF /* bricks9.png in Resources */,
+				65F8D2EC17F41F7B00FE41DF /* brick_marker.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -516,6 +541,7 @@
 				65F5E2B817C1460F00303009 /* ExternalDislayCalibrationBorderView.m in Sources */,
 				65F6109417E2074700D8C0DF /* Util.mm in Sources */,
 				65F6109717E787EE00D8C0DF /* BrickRecognizer.mm in Sources */,
+				65F8D2E817F4184100FE41DF /* GameObject.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

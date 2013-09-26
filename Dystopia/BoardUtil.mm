@@ -91,11 +91,11 @@ BoardUtil *boardUtilInstance = nil;
     return CGSizeMake((int)(brickSizes[type].width * [self singleBrickScreenSize].width) + 1.0f, (int)(brickSizes[type].height * [self singleBrickScreenSize].height) + 1.0f);
 }
 
-- (CGPoint)brickScreenPosition:(CGPoint)brickBoardPosition {
+- (CGPoint)brickScreenPosition:(cv::Point)brickBoardPosition {
     return CGPointMake((int)(brickBoardPosition.x * [self singleBrickScreenSize].width) + 1.0f, (int)(brickBoardPosition.y * [self singleBrickScreenSize].height) + 1.0f);
 }
 
-- (CGRect)brickTypeFrame:(int)brickType position:(CGPoint)position {
+- (CGRect)brickTypeFrame:(int)brickType position:(cv::Point)position {
     return CGRectMake([self brickScreenPosition:position].x,
                       [self brickScreenPosition:position].y,
                       [self brickTypeScreenSize:brickType].width,

@@ -35,7 +35,9 @@
 
 @interface BoardCalibrator : UIView
 
-- (id)initWithFrame:(CGRect)frame cameraSession:(CameraSession *)session;
++ (BoardCalibrator *)instance;
+
+- (void)initializeWithFrame:(CGRect)frame cameraSession:(CameraSession *)session;
 
 - (void)updateBoundsWithImage:(cv::Mat)image;
 
