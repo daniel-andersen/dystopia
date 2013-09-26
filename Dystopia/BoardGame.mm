@@ -26,6 +26,8 @@
 #import "BoardGame.h"
 #import "BoardCalibrator.h"
 #import "BrickRecognizer.h"
+#import "ExternalDisplay.h"
+#import "PreviewableViewController.h"
 
 @interface BoardGame () {
     int level;
@@ -36,6 +38,7 @@
     UIView *boardRecognizedView;
     
     UIView *tmpBrickPositionView;
+    UIView *tmpBrickView;
 }
 
 @end
@@ -54,6 +57,11 @@
     board = [[Board alloc] initWithFrame:self.bounds];
     [self addSubview:board];
     
+    tmpBrickView = [[UIView alloc] initWithFrame:CGRectMake([[BoardUtil instance] singleBrickScreenSize].width * 7.0f, [[BoardUtil instance] singleBrickScreenSize].height * 10.0f, [[BoardUtil instance] singleBrickScreenSize].width, [[BoardUtil instance] singleBrickScreenSize].height)];
+    tmpBrickView.backgroundColor = [UIColor blackColor];
+    tmpBrickView.hidden = [ExternalDisplay instance].externalDisplayFound;
+    [self addSubview:tmpBrickView];
+
     tmpBrickPositionView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, [[BoardUtil instance] singleBrickScreenSize].width * 2.0f, [[BoardUtil instance] singleBrickScreenSize].height * 2.0f)];
     tmpBrickPositionView.layer.contents = (id)[UIImage imageNamed:@"brick_marker.png"].CGImage;
     tmpBrickPositionView.hidden = YES;
@@ -63,7 +71,8 @@
 - (void)startWithLevel:(int)l {
     level = l;
     [board loadLevel:level];
-    [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(update) userInfo:nil repeats:YES];
+    NSTimer* timer = [NSTimer timerWithTimeInterval:0.1f target:self selector:@selector(update) userInfo:nil repeats:YES];
+    [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
     NSLog(@"Level %i started", level + 1);
 }
 
@@ -88,8 +97,8 @@
     int bestY = -1;
     float bestProb = -1.0f;
     int idx = 0;
-    for (int y = 15; y < 15 + 3; y++) {
-        for (int x = 6; x < 6 + 3; x++) {
+    for (int y = 0; y < BOARD_HEIGHT; y++) {
+        for (int x = 0; x < BOARD_WIDTH; x++) {
             if ([board hasBrickAtPosition:cv::Point(x, y)]) {
                 if (probs[idx] > bestProb) {
                     bestProb = probs[idx];
@@ -100,12 +109,15 @@
             }
         }
     }
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:0.0f];
+    tmpBrickPositionView.alpha = bestX == -1 || bestY == -1 ? 0.5f : 1.0f;
+    [CATransaction commit];
     if (bestX == -1 || bestY == -1) {
-        tmpBrickPositionView.hidden = YES;
         return;
     }
     tmpBrickPositionView.hidden = NO;
-
+    
     cv::Point pos = cv::Point(bestX, bestY);
     CGPoint p = [[BoardUtil instance] brickScreenPosition:pos];
     p.x -= (tmpBrickPositionView.frame.size.width - [[BoardUtil instance] singleBrickScreenSize].width) / 2.0f;
@@ -114,6 +126,8 @@
     [CATransaction setAnimationDuration:0.0f];
     tmpBrickPositionView.frame = CGRectMake(p.x, p.y, tmpBrickPositionView.frame.size.width, tmpBrickPositionView.frame.size.height);
     [CATransaction commit];
+    
+    [[PreviewableViewController instance] previewProbabilityOfBrick:bestProb x:bestX y:bestY];
 }
 
 @end

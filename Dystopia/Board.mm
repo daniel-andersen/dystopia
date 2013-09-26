@@ -27,7 +27,7 @@
 #import "BorderView.h"
 
 @interface Board () {
-    int bricks[BOARD_WIDTH][BOARD_HEIGHT];
+    int bricks[BOARD_HEIGHT][BOARD_WIDTH];
     
     BrickView *brickViews[BOARD_BRICK_VIEWS_COUNT];
     int brickViewsCount;
@@ -58,7 +58,6 @@
     [self loadBoard];
     [self setupBorderView];
     [self setupBrickViews];
-    NSLog(@"Level %i loaded", level + 1);
 }
 
 - (void)loadBoard {

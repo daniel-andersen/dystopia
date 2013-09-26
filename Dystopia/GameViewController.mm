@@ -93,15 +93,10 @@ extern PreviewableViewController *previewInstance;
 
 - (void)processFrame:(UIImage *)image {
     @autoreleasepool {
-        if (gameState < GAME_STATE_GAME) {
-            return;
+        if (gameState >= GAME_STATE_GAME) {
+            cv::Mat grayscaledImage = [self grayscaledImage:image];
+            [self calibrateBoard:grayscaledImage];
         }
-        cv::Mat img = [image CVMat];
-
-        cv::Mat grayscaledImage;
-        cv::cvtColor(img, grayscaledImage, CV_RGB2GRAY);
-        
-        [self calibrateBoard:grayscaledImage];
         [self updateGameStateAccordingToFrame];
         [previewInstance previewFrame:image boardCalibrator:[BoardCalibrator instance]];
         //NSArray *images = [[BoardRecognizer instance] boardBoundsToImages:image];
@@ -114,6 +109,14 @@ extern PreviewableViewController *previewInstance;
         [self setFrameUpdateIntervalAccordingToGameState];
         cameraSession.readyToProcessFrame = YES;
     });
+}
+
+- (cv::Mat)grayscaledImage:(UIImage *)image {
+    cv::Mat img = [image CVMat];
+    
+    cv::Mat outputImage;
+    cv::cvtColor(img, outputImage, CV_RGB2GRAY);
+    return outputImage;
 }
 
 - (void)setFrameUpdateIntervalAccordingToGameState {

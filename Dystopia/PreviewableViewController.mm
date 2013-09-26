@@ -56,6 +56,10 @@ PreviewableViewController *previewInstance = nil;
 
 @synthesize overlayView;
 
++ (PreviewableViewController *)instance {
+    return previewInstance;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupPreview];
@@ -230,7 +234,7 @@ PreviewableViewController *previewInstance = nil;
     });
 }
 
-- (void)previewProbabilityOfBrick:(float)probability x:(int)x y:(int)y boardImage:(cv::Mat)boardImage {
+- (void)previewProbabilityOfBrick:(float)probability x:(int)x y:(int)y {
     dispatch_async(dispatch_get_main_queue(), ^{
         [CATransaction begin];
         [CATransaction setAnimationDuration:0.0f];
@@ -242,7 +246,6 @@ PreviewableViewController *previewInstance = nil;
             brickProbabilityLayer.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:1.0f].CGColor;
         }
         
-        //brickProbabilityLayer.contents = (id)[[BrickRecognizer instance] extractBrickUIImageFromLocation:cv::Point(x, y) image:boardImage].CGImage;
         [CATransaction commit];
     });
 }
