@@ -34,6 +34,9 @@
 #define LINE_DIRECTION_VERTICAL_LEFT   2
 #define LINE_DIRECTION_VERTICAL_RIGHT  3
 
+#define CANNY_THRESHOLDING_MODE_AUTOMATIC 0
+#define CANNY_THRESHOLDING_MODE_BRIGHT    1
+
 float intersectionAcceptDistanceMin = 0.02f;
 float intersectionAcceptDistanceMax = 5.0f;
 float squareAngleAcceptMax = 15.0f;
@@ -67,6 +70,8 @@ typedef struct {
     
     cv::vector<cv::vector<cv::Point>> approx;
     cv::vector<bool> hasBeenApproxed;
+    
+    int previousCannyThresholdDetectionMode;
 }
 
 @end
@@ -84,19 +89,84 @@ BoardRecognizer *boardRecognizerInstance = nil;
     }
 }
 
+- (id)init {
+    if (self = [super init]) {
+        previousCannyThresholdDetectionMode = CANNY_THRESHOLDING_MODE_AUTOMATIC;
+    }
+    return self;
+}
 - (BoardBounds)findBoardBoundsFromImage:(cv::Mat)image {
     BoardBounds undefinedBounds = {.bounds = {.defined = NO}};
+
+    cv::vector<cv::vector<cv::Point>> contours[2];
+    cv::vector<cv::Vec4i> hierarchy[2];
 
     // Prepare image
     cv::Mat copiedImage = image.clone();
     [self prepareConstantsFromImage:copiedImage];
 
     // Prepare image
-    cv::Mat img = [self smooth:copiedImage];
+    cv::Mat preparedImage = [self smooth:copiedImage];
 
-    // Calculate canny thresholding levels from histogram
-    cv::Mat histogram = [self calculateHistogramFromImage:img];
+    // Find non-obstructed bounds
+    for (int i = 0; i < 2; i++) {
 
+        cv::Mat img = preparedImage.clone();
+
+        // Find canny thresholding mode
+        int thresholdingMode = [self thresholdingModeForIndex:i];
+
+        // Hardcoded canny levels first
+        float thresholdMin = 40;
+        float thresholdMax = 60;
+
+        // Levels by histogram
+        if (thresholdingMode == CANNY_THRESHOLDING_MODE_AUTOMATIC) {
+            float meanThreshold = [self automaticThresholdingMean:img];
+            thresholdMin = meanThreshold * 2.0f / 3.0f;
+            thresholdMax = meanThreshold * 4.0f / 3.0f;
+        }
+        
+        // Canny image
+        img = [self applyCannyOnImage:img threshold1:thresholdMin threshold2:thresholdMax];
+        img = [self dilate:img];
+        
+        // Find contours
+        cv::findContours(img, contours[i], hierarchy[i], CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+        if (contours[i].size() == 0) {
+            return undefinedBounds;
+        }
+        
+        // Find non-obstructed bounds
+        FourPoints corners = [self findNonObstructedBoardCornersFromContours:contours[i] hierarchy:hierarchy[i]];
+        if (corners.defined) {
+            previousCannyThresholdDetectionMode = thresholdingMode;
+            BoardBounds bounds = {.bounds = corners, .isBoundsObstructed = NO};
+            return bounds;
+        }
+    }
+    
+    // Find obstructed bounds
+    for (int i = 0; i < 2; i++) {
+
+        // Find obstructed bounds
+        FourPoints corners = [self findObstructedBoardCornersFromContours:contours[i]];
+        if (corners.defined) {
+            previousCannyThresholdDetectionMode = [self thresholdingModeForIndex:i];
+            BoardBounds bounds = {.bounds = corners, .isBoundsObstructed = YES};
+            return bounds;
+        }
+    }
+    
+    // Border not found
+    return undefinedBounds;
+}
+
+- (float)automaticThresholdingMean:(cv::Mat)image {
+    // Calculate histogram
+    cv::Mat histogram = [self calculateHistogramFromImage:image];
+
+    // Calculate mean value
     int minIndex = 255;
     int maxIndex = 0;
     for (int i = 0; i < 256; i++) {
@@ -106,41 +176,16 @@ BoardRecognizer *boardRecognizerInstance = nil;
             maxIndex = MAX(maxIndex, i);
         }
     }
-    float centerThreshold = (minIndex + maxIndex) / 2.0f;
-    float thresholdMin = centerThreshold * 0.666666f;
-    float thresholdMax = centerThreshold * 1.333333f;
-    
-    //NSLog(@"%f vs %f", thresholdMin, thresholdMax);
-    
-    // Canny image
-    img = [self applyCannyOnImage:img threshold1:thresholdMin threshold2:thresholdMax];
-    img = [self dilate:img];
+    return (minIndex + maxIndex) / 2.0f;
+}
 
-    // Find contours
-    cv::vector<cv::vector<cv::Point>> contours;
-    cv::vector<cv::Vec4i> hierarchy;
-
-    cv::findContours(img, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
-    if (contours.size() == 0) {
-        return undefinedBounds;
+- (int)thresholdingModeForIndex:(int)index {
+    if ((index == 0 && previousCannyThresholdDetectionMode == CANNY_THRESHOLDING_MODE_AUTOMATIC) ||
+        (index == 1 && previousCannyThresholdDetectionMode != CANNY_THRESHOLDING_MODE_AUTOMATIC)) {
+        return CANNY_THRESHOLDING_MODE_AUTOMATIC;
+    } else {
+        return CANNY_THRESHOLDING_MODE_BRIGHT;
     }
-
-    // Find non-obstructed bounds
-    FourPoints corners = [self findNonObstructedBoardCornersFromImage:img contours:contours hierarchy:hierarchy];
-    if (corners.defined) {
-        BoardBounds bounds = {.bounds = corners, .isBoundsObstructed = NO};
-        return bounds;
-    }
-
-    // Find obstructed bounds
-    corners = [self findObstructedBoardCornersFromImage:img contours:contours];
-    if (corners.defined) {
-        BoardBounds bounds = {.bounds = corners, .isBoundsObstructed = YES};
-        return bounds;
-    }
-    
-    // Border not found
-    return undefinedBounds;
 }
 
 - (cv::Mat)perspectiveCorrectImage:(cv::Mat)image fromBoardBounds:(FourPoints)boardBounds {
@@ -214,7 +259,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
         cv::Scalar color = cv::Scalar(255, 0, 255);
         for (int i = 0; i < contours.size(); i++) {
             cv::vector<cv::Point> approxed;
-            cv::approxPolyDP(cv::Mat(contours[i]), approxed, cv::arcLength(cv::Mat(contours[i]), true) * 0.01f, true);
+            cv::approxPolyDP(cv::Mat(contours[i]), approxed, cv::arcLength(cv::Mat(contours[i]), true) * 0.002f, true);
             [self drawContour:approxed ontoImage:outputImg withColor:color];
         }
         [images addObject:[UIImage imageWithCVMat:outputImg]];
@@ -337,7 +382,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     return image;
 }
 
-- (FourPoints)findNonObstructedBoardCornersFromImage:(cv::Mat)image contours:(cv::vector<cv::vector<cv::Point>> &)contours hierarchy:(cv::vector<cv::Vec4i> &)hierarchy {
+- (FourPoints)findNonObstructedBoardCornersFromContours:(cv::vector<cv::vector<cv::Point>> &)contours hierarchy:(cv::vector<cv::Vec4i> &)hierarchy {
     FourPoints undefinedPoints = {.defined = NO};
 
     cv::vector<cv::vector<cv::Point>> approxedContours;
@@ -421,7 +466,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     return count == 1; // Return true if count is one - last child must not have valid children!
 }
 
-- (FourPoints)findObstructedBoardCornersFromImage:(cv::Mat)image contours:(cv::vector<cv::vector<cv::Point>> &)contours {
+- (FourPoints)findObstructedBoardCornersFromContours:(cv::vector<cv::vector<cv::Point>> &)contours {
     FourPoints undefinedPoints = {.defined = NO};
     
     // Find lines from contours

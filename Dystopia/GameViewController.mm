@@ -98,9 +98,9 @@ extern PreviewableViewController *previewInstance;
             [self calibrateBoard:grayscaledImage];
         }
         [self updateGameStateAccordingToFrame];
-        [previewInstance previewFrame:image boardCalibrator:[BoardCalibrator instance]];
+        [previewInstance previewFrame:image];
         //NSArray *images = [[BoardRecognizer instance] boardBoundsToImages:image];
-        //[previewInstance previewFrame:[images objectAtIndex:5] boardCalibrator:boardCalibrator];
+        //[previewInstance previewFrame:[images objectAtIndex:5]];
     }
 }
 

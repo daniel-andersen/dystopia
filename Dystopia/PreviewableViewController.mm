@@ -222,15 +222,15 @@ PreviewableViewController *previewInstance = nil;
 #endif
 }
 
-- (void)previewFrame:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
+- (void)previewFrame:(UIImage *)image {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (takeScreenshot) {
             [self takeScreenshotFromImage:image];
             takeScreenshot = NO;
         }
         [self previewCamera:image];
-        [self previewBoard:image boardCalibrator:boardCalibrator];
-        [self previewBoardBounds:boardCalibrator.boardBounds];
+        [self previewBoard:image];
+        [self previewBoardBounds:[BoardCalibrator instance].boardBounds];
     });
 }
 
@@ -256,10 +256,10 @@ PreviewableViewController *previewInstance = nil;
     }
 }
 
-- (void)previewBoard:(UIImage *)image boardCalibrator:(BoardCalibrator *)boardCalibrator {
+- (void)previewBoard:(UIImage *)image {
     if (boardPreview.hidden == NO) {
         cv::Mat coloredImage;
-        cv::cvtColor(boardCalibrator.boardImage, coloredImage, CV_GRAY2RGB);
+        cv::cvtColor([BoardCalibrator instance].boardImage, coloredImage, CV_GRAY2RGB);
         boardPreview.image = [UIImage imageWithCVMat:coloredImage];
     }
 }

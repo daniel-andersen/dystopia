@@ -48,6 +48,7 @@ BoardCalibrator *boardCalibratorInstance = nil;
 @synthesize boardBounds;
 @synthesize screenPoints;
 @synthesize boardImage;
+@synthesize boardImageLock;
 
 + (BoardCalibrator *)instance {
     @synchronized(self) {
@@ -56,6 +57,13 @@ BoardCalibrator *boardCalibratorInstance = nil;
         }
         return boardCalibratorInstance;
     }
+}
+
+- (id)init {
+    if (self = [super init]) {
+        boardImageLock = [[NSObject alloc] init];
+    }
+    return self;
 }
 
 - (void)initializeWithFrame:(CGRect)frame cameraSession:(CameraSession *)session {
@@ -73,7 +81,9 @@ BoardCalibrator *boardCalibratorInstance = nil;
     boardBounds = [[BoardRecognizer instance] findBoardBoundsFromImage:image];
     if (boardBounds.bounds.defined) {
         state = BOARD_CALIBRATION_STATE_CALIBRATED;
-        boardImage = [self perspectiveCorrectImage:image];
+        @synchronized(boardImageLock) {
+            boardImage = [self perspectiveCorrectImage:image];
+        }
         //[cameraSession lock];
     } else {
         state = BOARD_CALIBRATION_STATE_CALIBRATING;

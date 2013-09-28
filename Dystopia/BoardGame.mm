@@ -92,7 +92,10 @@
             }
         }
     }
-    cv::vector<float> probs = [[BrickRecognizer instance] probabilitiesOfBricksAtLocations:bricks inImage:[BoardCalibrator instance].boardImage];
+    cv::vector<float> probs;
+    @synchronized([BoardCalibrator instance].boardImageLock) {
+        probs = [[BrickRecognizer instance] probabilitiesOfBricksAtLocations:bricks inImage:[BoardCalibrator instance].boardImage];
+    }
     int bestX = -1;
     int bestY = -1;
     float bestProb = -1.0f;
