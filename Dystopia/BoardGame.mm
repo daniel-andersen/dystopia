@@ -37,7 +37,7 @@
 
     UIView *boardRecognizedView;
     
-    UIView *tmpBrickPositionView;
+    UIView *tmpBrickPositionView[4];
     UIView *tmpBrickView;
 }
 
@@ -62,10 +62,12 @@
     tmpBrickView.hidden = [ExternalDisplay instance].externalDisplayFound;
     [self addSubview:tmpBrickView];
 
-    tmpBrickPositionView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, [[BoardUtil instance] singleBrickScreenSize].width * 2.0f, [[BoardUtil instance] singleBrickScreenSize].height * 2.0f)];
-    tmpBrickPositionView.layer.contents = (id)[UIImage imageNamed:@"brick_marker.png"].CGImage;
-    tmpBrickPositionView.hidden = YES;
-    [self addSubview:tmpBrickPositionView];
+    for (int i = 0; i < 4; i++) {
+        tmpBrickPositionView[i] = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, [[BoardUtil instance] singleBrickScreenSize].width * 2.0f, [[BoardUtil instance] singleBrickScreenSize].height * 2.0f)];
+        tmpBrickPositionView[i].layer.contents = (id)[UIImage imageNamed:@"brick_marker.png"].CGImage;
+        tmpBrickPositionView[i].hidden = YES;
+        [self addSubview:tmpBrickPositionView[i]];
+    }
 }
 
 - (void)startWithLevel:(int)l {
@@ -96,41 +98,62 @@
     @synchronized([BoardCalibrator instance].boardImageLock) {
         probs = [[BrickRecognizer instance] probabilitiesOfBricksAtLocations:bricks inImage:[BoardCalibrator instance].boardImage];
     }
-    int bestX = -1;
-    int bestY = -1;
-    float bestProb = -1.0f;
+    int bestX[4] = {-1, -1, -1, -1};
+    int bestY[4] = {-1, -1, -1, -1};
+    float bestProb[4] = {-1.0f, -1.0f, -1.0f, -1.0f};
     int idx = 0;
     for (int y = 0; y < BOARD_HEIGHT; y++) {
         for (int x = 0; x < BOARD_WIDTH; x++) {
             if ([board hasBrickAtPosition:cv::Point(x, y)]) {
-                if (probs[idx] > bestProb) {
-                    bestProb = probs[idx];
-                    bestX = x;
-                    bestY = y;
+                if (probs[idx] > bestProb[3]) {
+                    bestProb[3] = probs[idx];
+                    bestX[3] = x;
+                    bestY[3] = y;
+                    for (int j = 2; j >= 0; j--) {
+                        if (bestProb[j + 1] > bestProb[j]) {
+                            float tmpProb = bestProb[j];
+                            int tmpX = bestX[j];
+                            int tmpY = bestY[j];
+                            bestProb[j] = bestProb[j + 1];
+                            bestX[j] = bestX[j + 1];
+                            bestY[j] = bestY[j + 1];
+                            bestProb[j + 1] = tmpProb;
+                            bestX[j + 1] = tmpX;
+                            bestY[j + 1] = tmpY;
+                        }
+                    }
                 }
                 idx++;
             }
         }
     }
+    
     [CATransaction begin];
     [CATransaction setAnimationDuration:0.0f];
-    tmpBrickPositionView.alpha = bestX == -1 || bestY == -1 ? 0.5f : 1.0f;
-    [CATransaction commit];
-    if (bestX == -1 || bestY == -1) {
-        return;
+    for (int i = 0; i < 4; i++) {
+        tmpBrickPositionView[i].alpha = bestX[i] == -1 || bestY[i] == -1 ? 0.5f : 1.0f;
     }
-    tmpBrickPositionView.hidden = NO;
-    
-    cv::Point pos = cv::Point(bestX, bestY);
-    CGPoint p = [[BoardUtil instance] brickScreenPosition:pos];
-    p.x -= (tmpBrickPositionView.frame.size.width - [[BoardUtil instance] singleBrickScreenSize].width) / 2.0f;
-    p.y -= (tmpBrickPositionView.frame.size.height - [[BoardUtil instance] singleBrickScreenSize].height) / 2.0f;
+    [CATransaction commit];
+
     [CATransaction begin];
     [CATransaction setAnimationDuration:0.0f];
-    tmpBrickPositionView.frame = CGRectMake(p.x, p.y, tmpBrickPositionView.frame.size.width, tmpBrickPositionView.frame.size.height);
-    [CATransaction commit];
+    for (int i = 0; i < 4; i++) {
+        if (bestX[i] == -1 || bestY[i] == -1) {
+            continue;
+        }
+        tmpBrickPositionView[i].hidden = NO;
     
-    [[PreviewableViewController instance] previewProbabilityOfBrick:bestProb x:bestX y:bestY];
+        cv::Point pos = cv::Point(bestX[i], bestY[i]);
+        CGPoint p = [[BoardUtil instance] brickScreenPosition:pos];
+        p.x -= (tmpBrickPositionView[i].frame.size.width - [[BoardUtil instance] singleBrickScreenSize].width) / 2.0f;
+        p.y -= (tmpBrickPositionView[i].frame.size.height - [[BoardUtil instance] singleBrickScreenSize].height) / 2.0f;
+        tmpBrickPositionView[i].frame = CGRectMake(p.x, p.y, tmpBrickPositionView[i].frame.size.width, tmpBrickPositionView[i].frame.size.height);
+    }
+    [CATransaction commit];
+
+    if (bestX[0] != -1 && bestY[0] != -1) {
+        [[PreviewableViewController instance] previewProbabilityOfBrick:bestProb[0] x:bestX[0] y:bestY[0]];
+    }
 }
 
 @end
