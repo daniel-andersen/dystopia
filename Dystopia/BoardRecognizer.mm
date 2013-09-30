@@ -34,8 +34,11 @@
 #define LINE_DIRECTION_VERTICAL_LEFT   2
 #define LINE_DIRECTION_VERTICAL_RIGHT  3
 
-#define CANNY_THRESHOLDING_MODE_AUTOMATIC 0
-#define CANNY_THRESHOLDING_MODE_BRIGHT    1
+#define CANNY_THRESHOLDING_MODE_COUNT 3
+
+#define CANNY_THRESHOLDING_MODE_AUTOMATIC   0
+#define CANNY_THRESHOLDING_MODE_BRIGHT_ROOM 1
+#define CANNY_THRESHOLDING_MODE_DARK_ROOM   2
 
 float intersectionAcceptDistanceMin = 0.02f;
 float intersectionAcceptDistanceMax = 5.0f;
@@ -98,8 +101,8 @@ BoardRecognizer *boardRecognizerInstance = nil;
 - (BoardBounds)findBoardBoundsFromImage:(cv::Mat)image {
     BoardBounds undefinedBounds = {.bounds = {.defined = NO}};
 
-    cv::vector<cv::vector<cv::Point>> contours[2];
-    cv::vector<cv::Vec4i> hierarchy[2];
+    cv::vector<cv::vector<cv::Point>> contours[CANNY_THRESHOLDING_MODE_COUNT];
+    cv::vector<cv::Vec4i> hierarchy[CANNY_THRESHOLDING_MODE_COUNT];
 
     // Prepare image
     cv::Mat copiedImage = image.clone();
@@ -108,8 +111,9 @@ BoardRecognizer *boardRecognizerInstance = nil;
     // Prepare image
     cv::Mat preparedImage = [self smooth:copiedImage];
 
+    NSLog(@"%i", previousCannyThresholdDetectionMode);
     // Find non-obstructed bounds
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < CANNY_THRESHOLDING_MODE_COUNT; i++) {
 
         cv::Mat img = preparedImage.clone();
 
@@ -117,14 +121,21 @@ BoardRecognizer *boardRecognizerInstance = nil;
         int thresholdingMode = [self thresholdingModeForIndex:i];
 
         // Hardcoded canny levels first
-        float thresholdMin = 40;
-        float thresholdMax = 60;
+        float thresholdMin;
+        float thresholdMax;
 
-        // Levels by histogram
+        
+        // Canny thresholding min and max
         if (thresholdingMode == CANNY_THRESHOLDING_MODE_AUTOMATIC) {
             float meanThreshold = [self automaticThresholdingMean:img];
             thresholdMin = meanThreshold * 2.0f / 3.0f;
             thresholdMax = meanThreshold * 4.0f / 3.0f;
+        } else if (thresholdingMode == CANNY_THRESHOLDING_MODE_BRIGHT_ROOM) {
+            thresholdMin = 40;
+            thresholdMax = 60;
+        } else {
+            thresholdMin = 100;
+            thresholdMax = 300;
         }
         
         // Canny image
@@ -147,7 +158,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     }
     
     // Find obstructed bounds
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < CANNY_THRESHOLDING_MODE_COUNT; i++) {
 
         // Find obstructed bounds
         FourPoints corners = [self findObstructedBoardCornersFromContours:contours[i]];
@@ -180,12 +191,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
 }
 
 - (int)thresholdingModeForIndex:(int)index {
-    if ((index == 0 && previousCannyThresholdDetectionMode == CANNY_THRESHOLDING_MODE_AUTOMATIC) ||
-        (index == 1 && previousCannyThresholdDetectionMode != CANNY_THRESHOLDING_MODE_AUTOMATIC)) {
-        return CANNY_THRESHOLDING_MODE_AUTOMATIC;
-    } else {
-        return CANNY_THRESHOLDING_MODE_BRIGHT;
-    }
+    return (previousCannyThresholdDetectionMode + index) % CANNY_THRESHOLDING_MODE_COUNT;
 }
 
 - (cv::Mat)perspectiveCorrectImage:(cv::Mat)image fromBoardBounds:(FourPoints)boardBounds {
