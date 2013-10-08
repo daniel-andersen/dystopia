@@ -42,6 +42,13 @@
 		6552706117B1733F00784CD7 /* border_top_right.png in Resources */ = {isa = PBXBuildFile; fileRef = 6552705917B1733F00784CD7 /* border_top_right.png */; };
 		6552706217B1733F00784CD7 /* border_top.png in Resources */ = {isa = PBXBuildFile; fileRef = 6552705A17B1733F00784CD7 /* border_top.png */; };
 		6552706517B177B300784CD7 /* BorderView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6552706417B177B300784CD7 /* BorderView.mm */; };
+		656AEC9617FAD7CB004CB86B /* HeroFigure.mm in Sources */ = {isa = PBXBuildFile; fileRef = 656AEC9517FAD7CB004CB86B /* HeroFigure.mm */; };
+		656AEC9D17FAEA95004CB86B /* marker_archer.png in Resources */ = {isa = PBXBuildFile; fileRef = 656AEC9817FAEA95004CB86B /* marker_archer.png */; };
+		656AEC9E17FAEA95004CB86B /* marker_dwerf.png in Resources */ = {isa = PBXBuildFile; fileRef = 656AEC9917FAEA95004CB86B /* marker_dwerf.png */; };
+		656AEC9F17FAEA95004CB86B /* marker_elf.png in Resources */ = {isa = PBXBuildFile; fileRef = 656AEC9A17FAEA95004CB86B /* marker_elf.png */; };
+		656AECA017FAEA95004CB86B /* marker_warrior.png in Resources */ = {isa = PBXBuildFile; fileRef = 656AEC9B17FAEA95004CB86B /* marker_warrior.png */; };
+		656AECA117FAEA95004CB86B /* marker_wizard.png in Resources */ = {isa = PBXBuildFile; fileRef = 656AEC9C17FAEA95004CB86B /* marker_wizard.png */; };
+		656AECA417FDB2F7004CB86B /* AnimatableBrickView.m in Sources */ = {isa = PBXBuildFile; fileRef = 656AECA317FDB2F7004CB86B /* AnimatableBrickView.m */; };
 		65AAD04017C2468B003BFC4C /* dystopia_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 65AAD03F17C2468B003BFC4C /* dystopia_logo.png */; };
 		65B9307317806B4500312B88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307217806B4500312B88 /* UIKit.framework */; };
 		65B9307517806B4500312B88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B9307417806B4500312B88 /* Foundation.framework */; };
@@ -61,6 +68,7 @@
 		65B930B217806C5500312B88 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B117806C5500312B88 /* AVFoundation.framework */; };
 		65B930B417806C6400312B88 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B317806C6400312B88 /* CoreMedia.framework */; };
 		65B930B817806D1400312B88 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B930B717806D1400312B88 /* CoreVideo.framework */; };
+		65DCC50D180427490082785F /* fake_board_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 65DCC50C180427490082785F /* fake_board_1.png */; };
 		65EA26461780C54B00E84BA4 /* UIImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */; };
 		65EA26481780C6D700E84BA4 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA26471780C6D700E84BA4 /* libz.dylib */; };
 		65EA26551781608600E84BA4 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA26541781608600E84BA4 /* opencv2.framework */; };
@@ -124,6 +132,15 @@
 		6552705A17B1733F00784CD7 /* border_top.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = border_top.png; path = board/border/border_top.png; sourceTree = "<group>"; };
 		6552706317B177B300784CD7 /* BorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BorderView.h; sourceTree = "<group>"; };
 		6552706417B177B300784CD7 /* BorderView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BorderView.mm; sourceTree = "<group>"; };
+		656AEC9417FAD7CB004CB86B /* HeroFigure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HeroFigure.h; sourceTree = "<group>"; };
+		656AEC9517FAD7CB004CB86B /* HeroFigure.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HeroFigure.mm; sourceTree = "<group>"; };
+		656AEC9817FAEA95004CB86B /* marker_archer.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marker_archer.png; sourceTree = "<group>"; };
+		656AEC9917FAEA95004CB86B /* marker_dwerf.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marker_dwerf.png; sourceTree = "<group>"; };
+		656AEC9A17FAEA95004CB86B /* marker_elf.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marker_elf.png; sourceTree = "<group>"; };
+		656AEC9B17FAEA95004CB86B /* marker_warrior.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marker_warrior.png; sourceTree = "<group>"; };
+		656AEC9C17FAEA95004CB86B /* marker_wizard.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marker_wizard.png; sourceTree = "<group>"; };
+		656AECA217FDB2F7004CB86B /* AnimatableBrickView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimatableBrickView.h; sourceTree = "<group>"; };
+		656AECA317FDB2F7004CB86B /* AnimatableBrickView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnimatableBrickView.m; sourceTree = "<group>"; };
 		65AAD03F17C2468B003BFC4C /* dystopia_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dystopia_logo.png; path = intro/dystopia_logo.png; sourceTree = "<group>"; };
 		65B9306F17806B4500312B88 /* Dystopia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dystopia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B9307217806B4500312B88 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -149,6 +166,7 @@
 		65B930B117806C5500312B88 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		65B930B317806C6400312B88 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		65B930B717806D1400312B88 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		65DCC50C180427490082785F /* fake_board_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fake_board_1.png; sourceTree = "<group>"; };
 		65EA26441780C54B00E84BA4 /* UIImage+OpenCV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+OpenCV.h"; sourceTree = "<group>"; };
 		65EA26451780C54B00E84BA4 /* UIImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+OpenCV.mm"; sourceTree = "<group>"; };
 		65EA26471780C6D700E84BA4 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
@@ -260,6 +278,19 @@
 			name = Border;
 			sourceTree = "<group>";
 		};
+		656AEC9717FAEA95004CB86B /* heroes */ = {
+			isa = PBXGroup;
+			children = (
+				656AEC9817FAEA95004CB86B /* marker_archer.png */,
+				656AEC9917FAEA95004CB86B /* marker_dwerf.png */,
+				656AEC9A17FAEA95004CB86B /* marker_elf.png */,
+				656AEC9B17FAEA95004CB86B /* marker_warrior.png */,
+				656AEC9C17FAEA95004CB86B /* marker_wizard.png */,
+			);
+			name = heroes;
+			path = markers/heroes;
+			sourceTree = "<group>";
+		};
 		65B9306617806B4500312B88 = {
 			isa = PBXGroup;
 			children = (
@@ -330,6 +361,7 @@
 		65B930AD17806BE800312B88 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				65DCC50B180427490082785F /* Simulator */,
 				6552705117B1733000784CD7 /* Board */,
 				650D4298178F366700D89CEB /* Bricks */,
 				65F8D2EA17F41F7200FE41DF /* Markers */,
@@ -368,6 +400,15 @@
 				65B9308217806B4500312B88 /* main.m */,
 			);
 			name = Application;
+			sourceTree = "<group>";
+		};
+		65DCC50B180427490082785F /* Simulator */ = {
+			isa = PBXGroup;
+			children = (
+				65DCC50C180427490082785F /* fake_board_1.png */,
+			);
+			name = Simulator;
+			path = simulator;
 			sourceTree = "<group>";
 		};
 		65EA264B1780C89500E84BA4 /* Recognizers */ = {
@@ -415,6 +456,10 @@
 			children = (
 				65F8D2E617F4184000FE41DF /* GameObject.h */,
 				65F8D2E717F4184000FE41DF /* GameObject.mm */,
+				656AEC9417FAD7CB004CB86B /* HeroFigure.h */,
+				656AEC9517FAD7CB004CB86B /* HeroFigure.mm */,
+				656AECA217FDB2F7004CB86B /* AnimatableBrickView.h */,
+				656AECA317FDB2F7004CB86B /* AnimatableBrickView.m */,
 			);
 			name = "Game Objects";
 			sourceTree = "<group>";
@@ -422,6 +467,7 @@
 		65F8D2EA17F41F7200FE41DF /* Markers */ = {
 			isa = PBXGroup;
 			children = (
+				656AEC9717FAEA95004CB86B /* heroes */,
 				65F8D2EB17F41F7B00FE41DF /* brick_marker.png */,
 			);
 			name = Markers;
@@ -488,6 +534,7 @@
 				650D421B178B335F00D89CEB /* icon_114x114.png in Resources */,
 				650D4240178DEDAE00D89CEB /* trollsahead_logo.png in Resources */,
 				650D428E178F365F00D89CEB /* bricks1.png in Resources */,
+				656AECA017FAEA95004CB86B /* marker_warrior.png in Resources */,
 				650D428F178F365F00D89CEB /* bricks2.png in Resources */,
 				650D4290178F365F00D89CEB /* bricks3.png in Resources */,
 				650D4291178F365F00D89CEB /* bricks4.png in Resources */,
@@ -495,6 +542,7 @@
 				650D4293178F365F00D89CEB /* bricks6.png in Resources */,
 				650D4294178F365F00D89CEB /* bricks7.png in Resources */,
 				650D4295178F365F00D89CEB /* bricks8.png in Resources */,
+				65DCC50D180427490082785F /* fake_board_1.png in Resources */,
 				650D4296178F365F00D89CEB /* exit.png in Resources */,
 				650D4297178F365F00D89CEB /* trap.png in Resources */,
 				6552705B17B1733F00784CD7 /* border_bottom_left.png in Resources */,
@@ -503,8 +551,12 @@
 				6552705E17B1733F00784CD7 /* border_left.png in Resources */,
 				6552705F17B1733F00784CD7 /* border_right.png in Resources */,
 				6552706017B1733F00784CD7 /* border_top_left.png in Resources */,
+				656AEC9F17FAEA95004CB86B /* marker_elf.png in Resources */,
 				6552706117B1733F00784CD7 /* border_top_right.png in Resources */,
+				656AECA117FAEA95004CB86B /* marker_wizard.png in Resources */,
+				656AEC9D17FAEA95004CB86B /* marker_archer.png in Resources */,
 				6552706217B1733F00784CD7 /* border_top.png in Resources */,
+				656AEC9E17FAEA95004CB86B /* marker_dwerf.png in Resources */,
 				65AAD04017C2468B003BFC4C /* dystopia_logo.png in Resources */,
 				65F8D2E517F363F400FE41DF /* bricks9.png in Resources */,
 				65F8D2EC17F41F7B00FE41DF /* brick_marker.png in Resources */,
@@ -524,11 +576,13 @@
 				65EA26461780C54B00E84BA4 /* UIImage+OpenCV.mm in Sources */,
 				65B9309A17806B4500312B88 /* GameViewController.mm in Sources */,
 				65B930A717806B9900312B88 /* BoardGame.mm in Sources */,
+				656AEC9617FAD7CB004CB86B /* HeroFigure.mm in Sources */,
 				65EA26781782038800E84BA4 /* BoardRecognizer.mm in Sources */,
 				65EA267F1783520900E84BA4 /* ExternalDisplay.m in Sources */,
 				65EA2684178361E300E84BA4 /* PhoneViewController.mm in Sources */,
 				650D42071787539600D89CEB /* Board.mm in Sources */,
 				650D420F1789F38800D89CEB /* CameraSession.mm in Sources */,
+				656AECA417FDB2F7004CB86B /* AnimatableBrickView.m in Sources */,
 				650D421E178B45A800D89CEB /* UIImage+CaptureScreen.m in Sources */,
 				650D4221178C5E4300D89CEB /* FakeCameraUtil.mm in Sources */,
 				650D4224178C92B700D89CEB /* PreviewableViewController.mm in Sources */,

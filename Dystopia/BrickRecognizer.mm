@@ -29,7 +29,9 @@
 #import "BrickRecognizer.h"
 #import "UIImage+OpenCV.h"
 
-#define HISTOGRAM_BIN_COUNT 4
+#define HISTOGRAM_BIN_COUNT 32
+
+#define BRICK_RECOGNITION_CONTROL_POINT_BRIGHTNESS_PCT 0.7f
 
 BrickRecognizer *brickRecognizerInstance = nil;
 
@@ -44,41 +46,73 @@ BrickRecognizer *brickRecognizerInstance = nil;
     }
 }
 
+- (cv::Point)positionOfBrickAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image controlPoint:(cv::Point)controlPoint {
+    cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:locations inImage:image withControlPoint:controlPoint];
+    cv::Point bestPosition = cv::Point(-1, -1);
+    float bestProb = -1.0f;
+    for (int i = 0; i < probabilities.size() - 2; i++) {
+        if (probabilities[i] > bestProb && probabilities[i] > probabilities[probabilities.size() - 1]) {
+            bestProb = probabilities[i];
+            bestPosition = locations[i];
+        }
+    }
+    return bestPosition;
+}
+
+- (cv::vector<cv::Point>)positionOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image controlPoint:(cv::Point)controlPoint {
+    cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:locations inImage:image withControlPoint:controlPoint];
+    cv::vector<cv::Point> positions;
+    NSLog(@"------------");
+    for (int i = 0; i < probabilities.size() - 2; i++) {
+        if (probabilities[i] > probabilities[probabilities.size() - 1]) {
+            positions.push_back(locations[i]);
+        }
+        NSLog(@"%f vs %f - %f   =   %i", probabilities[i], probabilities[probabilities.size() - 1], probabilities[probabilities.size() - 2], probabilities[i] > probabilities[probabilities.size() - 1] ? 1 : 0);
+    }
+    return positions;
+}
+
 - (cv::vector<float>)probabilitiesOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image {
+    return [self probabilitiesOfBricksAtLocations:locations inImage:image withControlPoint:cv::Point(-1, -1)];
+}
+
+- (cv::vector<float>)probabilitiesOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image withControlPoint:(cv::Point)controlPoint {
+    locations.push_back(controlPoint);
+    locations.push_back(controlPoint);
     CGSize brickSize = [[BoardUtil instance] singleBrickScreenSizeFromBoardSize:CGSizeMake(image.cols, image.rows)];
-    image = [self prepareImage:image withLocations:locations brickSize:brickSize];
+    cv::Mat preparedImage = controlPoint.x == -1 ? [self prepareImage:image withLocations:locations brickSize:brickSize] : [self prepareImageWithTwoControlPoints:image withLocations:locations brickSize:brickSize];
     cv::vector<float> probabilities;
     for (int i = 0; i < locations.size(); i++) {
-        probabilities.push_back([self probabilityOfBrickAtIndex:i inTiledImage:image brickSize:brickSize]);
+        probabilities.push_back([self probabilityOfBrickAtIndex:i inTiledImage:preparedImage brickSize:brickSize]);
     }
     return probabilities;
 }
 
-- (float)probabilityOfBrickAtIndex:(int)index inTiledImage:(cv::Mat)image brickSize:(CGSize)brickSize {
-    cv::Mat brickImage = [self extractBrickImageFromIndex:index inTiledImage:image brickSize:brickSize];
-    cv::Mat histogram = [self calculateHistogramFromImage:brickImage];
-    //std::cout << "Histogram: " << std::endl << histogram << std::endl;
-    return histogram.at<float>(0) / (float)(brickImage.rows * brickImage.cols);
+- (float)probabilityOfBrickAtIndex:(int)index inTiledImage:(cv::Mat)tiledImage brickSize:(CGSize)brickSize {
+    cv::Mat equalizedBrickImage = [self extractBrickImageFromIndex:index inTiledImage:tiledImage brickSize:brickSize];
+    cv::Mat equalizedHistogram = [self calculateHistogramFromImage:equalizedBrickImage binCount:HISTOGRAM_BIN_COUNT];
+    return equalizedHistogram.at<float>(0) / (float)(equalizedBrickImage.rows * equalizedBrickImage.cols);
 }
 
-- (cv::Mat)calculateHistogramFromImage:(cv::Mat)image {
+/*- (float)calculateMedianOfHistogram:(cv::Mat)histogram binCount:(int)binCount brickSize:(CGSize)brickSize {
+    float median = 0.0f;
+    int pos = 0;
+    for (int i = 0; i < binCount; i++) {
+        //median += histogram.at<float>(i) * (float)i / (brickSize.width * brickSize.height);
+        if (histogram.at<float>(i) > median) {
+            pos = i;
+            median = histogram.at<float>(i);
+        }
+    }
+    return pos;
+}*/
+
+- (cv::Mat)calculateHistogramFromImage:(cv::Mat)image binCount:(int)binCount {
     cv::Mat histogram;
-    int binCount = HISTOGRAM_BIN_COUNT;
     float range[] = {0, 256};
     const float *histRange = {range};
     cv::calcHist(&image, 1, 0, cv::Mat(), histogram, 1, &binCount, &histRange);
     return histogram;
-}
-
-- (UIImage *)extractBrickUIImageFromLocation:(cv::Point)location image:(cv::Mat)image {
-    CGSize brickSize = [[BoardUtil instance] singleBrickScreenSizeFromBoardSize:CGSizeMake(image.cols, image.rows)];
-    cv::vector<cv::Point> locations;
-    locations.push_back(location);
-    image = [self prepareImage:image withLocations:locations brickSize:brickSize];
-    cv::Rect rect = [self boardRectFromLocation:location inImage:image brickSize:brickSize];
-    image = cv::Mat(image, rect);
-    cv::cvtColor(image, image, CV_GRAY2RGB);
-    return [UIImage imageWithCVMat:image];
 }
 
 - (cv::Mat)extractBrickImageFromLocation:(cv::Point)location image:(cv::Mat)image brickSize:(CGSize)brickSize {
@@ -100,16 +134,42 @@ BrickRecognizer *brickRecognizerInstance = nil;
     return rect;
 }
 
+- (cv::Mat)prepareImageWithTwoControlPoints:(cv::Mat)image withLocations:(cv::vector<cv::Point>)locations brickSize:(CGSize)brickSize {
+    cv::Mat preparedImage = [self prepareImageNoEqualize:image withLocations:locations brickSize:brickSize];
+    preparedImage = [self darkenHalfOfLastImage:preparedImage brickSize:brickSize];
+    return [self equalizeImage:preparedImage];
+}
+
 - (cv::Mat)prepareImage:(cv::Mat)image withLocations:(cv::vector<cv::Point>)locations brickSize:(CGSize)brickSize {
+    cv::Mat preparedImage = [self prepareImageNoEqualize:image withLocations:locations brickSize:brickSize];
+    return [self equalizeImage:preparedImage];
+}
+
+- (cv::Mat)equalizeImage:(cv::Mat)image {
+    cv::Mat equalizedImage;
+    cv::equalizeHist(image, equalizedImage);
+    return equalizedImage;
+}
+
+- (cv::Mat)prepareImageNoEqualize:(cv::Mat)image withLocations:(cv::vector<cv::Point>)locations brickSize:(CGSize)brickSize {
     cv::Mat tiledImage = cv::Mat((int)brickSize.height, (int)brickSize.width * locations.size(), image.type());
     for (int i = 0; i < locations.size(); i++) {
         cv::Mat brickImage = [self extractBrickImageFromLocation:locations[i] image:image brickSize:brickSize];
         cv::Rect roi(cv::Point((int)brickSize.width * i, 0), brickImage.size());
         brickImage.copyTo(tiledImage(roi));
     }
-    cv::Mat outputImage;
-    cv::equalizeHist(tiledImage, outputImage);
-    return outputImage;
+    return tiledImage;
+}
+
+- (cv::Mat)darkenHalfOfLastImage:(cv::Mat)image brickSize:(CGSize)brickSize {
+    for (int i = 0; i < brickSize.height; i++) {
+        for (int j = 0; j < brickSize.width / 32; j++) {
+            int x = image.cols - j - 1;
+            int y = i;
+            image.at<uchar>(y, x) = image.at<uchar>(y, x) * BRICK_RECOGNITION_CONTROL_POINT_BRIGHTNESS_PCT;
+        }
+    }
+    return image;
 }
 
 @end

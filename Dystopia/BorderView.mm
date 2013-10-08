@@ -77,14 +77,14 @@
 
     for (int i = 0; i < countX; i++) {
         float x = (i * stripSize.width) + singleSize.width;
-        [borderImages[BORDER_TOP]    drawInRect:CGRectMake(x, 0.0f,                                        stripSize.width, singleSize.height)];
-        [borderImages[BORDER_BOTTOM] drawInRect:CGRectMake(x, self.bounds.size.height - singleSize.height, stripSize.width, singleSize.height)];
+        [borderImages[BORDER_TOP]    drawInRect:CGRectMake(x, 0.0f,                                        stripSize.width + 1, singleSize.height)];
+        [borderImages[BORDER_BOTTOM] drawInRect:CGRectMake(x, self.bounds.size.height - singleSize.height, stripSize.width + 1, singleSize.height)];
     }
     
     for (int i = 0; i < countY; i++) {
         float y = (i * stripSize.height) + singleSize.height;
-        [borderImages[BORDER_LEFT]  drawInRect:CGRectMake(0.0f,                                      y, singleSize.width, stripSize.height)];
-        [borderImages[BORDER_RIGHT] drawInRect:CGRectMake(self.bounds.size.width - singleSize.width, y, singleSize.width, stripSize.height)];
+        [borderImages[BORDER_LEFT]  drawInRect:CGRectMake(0.0f,                                      y, singleSize.width, stripSize.height + 1)];
+        [borderImages[BORDER_RIGHT] drawInRect:CGRectMake(self.bounds.size.width - singleSize.width, y, singleSize.width, stripSize.height + 1)];
     }
 
     [borderImages[BORDER_TOP_LEFT] drawInRect:CGRectMake(0.0f, 0.0f, singleSize.width, singleSize.height)];

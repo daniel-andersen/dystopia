@@ -28,6 +28,11 @@
 #import "BrickRecognizer.h"
 #import "ExternalDisplay.h"
 #import "PreviewableViewController.h"
+#import "HeroFigure.h"
+
+#define BOARD_GAME_STATE_INITIALIZING 0
+#define BOARD_GAME_STATE_PLACE_HEROES 1
+#define BOARD_GAME_STATE_PLAYER_TURN  2
 
 @interface BoardGame () {
     int level;
@@ -36,9 +41,10 @@
     Board *board;
 
     UIView *boardRecognizedView;
-    
-    UIView *tmpBrickPositionView[4];
-    UIView *tmpBrickView;
+
+    int state;
+
+    NSMutableArray *heroFigures;
 }
 
 @end
@@ -54,106 +60,96 @@
 }
 
 - (void)initialize {
+    state = BOARD_GAME_STATE_INITIALIZING;
     board = [[Board alloc] initWithFrame:self.bounds];
     [self addSubview:board];
-    
-    tmpBrickView = [[UIView alloc] initWithFrame:CGRectMake([[BoardUtil instance] singleBrickScreenSize].width * 7.0f, [[BoardUtil instance] singleBrickScreenSize].height * 10.0f, [[BoardUtil instance] singleBrickScreenSize].width, [[BoardUtil instance] singleBrickScreenSize].height)];
-    tmpBrickView.backgroundColor = [UIColor blackColor];
-    tmpBrickView.hidden = [ExternalDisplay instance].externalDisplayFound;
-    [self addSubview:tmpBrickView];
-
-    for (int i = 0; i < 4; i++) {
-        tmpBrickPositionView[i] = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, [[BoardUtil instance] singleBrickScreenSize].width * 2.0f, [[BoardUtil instance] singleBrickScreenSize].height * 2.0f)];
-        tmpBrickPositionView[i].layer.contents = (id)[UIImage imageNamed:@"brick_marker.png"].CGImage;
-        tmpBrickPositionView[i].hidden = YES;
-        [self addSubview:tmpBrickPositionView[i]];
-    }
 }
 
 - (void)startWithLevel:(int)l {
     level = l;
     [board loadLevel:level];
-    NSTimer* timer = [NSTimer timerWithTimeInterval:0.1f target:self selector:@selector(update) userInfo:nil repeats:YES];
-    [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+
+    [self resetFigures];
+
+    [self startUpdateTimer];
     NSLog(@"Level %i started", level + 1);
 }
 
-- (void)update {
-    [self calculateBrickPosition];
+- (void)startUpdateTimer {
+    NSTimer* timer = [NSTimer timerWithTimeInterval:0.1f target:self selector:@selector(update) userInfo:nil repeats:YES];
+    [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
 }
 
-- (void)calculateBrickPosition {
-    if (![BoardCalibrator instance].boardBounds.bounds.defined || [BoardCalibrator instance].boardBounds.isBoundsObstructed) {
+- (void)resetFigures {
+    if (heroFigures != nil) {
+        for (HeroFigure *hero in heroFigures) {
+            [hero removeFromSuperview];
+        }
+    }
+    heroFigures = [NSMutableArray array];
+    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_DWERF position:cv::Point(7, 10)]];
+    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_WARRIOR position:cv::Point(9, 10)]];
+    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_ELF position:cv::Point(11, 10)]];
+    for (HeroFigure *hero in heroFigures) {
+        [self addSubview:hero];
+    }
+}
+
+- (void)switchToState:(int)s {
+    state = s;
+    if (state == BOARD_GAME_STATE_PLACE_HEROES) {
+        [self placeHeroes];
+    }
+}
+
+- (void)placeHeroes {
+    for (HeroFigure *hero in heroFigures) {
+        [hero showBrick];
+    }
+}
+
+- (void)update {
+    if (state == BOARD_GAME_STATE_INITIALIZING) {
+        [self switchToState:BOARD_GAME_STATE_PLACE_HEROES];
         return;
     }
-    cv::vector<cv::Point> bricks;
-    for (int y = 0; y < BOARD_HEIGHT; y++) {
-        for (int x = 0; x < BOARD_WIDTH; x++) {
-            if ([board hasBrickAtPosition:cv::Point(x, y)]) {
-                bricks.push_back(cv::Point(x, y));
-            }
-        }
+    if (state == BOARD_GAME_STATE_PLACE_HEROES) {
+        [self updatePlaceHeroes];
+        return;
     }
-    cv::vector<float> probs;
+}
+
+- (void)updatePlaceHeroes {
+    if (![self isBoardReadyForStateUpdate]) {
+        return;
+    }
+    cv::vector<cv::Point> searchPositions;
+    for (HeroFigure *hero in heroFigures) {
+        searchPositions.push_back(hero.position);
+    };
+    cv::vector<cv::Point> positions;
     @synchronized([BoardCalibrator instance].boardImageLock) {
-        probs = [[BrickRecognizer instance] probabilitiesOfBricksAtLocations:bricks inImage:[BoardCalibrator instance].boardImage];
-    }
-    int bestX[4] = {-1, -1, -1, -1};
-    int bestY[4] = {-1, -1, -1, -1};
-    float bestProb[4] = {-1.0f, -1.0f, -1.0f, -1.0f};
-    int idx = 0;
-    for (int y = 0; y < BOARD_HEIGHT; y++) {
-        for (int x = 0; x < BOARD_WIDTH; x++) {
-            if ([board hasBrickAtPosition:cv::Point(x, y)]) {
-                if (probs[idx] > bestProb[3]) {
-                    bestProb[3] = probs[idx];
-                    bestX[3] = x;
-                    bestY[3] = y;
-                    for (int j = 2; j >= 0; j--) {
-                        if (bestProb[j + 1] > bestProb[j]) {
-                            float tmpProb = bestProb[j];
-                            int tmpX = bestX[j];
-                            int tmpY = bestY[j];
-                            bestProb[j] = bestProb[j + 1];
-                            bestX[j] = bestX[j + 1];
-                            bestY[j] = bestY[j + 1];
-                            bestProb[j + 1] = tmpProb;
-                            bestX[j + 1] = tmpX;
-                            bestY[j + 1] = tmpY;
-                        }
-                    }
-                }
-                idx++;
+        positions = [[BrickRecognizer instance] positionOfBricksAtLocations:searchPositions inImage:[BoardCalibrator instance].boardImage controlPoint:cv::Point(13, 10)];
+    };
+    for (HeroFigure *hero in heroFigures) {
+        bool recognized = NO;
+        for (int i = 0; i < positions.size(); i++) {
+            if (positions[i] == hero.position) {
+                recognized = YES;
             }
         }
-    }
-    
-    [CATransaction begin];
-    [CATransaction setAnimationDuration:0.0f];
-    for (int i = 0; i < 4; i++) {
-        tmpBrickPositionView[i].alpha = bestX[i] == -1 || bestY[i] == -1 ? 0.5f : 1.0f;
-    }
-    [CATransaction commit];
-
-    [CATransaction begin];
-    [CATransaction setAnimationDuration:0.0f];
-    for (int i = 0; i < 4; i++) {
-        if (bestX[i] == -1 || bestY[i] == -1) {
-            continue;
+        if (recognized) {
+            [hero showMarker];
+            [hero hideBrick];
+        } else {
+            [hero hideMarker];
+            [hero showBrick];
         }
-        tmpBrickPositionView[i].hidden = NO;
-    
-        cv::Point pos = cv::Point(bestX[i], bestY[i]);
-        CGPoint p = [[BoardUtil instance] brickScreenPosition:pos];
-        p.x -= (tmpBrickPositionView[i].frame.size.width - [[BoardUtil instance] singleBrickScreenSize].width) / 2.0f;
-        p.y -= (tmpBrickPositionView[i].frame.size.height - [[BoardUtil instance] singleBrickScreenSize].height) / 2.0f;
-        tmpBrickPositionView[i].frame = CGRectMake(p.x, p.y, tmpBrickPositionView[i].frame.size.width, tmpBrickPositionView[i].frame.size.height);
     }
-    [CATransaction commit];
+}
 
-    if (bestX[0] != -1 && bestY[0] != -1) {
-        [[PreviewableViewController instance] previewProbabilityOfBrick:bestProb[0] x:bestX[0] y:bestY[0]];
-    }
+- (bool)isBoardReadyForStateUpdate {
+    return [BoardCalibrator instance].boardBounds.bounds.defined && ![BoardCalibrator instance].boardBounds.isBoundsObstructed;
 }
 
 @end

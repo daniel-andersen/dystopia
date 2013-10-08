@@ -25,6 +25,7 @@
 
 #import "CameraSession.h"
 #import "CameraUtil.h"
+#import "FakeCameraUtil.h"
 
 @interface CameraSession () {
     AVCaptureSession *session;
@@ -183,7 +184,8 @@
         readyToProcessFrame = NO;
         lastDeliveredFrameTime = CFAbsoluteTimeGetCurrent();
         @autoreleasepool {
-            UIImage *image = [delegate requestSimulatedImageIfNoCamera];
+            //UIImage *image = [delegate requestSimulatedImageIfNoCamera];
+            UIImage *image = [FakeCameraUtil fakeOutputImage];
             dispatch_async(frameProcessQueue, ^{
                 [delegate processFrame:image];
             });

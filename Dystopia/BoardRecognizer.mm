@@ -45,6 +45,7 @@ float intersectionAcceptDistanceMax = 5.0f;
 float squareAngleAcceptMax = 15.0f;
 float lineGroupAngleAcceptMax = 15.0f;
 float aspectRatioAcceptMax = 0.1f;
+float lineGroupPointDistanceAcceptMax;
 
 typedef struct {
     cv::Point p1;
@@ -111,7 +112,6 @@ BoardRecognizer *boardRecognizerInstance = nil;
     // Prepare image
     cv::Mat preparedImage = [self smooth:copiedImage];
 
-    NSLog(@"%i", previousCannyThresholdDetectionMode);
     // Find non-obstructed bounds
     for (int i = 0; i < CANNY_THRESHOLDING_MODE_COUNT; i++) {
 
@@ -124,7 +124,6 @@ BoardRecognizer *boardRecognizerInstance = nil;
         float thresholdMin;
         float thresholdMax;
 
-        
         // Canny thresholding min and max
         if (thresholdingMode == CANNY_THRESHOLDING_MODE_AUTOMATIC) {
             float meanThreshold = [self automaticThresholdingMean:img];
@@ -132,7 +131,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
             thresholdMax = meanThreshold * 4.0f / 3.0f;
         } else if (thresholdingMode == CANNY_THRESHOLDING_MODE_BRIGHT_ROOM) {
             thresholdMin = 40;
-            thresholdMax = 60;
+            thresholdMax = 70;
         } else {
             thresholdMin = 100;
             thresholdMax = 300;
@@ -243,7 +242,10 @@ BoardRecognizer *boardRecognizerInstance = nil;
         [images addObject:[UIImage imageWithCVMat:outputImg]];
     }
 
-    image = [self applyCannyOnImage:image threshold1:100.0f threshold2:300.0f];
+    float meanThreshold = [self automaticThresholdingMean:image];
+    float thresholdMin = meanThreshold * 2.0f / 3.0f;
+    float thresholdMax = meanThreshold * 4.0f / 3.0f;
+    image = [self applyCannyOnImage:image threshold1:thresholdMin threshold2:thresholdMax];
     {
         cv::Mat outputImg;
         cv::cvtColor(image, outputImg, CV_GRAY2RGB);
@@ -350,6 +352,8 @@ BoardRecognizer *boardRecognizerInstance = nil;
     borderSize = [[BoardUtil instance] borderSizeFromBoardSize:imageSize];
     borderSize.width *= 1.2f;
     borderSize.height *= 1.2f;
+    
+    lineGroupPointDistanceAcceptMax = MAX(borderSize.width, borderSize.height) * 1.5f;
     
     if ([ExternalDisplay instance].externalDisplayFound) {
         boardAspectRatio = [ExternalDisplay instance].widescreenBounds.size.width / [ExternalDisplay instance].widescreenBounds.size.height;
@@ -551,9 +555,9 @@ BoardRecognizer *boardRecognizerInstance = nil;
     if ([self maxCosineFromContour:contour] > squareAngleAcceptMax * M_PI / 180.0f) {
         return NO;
     }
-    if (![self hasCorrectAspectRatio:contour]) {
+    /*if (![self hasCorrectAspectRatio:contour]) {
         return NO;
-    }
+    }*/
     return YES;
 }
 
@@ -660,7 +664,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
         int direction = [self lineDirection:lines[i]];
         bool addedLine = NO;
         for (int j = 0; j < lineGroups[direction].size(); j++) {
-            if (![self doesLine:lines[i] haveSameAngleAsLine:lineGroups[direction][j].minLine]) {
+            if (![self doesLine:lines[i] haveSameEndpointsAsLine:lineGroups[direction][j].minLine]) {
                 continue;
             }
             if (![self isLine:lines[i] closeToLine:lineGroups[direction][j].minLine]) {
@@ -730,8 +734,10 @@ BoardRecognizer *boardRecognizerInstance = nil;
     }
 }
 
-- (bool)doesLine:(LineWithAngle)line1 haveSameAngleAsLine:(LineWithAngle)line2 {
-    return angleDelta180(line1.angle, line2.angle) <= 2.0f;
+- (bool)doesLine:(LineWithAngle)line1 haveSameEndpointsAsLine:(LineWithAngle)line2 {
+    CGSize deltaP1 = CGSizeMake(ABS(line1.p1.x - line2.p1.x), ABS(line1.p1.y - line2.p1.y));
+    CGSize deltaP2 = CGSizeMake(ABS(line1.p2.x - line2.p2.x), ABS(line1.p2.y - line2.p2.y));
+    return deltaP1.width < lineGroupPointDistanceAcceptMax && deltaP1.height < lineGroupPointDistanceAcceptMax && deltaP2.width < lineGroupPointDistanceAcceptMax && deltaP2.height < lineGroupPointDistanceAcceptMax;
 }
 
 - (bool)isLine:(LineWithAngle)line1 closeToLine:(LineWithAngle)line2 {

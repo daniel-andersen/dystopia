@@ -46,7 +46,7 @@
 @property (readonly) int state;
 @property (readonly) BoardBounds boardBounds;
 @property (readonly) cv::Mat boardImage;
-@property (readwrite) NSObject *boardImageLock;
+@property (nonatomic) NSObject *boardImageLock;
 @property (readonly) FourPoints screenPoints;
 
 @end

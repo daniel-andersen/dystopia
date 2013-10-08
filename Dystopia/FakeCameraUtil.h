@@ -29,5 +29,6 @@
 
 + (UIImage *)fakePerspectiveOnImage:(UIImage *)image;
 + (UIImage *)rotateImageToLandscapeMode:(UIImage *)image;
++ (UIImage *)fakeOutputImage;
 
 @end

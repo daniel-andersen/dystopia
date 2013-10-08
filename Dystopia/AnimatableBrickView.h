@@ -23,13 +23,17 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
-@interface BrickView : UIView
+@interface AnimatableBrickView : UIView {
+    int animationEndTransitionState;
+    bool animating;
+    bool visible;
+}
 
-- (id)initWithFrame:(CGRect)frame brickType:(int)b;
+- (void)show;
+- (void)hide;
 
-@property (readonly) int brickType;
-@property (nonatomic) bool visible;
+@property (nonatomic) float viewAlpha;
 
 @end

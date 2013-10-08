@@ -57,6 +57,8 @@
 - (CGSize)brickTypeScreenSize:(int)type;
 
 - (CGPoint)brickScreenPosition:(cv::Point)brickBoardPosition;
+- (CGRect)brickScreenRect:(cv::Point)brickBoardPosition;
+
 - (CGRect)brickTypeFrame:(int)brickType position:(cv::Point)position;
 
 - (CGSize)borderSizeFromBoardSize:(CGSize)size;

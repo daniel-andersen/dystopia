@@ -23,13 +23,40 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <Foundation/Foundation.h>
+#import "HeroFigure.h"
 
-@interface BrickView : UIView
+const int HERO_MOVEMENT_LENGTH[HEROES_COUNT] = {4, 8, 8, 6, 5};
+const NSArray *HERO_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.png", @"marker_archor.png", @"marker_elf.png", @"marker_warrior.png", @"marker_wizard.png", nil];
 
-- (id)initWithFrame:(CGRect)frame brickType:(int)b;
+@interface HeroFigure () {
+    int heroType;
+    int movementLength;
+}
 
-@property (readonly) int brickType;
-@property (nonatomic) bool visible;
+@end
+
+@implementation HeroFigure
+
+- (id)initWithHeroType:(int)type position:(cv::Point)p {
+    if (self = [super initWithPosition:p]) {
+        [self initializeWithHeroType:type];
+    }
+    return self;
+}
+
+- (void)initializeWithHeroType:(int)type {
+    heroType = type;
+    [self reset];
+    super.brickView.layer.contents = (id)[UIImage imageNamed:[HERO_MARKER_IMAGE objectAtIndex:heroType]].CGImage;
+    super.brickView.viewAlpha = 0.7f;
+}
+
+- (void)reset {
+    movementLength = HERO_MOVEMENT_LENGTH[heroType];
+}
+
+- (bool)canMoveToLocation:(cv::Point)location withMovementCount:(int)movementCount {
+    return movementCount <= movementLength;
+}
 
 @end

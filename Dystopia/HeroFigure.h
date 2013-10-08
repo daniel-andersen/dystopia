@@ -25,11 +25,18 @@
 
 #import <Foundation/Foundation.h>
 
-@interface BrickView : UIView
+#import "GameObject.h"
 
-- (id)initWithFrame:(CGRect)frame brickType:(int)b;
+#define HEROES_COUNT 5
 
-@property (readonly) int brickType;
-@property (nonatomic) bool visible;
+#define HERO_DWERF   0
+#define HERO_ARCHOR  1
+#define HERO_ELF     2
+#define HERO_WARRIOR 3
+#define HERO_WIZARD  4
+
+@interface HeroFigure : MoveableGameObject
+
+- (id)initWithHeroType:(int)type position:(cv::Point)p;
 
 @end

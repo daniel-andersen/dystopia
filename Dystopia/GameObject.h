@@ -25,12 +25,33 @@
 
 #import <UIKit/UIKit.h>
 
+#import "AnimatableBrickView.h"
+
 @interface GameObject : UIView
 
+- (id)initWithPosition:(cv::Point)p;
+
+- (void)initialize;
+
+- (void)showBrick;
+- (void)hideBrick;
+
+- (void)showMarker;
+- (void)hideMarker;
+
+@property (nonatomic) cv::Point position;
+@property (nonatomic) AnimatableBrickView *brickView;
+@property (nonatomic) AnimatableBrickView *markerView;
+
 @end
+
+
 
 @interface MoveableGameObject : GameObject
 
 - (cv::vector<cv::Point>)moveablePositions;
+- (cv::vector<cv::Point>)floodFillMoveablePositions;
+
+- (bool)canMoveToLocation:(cv::Point)location withMovementCount:(int)movementCount;
 
 @end

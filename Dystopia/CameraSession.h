@@ -47,7 +47,7 @@
 - (void)unlock;
 
 @property (readonly) bool initialized;
-@property (readwrite) bool readyToProcessFrame;
-@property (readwrite) CFTimeInterval delegateProcessFrameInterval;
+@property (nonatomic) bool readyToProcessFrame;
+@property (nonatomic) CFTimeInterval delegateProcessFrameInterval;
 
 @end

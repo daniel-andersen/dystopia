@@ -29,6 +29,8 @@
 
 @implementation FakeCameraUtil
 
+UIImage *fakeCameraImage = nil;
+
 + (UIImage *)fakePerspectiveOnImage:(UIImage *)image {
     FourPoints srcPoints = {
         .p1 = CGPointMake(0.0f, 0.0f),
@@ -49,6 +51,13 @@
 
 + (UIImage *)rotateImageToLandscapeMode:(UIImage *)image {
     return [[UIImage alloc] initWithCGImage:image.CGImage scale:image.scale orientation:UIImageOrientationLeftMirrored];
+}
+
++ (UIImage *)fakeOutputImage {
+    if (fakeCameraImage == nil) {
+        fakeCameraImage = [UIImage imageNamed:@"fake_board_1.png"];
+    }
+    return fakeCameraImage;
 }
 
 @end
