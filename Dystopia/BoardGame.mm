@@ -87,9 +87,10 @@
         }
     }
     heroFigures = [NSMutableArray array];
-    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_DWERF position:cv::Point(7, 10)]];
+    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_WIZARD position:cv::Point(7, 10)]];
     [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_WARRIOR position:cv::Point(9, 10)]];
     [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_ELF position:cv::Point(11, 10)]];
+    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_DWERF position:cv::Point(15, 10)]];
     for (HeroFigure *hero in heroFigures) {
         [self addSubview:hero];
     }
@@ -129,7 +130,34 @@
     };
     cv::vector<cv::Point> positions;
     @synchronized([BoardCalibrator instance].boardImageLock) {
-        positions = [[BrickRecognizer instance] positionOfBricksAtLocations:searchPositions inImage:[BoardCalibrator instance].boardImage controlPoint:cv::Point(13, 10)];
+        cv::vector<cv::Point> controlPoints;
+        for (int i = 0; i < BOARD_HEIGHT; i++) {
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                if ([board hasBrickAtPosition:cv::Point(j, i)]) {
+                    bool heroOnBrick = NO;
+                    for (HeroFigure *hero in heroFigures) {
+                        if (hero.position.x == j && hero.position.y == i) {
+                            heroOnBrick = YES;
+                        }
+                    }
+                    if (!heroOnBrick) {
+                        controlPoints.push_back(cv::Point(j, i));
+                    }
+                }
+            }
+        }
+        controlPoints.push_back(cv::Point(14, 9));
+        controlPoints.push_back(cv::Point(7, 8));
+        controlPoints.push_back(cv::Point(7, 4));
+        controlPoints.push_back(cv::Point(7, 12));
+        controlPoints.push_back(cv::Point(7, 15));
+        controlPoints.push_back(cv::Point(7, 16));
+        controlPoints.push_back(cv::Point(8, 17));
+        positions = [[BrickRecognizer instance] positionOfBricksAtLocations:searchPositions inImage:[BoardCalibrator instance].boardImage controlPoints:controlPoints];
+        for (int i = 0; i < positions.size(); i++) {
+            NSLog(@"%i, %i", positions[i].x, positions[i].y);
+        }
+        NSLog(@"====================");
     };
     for (HeroFigure *hero in heroFigures) {
         bool recognized = NO;

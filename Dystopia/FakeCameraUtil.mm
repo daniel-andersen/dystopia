@@ -55,7 +55,7 @@ UIImage *fakeCameraImage = nil;
 
 + (UIImage *)fakeOutputImage {
     if (fakeCameraImage == nil) {
-        fakeCameraImage = [UIImage imageNamed:@"fake_board_1.png"];
+        fakeCameraImage = [UIImage imageNamed:@"fake_board_2.png"];
     }
     return fakeCameraImage;
 }

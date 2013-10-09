@@ -99,6 +99,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     }
     return self;
 }
+
 - (BoardBounds)findBoardBoundsFromImage:(cv::Mat)image {
     BoardBounds undefinedBounds = {.bounds = {.defined = NO}};
 

@@ -37,6 +37,6 @@
 
 @interface GameViewController : PreviewableViewController <CameraSessionDelegate, IntroDelegate, BoardGameProtocol>
 
-- (void)startGame;
+- (IBAction)startButtonPressed:(id)sender;
 
 @end

@@ -31,8 +31,6 @@
 #import "ExternalDislayCalibrationBorderView.h"
 #import "BrickRecognizer.h"
 
-extern PreviewableViewController *previewInstance;
-
 @interface GameViewController () {
     CameraSession *cameraSession;
 
@@ -50,25 +48,35 @@ extern PreviewableViewController *previewInstance;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    gameState = GAME_STATE_AWAITING_START;
+    [self setupExternalDisplay];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self initialize];
+    if (gameState == GAME_STATE_AWAITING_START) {
+        [self startCalibrationMode];
+    }
 }
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
     [self.view bringSubviewToFront:[BoardCalibrator instance]];
     [self.view bringSubviewToFront:super.overlayView];
+    super.overlayView.hidden = gameState == GAME_STATE_AWAITING_START;
     if (externalDislayCalibrationBorderView != nil) {
-        [self.view bringSubviewToFront:externalDislayCalibrationBorderView];
+        [[ExternalDisplay instance].window bringSubviewToFront:externalDislayCalibrationBorderView];
     }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [cameraSession start];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [cameraSession stop];
 }
 
 - (void)initialize {
@@ -78,16 +86,31 @@ extern PreviewableViewController *previewInstance;
 
     [[BoardCalibrator instance] initializeWithFrame:self.view.bounds cameraSession:cameraSession];
     [self.view addSubview:[BoardCalibrator instance]];
+}
 
-    externalDislayCalibrationBorderView = [[ExternalDislayCalibrationBorderView alloc] initWithFrame:self.view.bounds];
-    [self.view addSubview:externalDislayCalibrationBorderView];
+- (void)setupExternalDisplay {
+    [[ExternalDisplay instance] initialize];
+    [ExternalDisplay instance].window.backgroundColor = [UIColor blackColor];
+}
 
-    gameState = GAME_STATE_AWAITING_START;
+- (IBAction)startButtonPressed:(id)sender {
+    [self startGame];
+}
+
+- (void)startCalibrationMode {
+    externalDislayCalibrationBorderView = [[ExternalDislayCalibrationBorderView alloc] initWithFrame:[ExternalDisplay instance].screen.bounds];
+    [[ExternalDisplay instance].window addSubview:externalDislayCalibrationBorderView];
+    [ExternalDisplay instance].window.hidden = [ExternalDisplay instance].externalDisplayFound ? NO : YES;
+    
+    if (![ExternalDisplay instance].externalDisplayFound) {
+        [self startGame];
+    }
 }
 
 - (void)startGame {
     [externalDislayCalibrationBorderView removeFromSuperview];
     externalDislayCalibrationBorderView = nil;
+    super.overlayView.hidden = NO;
     [self startIntro];
 }
 
@@ -98,7 +121,7 @@ extern PreviewableViewController *previewInstance;
             [self calibrateBoard:grayscaledImage];
         }
         [self updateGameStateAccordingToFrame];
-        [previewInstance previewFrame:image];
+        [self previewFrame:image];
         //NSArray *images = [[BoardRecognizer instance] boardBoundsToImages:image];
         //[previewInstance previewFrame:[images objectAtIndex:5]];
     }
@@ -130,8 +153,8 @@ extern PreviewableViewController *previewInstance;
 
 - (void)startIntro {
     gameState = GAME_STATE_INTRO;
-    intro = [[Intro alloc] initWithFrame:self.view.bounds delegate:self];
-    [self.view insertSubview:intro atIndex:0];
+    intro = [[Intro alloc] initWithFrame:[ExternalDisplay instance].screen.bounds delegate:self];
+    [[ExternalDisplay instance].window insertSubview:intro atIndex:0];
     [intro show];
 }
 
@@ -142,8 +165,8 @@ extern PreviewableViewController *previewInstance;
 
 - (void)startBoardGame {
     gameState = GAME_STATE_GAME;
-    boardGame = [[BoardGame alloc] initWithFrame:self.view.bounds delegate:self];
-    [self.view insertSubview:boardGame atIndex:0];
+    boardGame = [[BoardGame alloc] initWithFrame:[ExternalDisplay instance].screen.bounds delegate:self];
+    [[ExternalDisplay instance].window insertSubview:boardGame atIndex:0];
     [boardGame startWithLevel:0];
 }
 
