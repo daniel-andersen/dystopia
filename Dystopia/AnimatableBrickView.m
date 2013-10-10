@@ -25,15 +25,23 @@
 
 #import "AnimatableBrickView.h"
 
-#define GAME_OBJECT_BRICK_ANIMATION_DURATION 2.0f
+#define GAME_OBJECT_BRICK_ANIMATION_DURATION 1.0f
 
 #define GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_UNCHANGED 0
 #define GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_VISIBLE   1
 #define GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_HIDDEN    2
 
+@interface AnimatableBrickView () {
+    int animationEndTransitionState;
+}
+
+@end
+
 @implementation AnimatableBrickView
 
 @synthesize viewAlpha = _viewAlpha;
+@synthesize visible;
+@synthesize animating;
 
 - (id)init {
     if (self = [super init]) {
@@ -57,13 +65,11 @@
         visible = YES;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:0.0f animations:^{
-            self.layer.transform = CATransform3DMakeScale(2.0f, 2.0f, 1.0f);
-            self.layer.opacity = 0.0f;
-        }];
+        self.alpha = 0.0f;
+        self.transform = CGAffineTransformMakeScale(2.0f, 2.0f);
         [UIView animateWithDuration:GAME_OBJECT_BRICK_ANIMATION_DURATION animations:^{
-            self.layer.opacity = self.viewAlpha;
-            self.layer.transform = CATransform3DMakeScale(1.0f, 1.0f, 1.0f);
+            self.alpha = self.viewAlpha;
+            self.transform = CGAffineTransformIdentity;
         } completion:^(BOOL finished) {
             if (finished) {
                 animating = NO;
@@ -86,13 +92,11 @@
         visible = NO;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:0.0f animations:^{
-            self.layer.transform = CATransform3DMakeScale(1.0f, 1.0f, 1.0f);
-            self.layer.opacity = self.viewAlpha;
-        }];
+        self.transform = CGAffineTransformIdentity;
+        self.alpha = self.viewAlpha;
         [UIView animateWithDuration:GAME_OBJECT_BRICK_ANIMATION_DURATION animations:^{
-            self.layer.opacity = 0.0f;
-            self.layer.transform = CATransform3DMakeScale(0.75f, 0.75f, 1.0f);
+            self.alpha = 0.0f;
+            self.transform = CGAffineTransformMakeScale(0.75f, 0.75f);
         } completion:^(BOOL finished) {
             if (finished) {
                 animating = NO;

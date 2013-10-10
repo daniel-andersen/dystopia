@@ -27,6 +27,8 @@
 
 #import "BrickView.h"
 #import "BoardUtil.h"
+#import "HeroFigure.h"
+#import "MonsterFigure.h"
 
 #define BOARD_BRICK_VIEWS_COUNT 50
 
@@ -37,5 +39,12 @@
 - (void)loadLevel:(int)l;
 
 - (bool)hasBrickAtPosition:(cv::Point)position;
+
+- (cv::vector<cv::Point>)randomControlPoints:(int)count;
+
+@property (nonatomic) NSMutableArray *heroFigures;
+@property (nonatomic) NSMutableArray *monsterFigures;
+
+@property (nonatomic) cv::vector<cv::Point> brickPositions;
 
 @end

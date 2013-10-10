@@ -40,6 +40,9 @@
 - (void)hideMarker;
 
 @property (nonatomic) cv::Point position;
+
+@property (nonatomic) bool recognizedOnBoard;
+
 @property (nonatomic) AnimatableBrickView *brickView;
 @property (nonatomic) AnimatableBrickView *markerView;
 

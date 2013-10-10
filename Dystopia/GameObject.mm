@@ -34,6 +34,7 @@
 @implementation GameObject
 
 @synthesize position;
+@synthesize recognizedOnBoard;
 @synthesize brickView;
 @synthesize markerView;
 
@@ -49,27 +50,31 @@
     self.frame = [[BoardUtil instance] brickScreenRect:position];
     [self initializeBrickView];
     [self initializeMarkerView];
+    recognizedOnBoard = NO;
 }
 
 - (void)initializeBrickView {
     brickView = [[AnimatableBrickView alloc] init];
-    brickView.layer.opacity = 0.0f;
-    brickView.layer.anchorPoint = CGPointMake(0.5f, 0.5f);
+    brickView.alpha = 0.0f;
     [self addSubview:brickView];
 }
 
 - (void)initializeMarkerView {
     markerView = [[AnimatableBrickView alloc] init];
-    markerView.layer.opacity = 0.0f;
-    markerView.layer.anchorPoint = CGPointMake(0.5f, 0.5f);
-    markerView.layer.contents = (id)[UIImage imageNamed:@"brick_marker.png"].CGImage;
+    markerView.viewAlpha = 0.7f;
+    markerView.image = [UIImage imageNamed:@"brick_marker.png"];
+    markerView.alpha = 0.0f;
     [self addSubview:markerView];
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    brickView.frame = [self brickFrame];
-    markerView.frame = [self markerFrame];
+    if (!brickView.animating) {
+        brickView.frame = [self brickFrame];
+    }
+    if (!markerView.animating) {
+        markerView.frame = [self markerFrame];
+    }
 }
 
 - (CGRect)brickFrame {

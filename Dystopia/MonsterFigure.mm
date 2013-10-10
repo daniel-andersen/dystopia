@@ -23,41 +23,40 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "FakeCameraUtil.h"
-#import "UIImage+OpenCV.h"
-#import "CameraUtil.h"
+#import "MonsterFigure.h"
 
-@implementation FakeCameraUtil
+const int MONSTER_MOVEMENT_LENGTH[MONSTERS_COUNT] = {4, 8, 8, 6, 5};
+const NSArray *MONSTER_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.png", nil];
 
-UIImage *fakeCameraImage = nil;
-
-+ (UIImage *)fakePerspectiveOnImage:(UIImage *)image {
-    FourPoints srcPoints = {
-        .p1 = CGPointMake(0.0f, 0.0f),
-        .p2 = CGPointMake(image.size.width, 0.0f),
-        .p3 = CGPointMake(image.size.width, image.size.height),
-        .p4 = CGPointMake(0.0f, image.size.height)
-    };
-    FourPoints dstPoints = {
-        .p1 = CGPointMake(15.0f, 25.0f),
-        .p2 = CGPointMake(image.size.width - 15.0f, 25.0f),
-        .p3 = CGPointMake(image.size.width - 15.0f, image.size.height - 25.0f),
-        .p4 = CGPointMake(15.0f, image.size.height - 25.0f)
-    };
-    cv::Mat transformation = [CameraUtil findPerspectiveTransformationSrcPoints:srcPoints dstPoints:dstPoints];
-    cv::Mat outputImg = [CameraUtil perspectiveTransformImage:[image CVMat] withTransformation:transformation toSize:image.size];
-    return [UIImage imageWithCVMat:outputImg];
+@interface MonsterFigure () {
+    int monsterType;
+    int movementLength;
 }
 
-+ (UIImage *)rotateImageToLandscapeMode:(UIImage *)image {
-    return [[UIImage alloc] initWithCGImage:image.CGImage scale:image.scale orientation:UIImageOrientationLeftMirrored];
-}
+@end
 
-+ (UIImage *)fakeOutputImage {
-    if (fakeCameraImage == nil) {
-        fakeCameraImage = [UIImage imageNamed:@"fake_board_6.png"];
+@implementation MonsterFigure
+
+- (id)initWithMonsterType:(int)type position:(cv::Point)p {
+    if (self = [super initWithPosition:p]) {
+        [self initializeWithMonsterType:type];
     }
-    return fakeCameraImage;
+    return self;
+}
+
+- (void)initializeWithMonsterType:(int)type {
+    monsterType = type;
+    [self reset];
+    super.brickView.image = [UIImage imageNamed:[MONSTER_MARKER_IMAGE objectAtIndex:monsterType]];
+    super.brickView.viewAlpha = 0.7f;
+}
+
+- (void)reset {
+    movementLength = MONSTER_MOVEMENT_LENGTH[monsterType];
+}
+
+- (bool)canMoveToLocation:(cv::Point)location withMovementCount:(int)movementCount {
+    return movementCount <= movementLength;
 }
 
 @end

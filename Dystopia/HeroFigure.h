@@ -39,4 +39,6 @@
 
 - (id)initWithHeroType:(int)type position:(cv::Point)p;
 
+@property (nonatomic) bool active;
+
 @end

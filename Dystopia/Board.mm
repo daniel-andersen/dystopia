@@ -27,7 +27,8 @@
 #import "BorderView.h"
 
 @interface Board () {
-    int bricks[BOARD_HEIGHT][BOARD_WIDTH];
+    int brickMap[BOARD_HEIGHT][BOARD_WIDTH];
+    int objectMap[BOARD_HEIGHT][BOARD_WIDTH];
     
     BrickView *brickViews[BOARD_BRICK_VIEWS_COUNT];
     int brickViewsCount;
@@ -40,6 +41,10 @@
 @end
 
 @implementation Board
+
+@synthesize brickPositions;
+@synthesize heroFigures;
+@synthesize monsterFigures;
 
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
@@ -58,12 +63,13 @@
     [self loadBoard];
     [self setupBorderView];
     [self setupBrickViews];
+    [self initializeFigures];
 }
 
 - (void)loadBoard {
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
-            bricks[i][j] = -1;
+            brickMap[i][j] = -1;
         }
     }
 }
@@ -75,6 +81,7 @@
 
 - (void)setupBrickViews {
     brickViewsCount = 0;
+    [self addBrickOfType:2 atPosition:cv::Point(3, 3)];
     [self addBrickOfType:2 atPosition:cv::Point(6, 3)];
     [self addBrickOfType:8 atPosition:cv::Point(7, 6)];
     [self addBrickOfType:8 atPosition:cv::Point(7, 9)];
@@ -86,6 +93,30 @@
     for (int i = 0; i < brickViewsCount; i++) {
         [self addSubview:brickViews[i]];
     }
+    [self refreshBrickPositions];
+}
+
+- (void)refreshBrickPositions {
+    brickPositions = cv::vector<cv::Point>();
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            if ([self hasBrickAtPosition:cv::Point(i, j)]) {
+                brickPositions.push_back(cv::Point(i, j));
+            }
+        }
+    }
+}
+
+- (void)refreshObjectMap {
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            objectMap[i][j] = -1;
+        }
+    }
+    NSMutableArray *objects = [self boardObjects];
+    for (GameObject *object in objects) {
+        objectMap[object.position.y][object.position.x] = 1;
+    }
 }
 
 - (void)addBrickOfType:(int)type atPosition:(cv::Point)position {
@@ -93,13 +124,78 @@
     CGSize size = [[BoardUtil instance] brickTypeBoardSize:type];
     for (int i = 0; i < size.height; i++) {
         for (int j = 0; j< size.width; j++) {
-            bricks[i + (int)position.y][j + (int)position.x] = type;
+            brickMap[i + (int)position.y][j + (int)position.x] = type;
         }
     }
 }
 
 - (bool)hasBrickAtPosition:(cv::Point)position {
-    return position.x >= 0 && position.y >= 0 && position.x < BOARD_WIDTH && position.y < BOARD_HEIGHT && bricks[position.y][position.x] != -1;
+    return position.x >= 0 && position.y >= 0 && position.x < BOARD_WIDTH && position.y < BOARD_HEIGHT && brickMap[position.y][position.x] != -1;
+}
+
+- (bool)hasObjectAtPosition:(cv::Point)position {
+    return position.x >= 0 && position.y >= 0 && position.x < BOARD_WIDTH && position.y < BOARD_HEIGHT && objectMap[position.y][position.x] != -1;
+}
+
+- (void)initializeFigures {
+    [self initializeHeroFigures];
+    [self initializeMonsterFigures];
+}
+
+- (void)initializeHeroFigures {
+    if (heroFigures != nil) {
+        for (HeroFigure *hero in heroFigures) {
+            [hero removeFromSuperview];
+        }
+    }
+    heroFigures = [NSMutableArray array];
+    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_WIZARD position:cv::Point(4, 3)]];
+    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_WARRIOR position:cv::Point(5, 5)]];
+    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_DWERF position:cv::Point(6, 4)]];
+    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_ELF position:cv::Point(7, 3)]];
+    for (HeroFigure *hero in heroFigures) {
+        [self addSubview:hero];
+    }
+    [self refreshObjectMap];
+}
+
+- (void)initializeMonsterFigures {
+    if (monsterFigures != nil) {
+        for (MonsterFigure *monster in monsterFigures) {
+            [monster removeFromSuperview];
+        }
+    }
+    monsterFigures = [NSMutableArray array];
+    for (MonsterFigure *monster in monsterFigures) {
+        [self addSubview:monster];
+    }
+    [self refreshObjectMap];
+}
+
+- (cv::vector<cv::Point>)randomControlPoints:(int)count {
+    cv::vector<cv::Point> controlPoints;
+    int drawSize = brickPositions.size();
+    int indices[drawSize];
+    for (int i = 0; i < drawSize; i++) {
+        indices[i] = i;
+    }
+    while (drawSize > 0 && controlPoints.size() < count) {
+        int index = rand() % drawSize;
+        cv::Point position = brickPositions[indices[index]];
+        if (![self hasObjectAtPosition:position]) {
+            controlPoints.push_back(position);
+        }
+        indices[index] = indices[drawSize - 1];
+        drawSize--;
+    }
+    return controlPoints;
+}
+
+- (NSMutableArray *)boardObjects {
+    NSMutableArray *figures = [NSMutableArray array];
+    [figures addObjectsFromArray:heroFigures];
+    [figures addObjectsFromArray:monsterFigures];
+    return figures;
 }
 
 @end

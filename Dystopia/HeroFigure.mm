@@ -37,6 +37,8 @@ const NSArray *HERO_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.png"
 
 @implementation HeroFigure
 
+@synthesize active;
+
 - (id)initWithHeroType:(int)type position:(cv::Point)p {
     if (self = [super initWithPosition:p]) {
         [self initializeWithHeroType:type];
@@ -47,12 +49,13 @@ const NSArray *HERO_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.png"
 - (void)initializeWithHeroType:(int)type {
     heroType = type;
     [self reset];
-    super.brickView.layer.contents = (id)[UIImage imageNamed:[HERO_MARKER_IMAGE objectAtIndex:heroType]].CGImage;
+    super.brickView.image = [UIImage imageNamed:[HERO_MARKER_IMAGE objectAtIndex:heroType]];
     super.brickView.viewAlpha = 0.7f;
 }
 
 - (void)reset {
     movementLength = HERO_MOVEMENT_LENGTH[heroType];
+    active = NO;
 }
 
 - (bool)canMoveToLocation:(cv::Point)location withMovementCount:(int)movementCount {

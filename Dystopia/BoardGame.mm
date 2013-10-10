@@ -28,23 +28,28 @@
 #import "BrickRecognizer.h"
 #import "ExternalDisplay.h"
 #import "PreviewableViewController.h"
-#import "HeroFigure.h"
 
-#define BOARD_GAME_STATE_INITIALIZING 0
-#define BOARD_GAME_STATE_PLACE_HEROES 1
-#define BOARD_GAME_STATE_PLAYER_TURN  2
+#define BOARD_GAME_STATE_INITIALIZING         0
+#define BOARD_GAME_STATE_PLACE_HEROES         1
+#define BOARD_GAME_STATE_PLAYERS_TURN_INITIAL 2
+#define BOARD_GAME_STATE_PLAYERS_TURN         3
+#define BOARD_GAME_STATE_MONSTERS_TURN        4
 
 @interface BoardGame () {
-    int level;
     id<BoardGameProtocol> delegate;
-    
-    Board *board;
 
     UIView *boardRecognizedView;
 
-    int state;
+    Board *board;
 
-    NSMutableArray *heroFigures;
+    int level;
+    int state;
+    
+    NSMutableArray *heroesToMove;
+    HeroFigure *heroToMove;
+
+    NSMutableArray *monstersToMove;
+    HeroFigure *monsterToMove;
 }
 
 @end
@@ -68,9 +73,6 @@
 - (void)startWithLevel:(int)l {
     level = l;
     [board loadLevel:level];
-
-    [self resetFigures];
-
     [self startUpdateTimer];
     NSLog(@"Level %i started", level + 1);
 }
@@ -80,98 +82,134 @@
     [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
 }
 
-- (void)resetFigures {
-    if (heroFigures != nil) {
-        for (HeroFigure *hero in heroFigures) {
-            [hero removeFromSuperview];
-        }
-    }
-    heroFigures = [NSMutableArray array];
-    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_WIZARD position:cv::Point(7, 10)]];
-    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_WARRIOR position:cv::Point(9, 10)]];
-    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_ELF position:cv::Point(11, 10)]];
-    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_DWERF position:cv::Point(15, 10)]];
-    for (HeroFigure *hero in heroFigures) {
-        [self addSubview:hero];
-    }
-}
-
-- (void)switchToState:(int)s {
-    state = s;
-    if (state == BOARD_GAME_STATE_PLACE_HEROES) {
-        [self placeHeroes];
-    }
-}
-
-- (void)placeHeroes {
-    for (HeroFigure *hero in heroFigures) {
-        [hero showBrick];
-    }
-}
-
 - (void)update {
     if (state == BOARD_GAME_STATE_INITIALIZING) {
-        [self switchToState:BOARD_GAME_STATE_PLACE_HEROES];
+        [self startPlaceHeroes];
         return;
     }
     if (state == BOARD_GAME_STATE_PLACE_HEROES) {
         [self updatePlaceHeroes];
         return;
     }
+    if (state == BOARD_GAME_STATE_PLAYERS_TURN_INITIAL) {
+        [self updatePlayersTurnInitial];
+    }
+    if (state == BOARD_GAME_STATE_PLAYERS_TURN || state == BOARD_GAME_STATE_PLAYERS_TURN_INITIAL) {
+        [self updatePlayersTurn];
+        return;
+    }
+}
+
+- (void)startPlaceHeroes {
+    NSLog(@"Starting place heroes");
+    state = BOARD_GAME_STATE_PLACE_HEROES;
+    for (HeroFigure *hero in board.heroFigures) {
+        [hero showBrick];
+    }
+}
+
+- (void)startInitialPlayersTurn {
+    NSLog(@"Starting players turn (initial)");
+    [self startPlayersTurn];
+    state = BOARD_GAME_STATE_PLAYERS_TURN_INITIAL;
+}
+
+- (void)startPlayersTurn {
+    NSLog(@"Starting players turn");
+    state = BOARD_GAME_STATE_PLAYERS_TURN;
+    heroesToMove = [NSMutableArray array];
+    for (HeroFigure *hero in board.heroFigures) {
+        if (hero.active) {
+            [heroesToMove addObject:hero];
+        }
+    }
+    [self startNextPlayerTurn];
+    if (heroToMove == nil) {
+        [self startMonstersTurn];
+    }
+}
+
+- (void)startNextPlayerTurn {
+    heroToMove = nil;
+    for (HeroFigure *hero in heroesToMove) {
+        if (heroToMove == nil && hero.active && hero.recognizedOnBoard) {
+            heroToMove = hero;
+            [hero.markerView show];
+        } else {
+            [hero.markerView hide];
+        }
+    }
+    if (heroToMove != nil) {
+        [heroesToMove removeObject:heroToMove];
+    }
+}
+
+- (void)startMonstersTurn {
+    NSLog(@"Starting monsters turn");
+    if (state == BOARD_GAME_STATE_PLAYERS_TURN_INITIAL) {
+        [self disableNonRecognizedHeroes];
+    }
+}
+
+- (void)disableNonRecognizedHeroes {
+    for (HeroFigure *hero in board.heroFigures) {
+        if (!hero.recognizedOnBoard) {
+            hero.active = NO;
+        }
+    }
+}
+
+- (void)updatePlayersTurnInitial {
+    [self updateInitialHeroPositions];
+    for (HeroFigure *hero in board.heroFigures) {
+        if (hero != heroToMove) {
+            [hero hideMarker];
+        }
+    }
+}
+
+- (void)updatePlayersTurn {
+    
 }
 
 - (void)updatePlaceHeroes {
+    [self updateInitialHeroPositions];
+    for (HeroFigure *hero in board.heroFigures) {
+        if (hero.recognizedOnBoard) {
+            [self startInitialPlayersTurn];
+            break;
+        }
+    }
+}
+
+- (void)updateInitialHeroPositions {
     if (![self isBoardReadyForStateUpdate]) {
         return;
     }
-    cv::vector<cv::Point> searchPositions;
-    for (HeroFigure *hero in heroFigures) {
-        searchPositions.push_back(hero.position);
-    };
     cv::vector<cv::Point> positions;
-    @synchronized([BoardCalibrator instance].boardImageLock) {
-        cv::vector<cv::Point> controlPoints;
-        for (int i = 0; i < BOARD_HEIGHT; i++) {
-            for (int j = 0; j < BOARD_WIDTH; j++) {
-                if ([board hasBrickAtPosition:cv::Point(j, i)]) {
-                    bool heroOnBrick = NO;
-                    for (HeroFigure *hero in heroFigures) {
-                        if (hero.position.x == j && hero.position.y == i) {
-                            heroOnBrick = YES;
-                        }
-                    }
-                    if (!heroOnBrick) {
-                        controlPoints.push_back(cv::Point(j, i));
-                    }
-                }
-            }
+    cv::vector<cv::Point> searchPositions;
+    for (HeroFigure *hero in board.heroFigures) {
+        if (!hero.recognizedOnBoard) {
+            searchPositions.push_back(hero.position);
         }
-        controlPoints.push_back(cv::Point(14, 9));
-        controlPoints.push_back(cv::Point(7, 8));
-        controlPoints.push_back(cv::Point(7, 4));
-        controlPoints.push_back(cv::Point(7, 12));
-        controlPoints.push_back(cv::Point(7, 15));
-        controlPoints.push_back(cv::Point(7, 16));
-        controlPoints.push_back(cv::Point(8, 17));
-        positions = [[BrickRecognizer instance] positionOfBricksAtLocations:searchPositions inImage:[BoardCalibrator instance].boardImage controlPoints:controlPoints];
-        for (int i = 0; i < positions.size(); i++) {
-            NSLog(@"%i, %i", positions[i].x, positions[i].y);
-        }
-        NSLog(@"====================");
     };
-    for (HeroFigure *hero in heroFigures) {
-        bool recognized = NO;
+    @synchronized([BoardCalibrator instance].boardImageLock) {
+        cv::vector<cv::Point> controlPoints = [board randomControlPoints:10];
+        positions = [[BrickRecognizer instance] positionOfBricksAtLocations:searchPositions inImage:[BoardCalibrator instance].boardImage controlPoints:controlPoints];
+    };
+    for (HeroFigure *hero in board.heroFigures) {
+        if (hero.recognizedOnBoard) {
+            continue;
+        }
         for (int i = 0; i < positions.size(); i++) {
             if (positions[i] == hero.position) {
-                recognized = YES;
+                NSLog(@"Hero %i found!", i);
+                hero.recognizedOnBoard = YES;
+                hero.active = YES;
+                [hero showMarker];
+                [hero hideBrick];
+                break;
             }
-        }
-        if (recognized) {
-            [hero showMarker];
-            [hero hideBrick];
-        } else {
-            [hero hideMarker];
-            [hero showBrick];
         }
     }
 }

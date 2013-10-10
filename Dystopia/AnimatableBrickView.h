@@ -25,15 +25,13 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AnimatableBrickView : UIView {
-    int animationEndTransitionState;
-    bool animating;
-    bool visible;
-}
+@interface AnimatableBrickView : UIImageView
 
 - (void)show;
 - (void)hide;
 
 @property (nonatomic) float viewAlpha;
+@property (nonatomic) bool visible;
+@property (nonatomic) bool animating;
 
 @end

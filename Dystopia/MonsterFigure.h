@@ -23,41 +23,16 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "FakeCameraUtil.h"
-#import "UIImage+OpenCV.h"
-#import "CameraUtil.h"
+#import <Foundation/Foundation.h>
 
-@implementation FakeCameraUtil
+#import "GameObject.h"
 
-UIImage *fakeCameraImage = nil;
+#define MONSTERS_COUNT 5
 
-+ (UIImage *)fakePerspectiveOnImage:(UIImage *)image {
-    FourPoints srcPoints = {
-        .p1 = CGPointMake(0.0f, 0.0f),
-        .p2 = CGPointMake(image.size.width, 0.0f),
-        .p3 = CGPointMake(image.size.width, image.size.height),
-        .p4 = CGPointMake(0.0f, image.size.height)
-    };
-    FourPoints dstPoints = {
-        .p1 = CGPointMake(15.0f, 25.0f),
-        .p2 = CGPointMake(image.size.width - 15.0f, 25.0f),
-        .p3 = CGPointMake(image.size.width - 15.0f, image.size.height - 25.0f),
-        .p4 = CGPointMake(15.0f, image.size.height - 25.0f)
-    };
-    cv::Mat transformation = [CameraUtil findPerspectiveTransformationSrcPoints:srcPoints dstPoints:dstPoints];
-    cv::Mat outputImg = [CameraUtil perspectiveTransformImage:[image CVMat] withTransformation:transformation toSize:image.size];
-    return [UIImage imageWithCVMat:outputImg];
-}
+#define MONSTER_SKELOCH 0
 
-+ (UIImage *)rotateImageToLandscapeMode:(UIImage *)image {
-    return [[UIImage alloc] initWithCGImage:image.CGImage scale:image.scale orientation:UIImageOrientationLeftMirrored];
-}
+@interface MonsterFigure : MoveableGameObject
 
-+ (UIImage *)fakeOutputImage {
-    if (fakeCameraImage == nil) {
-        fakeCameraImage = [UIImage imageNamed:@"fake_board_6.png"];
-    }
-    return fakeCameraImage;
-}
+- (id)initWithMonsterType:(int)type position:(cv::Point)p;
 
 @end

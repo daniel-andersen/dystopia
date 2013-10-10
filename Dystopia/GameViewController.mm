@@ -123,7 +123,7 @@
         [self updateGameStateAccordingToFrame];
         [self previewFrame:image];
         //NSArray *images = [[BoardRecognizer instance] boardBoundsToImages:image];
-        //[previewInstance previewFrame:[images objectAtIndex:5]];
+        //[self previewFrame:[images objectAtIndex:5]];
     }
 }
 

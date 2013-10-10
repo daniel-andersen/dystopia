@@ -81,7 +81,7 @@ BrickRecognizer *brickRecognizerInstance = nil;
         medianMin = MIN(median, medianMin);
         medianMax = MAX(median, medianMax);
     }
-    NSLog(@"--> %f - %f = %f", medianMin, medianMax, medianMax - medianMin);
+    //NSLog(@"Median: %f - %f = %f", medianMin, medianMax, medianMax - medianMin);
     if (medianMax - medianMin < BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
         return cv::vector<cv::Point>();
     }
@@ -90,8 +90,9 @@ BrickRecognizer *brickRecognizerInstance = nil;
     for (int i = 0; i < locations.size(); i++) {
         cv::Mat brickImage = [self extractBrickImageFromIndex:i inTiledImage:allBricksImage brickSize:brickSize];
         cv::Mat histogram = [self calculateHistogramFromImage:brickImage binCount:256];
-        float median = [self calculateMedianOfHistogram:histogram binCount:256 brickSize:brickSize];
-        if (median < medianMax - BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
+        float mode = [self calculateModeOfHistogram:histogram binCount:256 brickSize:brickSize];
+        //NSLog(@"Mode for %i: %f", i, mode);
+        if (mode < medianMax - BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
             positions.push_back(locations[i]);
         }
     }
@@ -120,6 +121,18 @@ BrickRecognizer *brickRecognizerInstance = nil;
         median += histogram.at<float>(i) * (float)i / (brickSize.width * brickSize.height);
     }
     return median;
+}
+
+- (float)calculateModeOfHistogram:(cv::Mat)histogram binCount:(int)binCount brickSize:(CGSize)brickSize {
+    float max = 0.0f;
+    int mode = 0;
+    for (int i = 0; i < binCount; i++) {
+        if (histogram.at<float>(i) > max) {
+            max = histogram.at<float>(i);
+            mode = i;
+        }
+    }
+    return mode;
 }
 
 - (cv::Mat)calculateHistogramFromImage:(cv::Mat)image binCount:(int)binCount {
