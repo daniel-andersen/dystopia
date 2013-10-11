@@ -91,8 +91,9 @@ BrickRecognizer *brickRecognizerInstance = nil;
         cv::Mat brickImage = [self extractBrickImageFromIndex:i inTiledImage:allBricksImage brickSize:brickSize];
         cv::Mat histogram = [self calculateHistogramFromImage:brickImage binCount:256];
         float mode = [self calculateModeOfHistogram:histogram binCount:256 brickSize:brickSize];
+        float median = [self calculateMedianOfHistogram:histogram binCount:256 brickSize:brickSize];
         //NSLog(@"Mode for %i: %f", i, mode);
-        if (mode < medianMax - BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
+        if (MIN(mode, median) < medianMax - BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
             positions.push_back(locations[i]);
         }
     }

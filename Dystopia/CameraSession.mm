@@ -184,8 +184,7 @@
         readyToProcessFrame = NO;
         lastDeliveredFrameTime = CFAbsoluteTimeGetCurrent();
         @autoreleasepool {
-            //UIImage *image = [delegate requestSimulatedImageIfNoCamera];
-            UIImage *image = [FakeCameraUtil fakeOutputImage];
+            UIImage *image = [delegate requestSimulatedImageIfNoCamera];
             dispatch_async(frameProcessQueue, ^{
                 [delegate processFrame:image];
             });

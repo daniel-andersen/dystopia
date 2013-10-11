@@ -25,6 +25,8 @@
 
 #import "Board.h"
 #import "BorderView.h"
+#import "ExternalDisplay.h"
+#import "MoveableLocationsView.h"
 
 @interface Board () {
     int brickMap[BOARD_HEIGHT][BOARD_WIDTH];
@@ -33,6 +35,8 @@
     BrickView *brickViews[BOARD_BRICK_VIEWS_COUNT];
     int brickViewsCount;
 
+    MoveableLocationsView *moveableLocationsView;
+    
     BorderView *borderView;
     
     int level;
@@ -42,9 +46,20 @@
 
 @implementation Board
 
+Board *boardInstance = nil;
+
 @synthesize brickPositions;
 @synthesize heroFigures;
 @synthesize monsterFigures;
+
++ (Board *)instance {
+    @synchronized(self) {
+        if (boardInstance == nil) {
+            boardInstance = [[Board alloc] initWithFrame:[ExternalDisplay instance].widescreenBounds];
+        }
+        return boardInstance;
+    }
+}
 
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
@@ -127,6 +142,10 @@
             brickMap[i + (int)position.y][j + (int)position.x] = type;
         }
     }
+}
+
+- (void)showMoveableLocations:(cv::vector<cv::Point>)locations {
+    [moveableLocationsView showLocations:locations];
 }
 
 - (bool)hasBrickAtPosition:(cv::Point)position {

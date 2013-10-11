@@ -23,33 +23,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
-#import "BrickView.h"
-#import "BoardUtil.h"
-#import "HeroFigure.h"
-#import "MonsterFigure.h"
+@interface MoveableLocationsView : UIView
 
-#define BOARD_BRICK_VIEWS_COUNT 50
-
-@interface Board : UIView
-
-+ (Board *)instance;
-
-- (id)initWithFrame:(CGRect)frame;
-
-- (void)loadLevel:(int)l;
-
-- (void)showMoveableLocations:(cv::vector<cv::Point>)locations;
-
-- (bool)hasBrickAtPosition:(cv::Point)position;
-- (bool)hasObjectAtPosition:(cv::Point)position;
-
-- (cv::vector<cv::Point>)randomControlPoints:(int)count;
-
-@property (nonatomic) NSMutableArray *heroFigures;
-@property (nonatomic) NSMutableArray *monsterFigures;
-
-@property (nonatomic) cv::vector<cv::Point> brickPositions;
+- (void)showLocations:(cv::vector<cv::Point>)l;
+- (void)hideLocations;
 
 @end

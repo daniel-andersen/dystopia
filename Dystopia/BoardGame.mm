@@ -40,8 +40,6 @@
 
     UIView *boardRecognizedView;
 
-    Board *board;
-
     int level;
     int state;
     
@@ -66,13 +64,12 @@
 
 - (void)initialize {
     state = BOARD_GAME_STATE_INITIALIZING;
-    board = [[Board alloc] initWithFrame:self.bounds];
-    [self addSubview:board];
+    [self addSubview:[Board instance]];
 }
 
 - (void)startWithLevel:(int)l {
     level = l;
-    [board loadLevel:level];
+    [[Board instance] loadLevel:level];
     [self startUpdateTimer];
     NSLog(@"Level %i started", level + 1);
 }
@@ -103,7 +100,7 @@
 - (void)startPlaceHeroes {
     NSLog(@"Starting place heroes");
     state = BOARD_GAME_STATE_PLACE_HEROES;
-    for (HeroFigure *hero in board.heroFigures) {
+    for (HeroFigure *hero in [Board instance].heroFigures) {
         [hero showBrick];
     }
 }
@@ -118,7 +115,7 @@
     NSLog(@"Starting players turn");
     state = BOARD_GAME_STATE_PLAYERS_TURN;
     heroesToMove = [NSMutableArray array];
-    for (HeroFigure *hero in board.heroFigures) {
+    for (HeroFigure *hero in [Board instance].heroFigures) {
         if (hero.active) {
             [heroesToMove addObject:hero];
         }
@@ -141,6 +138,7 @@
     }
     if (heroToMove != nil) {
         [heroesToMove removeObject:heroToMove];
+        [[Board instance] showMoveableLocations:[heroToMove floodFillMoveablePositions]];
     }
 }
 
@@ -152,7 +150,7 @@
 }
 
 - (void)disableNonRecognizedHeroes {
-    for (HeroFigure *hero in board.heroFigures) {
+    for (HeroFigure *hero in [Board instance].heroFigures) {
         if (!hero.recognizedOnBoard) {
             hero.active = NO;
         }
@@ -161,7 +159,7 @@
 
 - (void)updatePlayersTurnInitial {
     [self updateInitialHeroPositions];
-    for (HeroFigure *hero in board.heroFigures) {
+    for (HeroFigure *hero in [Board instance].heroFigures) {
         if (hero != heroToMove) {
             [hero hideMarker];
         }
@@ -174,7 +172,7 @@
 
 - (void)updatePlaceHeroes {
     [self updateInitialHeroPositions];
-    for (HeroFigure *hero in board.heroFigures) {
+    for (HeroFigure *hero in [Board instance].heroFigures) {
         if (hero.recognizedOnBoard) {
             [self startInitialPlayersTurn];
             break;
@@ -188,16 +186,16 @@
     }
     cv::vector<cv::Point> positions;
     cv::vector<cv::Point> searchPositions;
-    for (HeroFigure *hero in board.heroFigures) {
+    for (HeroFigure *hero in [Board instance].heroFigures) {
         if (!hero.recognizedOnBoard) {
             searchPositions.push_back(hero.position);
         }
     };
     @synchronized([BoardCalibrator instance].boardImageLock) {
-        cv::vector<cv::Point> controlPoints = [board randomControlPoints:10];
+        cv::vector<cv::Point> controlPoints = [[Board instance] randomControlPoints:10];
         positions = [[BrickRecognizer instance] positionOfBricksAtLocations:searchPositions inImage:[BoardCalibrator instance].boardImage controlPoints:controlPoints];
     };
-    for (HeroFigure *hero in board.heroFigures) {
+    for (HeroFigure *hero in [Board instance].heroFigures) {
         if (hero.recognizedOnBoard) {
             continue;
         }

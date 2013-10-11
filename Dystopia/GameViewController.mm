@@ -179,10 +179,11 @@
 }
 
 - (UIImage *)requestSimulatedImageIfNoCamera {
-    super.overlayView.hidden = YES;
+    UIImage *image = [FakeCameraUtil fakeOutputImage];
+    /*super.overlayView.hidden = YES;
     UIImage *image = [UIImage imageWithView:self.view];
     image = [FakeCameraUtil fakePerspectiveOnImage:image];
-    super.overlayView.hidden = NO;
+    super.overlayView.hidden = NO;*/
     return image;
 }
 

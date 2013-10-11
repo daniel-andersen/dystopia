@@ -25,6 +25,7 @@
 
 #import "GameObject.h"
 #import "BoardUtil.h"
+#import "Board.h"
 
 @interface GameObject () {
 }
@@ -121,7 +122,8 @@
     int movementBoard[BOARD_HEIGHT][BOARD_WIDTH];
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
-            movementBoard[i][j] = 0;
+            cv::Point p = cv::Point(i, j);
+            movementBoard[i][j] = [[Board instance] hasBrickAtPosition:p] || [[Board instance] hasObjectAtPosition:p]? -1 : 0;
         }
     }
     
