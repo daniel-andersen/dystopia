@@ -27,6 +27,11 @@
 
 #import "BoardUtil.h"
 
+typedef struct {
+    float min;
+    float max;
+} MedianMinMax;
+
 @interface BrickRecognizer : NSObject
 
 + (BrickRecognizer *)instance;

@@ -48,7 +48,7 @@
 - (void)initializeGui {
     self.backgroundColor = [UIColor clearColor];
     self.alpha = 0.0f;
-    moveableLocationColor = [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:0.7f];
+    moveableLocationColor = [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:0.4f];
     views = nil;
 }
 
@@ -56,7 +56,7 @@
     locations = l;
     if (!self.hidden) {
         [self hideLocations];
-        [self performSelector:@selector(createAndShowLocations) withObject:nil afterDelay:MOVEABLE_LOCATIONS_APPEAR_DURATION];
+        [self performSelector:@selector(createAndShowLocations) withObject:nil afterDelay:(MOVEABLE_LOCATIONS_APPEAR_DURATION * 1.5f)];
     } else {
         [self createAndShowLocations];
     }

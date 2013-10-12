@@ -48,42 +48,39 @@ BrickRecognizer *brickRecognizerInstance = nil;
 }
 
 - (cv::Point)positionOfBrickAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image controlPoints:(cv::vector<cv::Point>)controlPoints {
-    /*cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:locations inImage:image withControlPoint:controlPoint];
-    cv::Point bestPosition = cv::Point(-1, -1);
-    float bestProb = -1.0f;
-    for (int i = 0; i < probabilities.size() - 2; i++) {
-        if (probabilities[i] > bestProb && probabilities[i] > probabilities[probabilities.size() - 1]) {
-            bestProb = probabilities[i];
-            bestPosition = locations[i];
+    CGSize brickSize = [[BoardUtil instance] singleBrickScreenSizeFromBoardSize:CGSizeMake(image.cols, image.rows)];
+    
+    cv::vector<cv::Point> allLocations = [self allLocationsFromLocations:locations controlPoints:controlPoints];
+    cv::Mat allBricksImage = [self tiledImageFromLocations:allLocations inImage:image];
+    
+    MedianMinMax medianMinMax = [self medianMinMaxFromLocations:allLocations inTiledImage:allBricksImage brickSize:brickSize];
+    //NSLog(@"Median: %f - %f = %f", medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
+    if (medianMinMax.max - medianMinMax.min < BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
+        return cv::Point(-1, -1);
+    }
+    
+    cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:locations inImage:image];
+
+    float maxProb = 0.0f;
+    int maxProbIndex = 0;
+    for (int i = 0; i < locations.size(); i++) {
+        if (probabilities[i] > maxProb) {
+            maxProb = probabilities[i];
+            maxProbIndex = i;
         }
     }
-    return bestPosition;*/
-    return cv::Point(0, 0);
+    return locations[maxProbIndex];
 }
 
 - (cv::vector<cv::Point>)positionOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image controlPoints:(cv::vector<cv::Point>)controlPoints {
-    cv::vector<cv::Point> allLocations;
-    for (int i = 0; i < locations.size(); i++) {
-        allLocations.push_back(locations[i]);
-    }
-    for (int i = 0; i < controlPoints.size(); i++) {
-        allLocations.push_back(controlPoints[i]);
-    }
-
     CGSize brickSize = [[BoardUtil instance] singleBrickScreenSizeFromBoardSize:CGSizeMake(image.cols, image.rows)];
-    cv::Mat allBricksImage = [self prepareImageWithoutEqualizing:image withLocations:allLocations brickSize:brickSize];
+
+    cv::vector<cv::Point> allLocations = [self allLocationsFromLocations:locations controlPoints:controlPoints];
+    cv::Mat allBricksImage = [self tiledImageFromLocations:allLocations inImage:image];
     
-    float medianMin = 256.0f;
-    float medianMax = 0.0f;
-    for (int i = 0; i < allLocations.size(); i++) {
-        cv::Mat brickImage = [self extractBrickImageFromIndex:i inTiledImage:allBricksImage brickSize:brickSize];
-        cv::Mat histogram = [self calculateHistogramFromImage:brickImage binCount:256];
-        float median = [self calculateMedianOfHistogram:histogram binCount:256 brickSize:brickSize];
-        medianMin = MIN(median, medianMin);
-        medianMax = MAX(median, medianMax);
-    }
-    //NSLog(@"Median: %f - %f = %f", medianMin, medianMax, medianMax - medianMin);
-    if (medianMax - medianMin < BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
+    MedianMinMax medianMinMax = [self medianMinMaxFromLocations:allLocations inTiledImage:allBricksImage brickSize:brickSize];
+    //NSLog(@"Median: %f - %f = %f", medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
+    if (medianMinMax.max - medianMinMax.min < BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
         return cv::vector<cv::Point>();
     }
     
@@ -94,11 +91,39 @@ BrickRecognizer *brickRecognizerInstance = nil;
         float mode = [self calculateModeOfHistogram:histogram binCount:256 brickSize:brickSize];
         float median = [self calculateMedianOfHistogram:histogram binCount:256 brickSize:brickSize];
         //NSLog(@"--> %i: %f - %f", i, mode, median);
-        if (MIN(mode, median) < medianMin + BRICK_RECOGNITION_MINIMUM_MEDIAN_ACCEPT) {
+        if (MIN(mode, median) < medianMinMax.min + BRICK_RECOGNITION_MINIMUM_MEDIAN_ACCEPT) {
             positions.push_back(locations[i]);
         }
     }
     return positions;
+}
+
+- (MedianMinMax)medianMinMaxFromLocations:(cv::vector<cv::Point>)locations inTiledImage:(cv::Mat)tiledImage brickSize:(CGSize)brickSize {
+    MedianMinMax medianMinMax = {.min = 256.0f, .max = 0.0f};
+    for (int i = 0; i < locations.size(); i++) {
+        cv::Mat brickImage = [self extractBrickImageFromIndex:i inTiledImage:tiledImage brickSize:brickSize];
+        cv::Mat histogram = [self calculateHistogramFromImage:brickImage binCount:256];
+        float median = [self calculateMedianOfHistogram:histogram binCount:256 brickSize:brickSize];
+        medianMinMax.min = MIN(median, medianMinMax.min);
+        medianMinMax.max = MAX(median, medianMinMax.max);
+    }
+    return medianMinMax;
+}
+
+- (cv::Mat)tiledImageFromLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image {
+    CGSize brickSize = [[BoardUtil instance] singleBrickScreenSizeFromBoardSize:CGSizeMake(image.cols, image.rows)];
+    return [self prepareImageWithoutEqualizing:image withLocations:locations brickSize:brickSize];
+}
+
+- (cv::vector<cv::Point>)allLocationsFromLocations:(cv::vector<cv::Point>)locations controlPoints:(cv::vector<cv::Point>)controlPoints {
+    cv::vector<cv::Point> allLocations;
+    for (int i = 0; i < locations.size(); i++) {
+        allLocations.push_back(locations[i]);
+    }
+    for (int i = 0; i < controlPoints.size(); i++) {
+        allLocations.push_back(controlPoints[i]);
+    }
+    return allLocations;
 }
 
 - (cv::vector<float>)probabilitiesOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image {
