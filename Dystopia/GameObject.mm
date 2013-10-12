@@ -102,6 +102,10 @@
     [markerView hide];
 }
 
+- (bool)isValidPosition:(cv::Point)p {
+    return p.x >= 0 && p.y >= 0 && p.x < BOARD_WIDTH && p.y < BOARD_HEIGHT;
+}
+
 @end
 
 
@@ -122,15 +126,19 @@
     int movementBoard[BOARD_HEIGHT][BOARD_WIDTH];
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
-            cv::Point p = cv::Point(i, j);
-            movementBoard[i][j] = [[Board instance] hasBrickAtPosition:p] || [[Board instance] hasObjectAtPosition:p]? -1 : 0;
+            cv::Point p = cv::Point(j, i);
+            movementBoard[i][j] = [[Board instance] hasBrickAtPosition:p] && ![[Board instance] hasObjectAtPosition:p] ? 0 : -1;
         }
     }
+    movementBoard[self.position.y][self.position.x] = 0;
     
     cv::vector<cv::Point> positions;
     cv::vector<PositionQueueElement> positionQueue;
     positionQueue.push_back(PositionQueueElement {.position = self.position, .movementCount = 0});
 
+    int DIR_X[4] = {-1, 1,  0, 0};
+    int DIR_Y[4] = { 0, 0, -1, 1};
+    
     int queueIndex = 0;
     while (positionQueue.size() > 0 && queueIndex < positionQueue.size()) {
         PositionQueueElement e = positionQueue[queueIndex++];
@@ -140,17 +148,11 @@
         movementBoard[e.position.y][e.position.x] = 1;
         positions.push_back(e.position);
 
-        if ([self canMoveToLocation:cv::Point(e.position.x - 1, e.position.y) withMovementCount:(e.movementCount + 1)]) {
-            positionQueue.push_back(PositionQueueElement {.position = cv::Point(e.position.x - 1, e.position.y), e.movementCount + 1});
-        }
-        if ([self canMoveToLocation:cv::Point(e.position.x + 1, e.position.y) withMovementCount:(e.movementCount + 1)]) {
-            positionQueue.push_back(PositionQueueElement {.position = cv::Point(e.position.x + 1, e.position.y), e.movementCount + 1});
-        }
-        if ([self canMoveToLocation:cv::Point(e.position.x, e.position.y - 1) withMovementCount:(e.movementCount + 1)]) {
-            positionQueue.push_back(PositionQueueElement {.position = cv::Point(e.position.x, e.position.y - 1), e.movementCount + 1});
-        }
-        if ([self canMoveToLocation:cv::Point(e.position.x, e.position.y + 1) withMovementCount:(e.movementCount + 1)]) {
-            positionQueue.push_back(PositionQueueElement {.position = cv::Point(e.position.x, e.position.y + 1), e.movementCount + 1});
+        for (int i = 0; i < 4; i++) {
+            cv::Point p = cv::Point(e.position.x + DIR_X[i], e.position.y + DIR_Y[i]);
+            if ([self isValidPosition:p] && [self canMoveToLocation:p withMovementCount:(e.movementCount + 1)]) {
+                positionQueue.push_back(PositionQueueElement {.position = p, e.movementCount + 1});
+            }
         }
     }
     return positions;

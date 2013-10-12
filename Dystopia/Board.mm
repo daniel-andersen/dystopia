@@ -70,7 +70,13 @@ Board *boardInstance = nil;
 
 - (void)initialize {
     self.backgroundColor = [UIColor blackColor];
+    moveableLocationsView = [[MoveableLocationsView alloc] initWithFrame:self.bounds];
+    [self addSubview:moveableLocationsView];
     NSLog(@"Board initialized");
+}
+
+- (void)layoutSubviews {
+    [self bringSubviewToFront:moveableLocationsView];
 }
 
 - (void)loadLevel:(int)l {
@@ -115,8 +121,9 @@ Board *boardInstance = nil;
     brickPositions = cv::vector<cv::Point>();
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
-            if ([self hasBrickAtPosition:cv::Point(i, j)]) {
-                brickPositions.push_back(cv::Point(i, j));
+            cv::Point p = cv::Point(j, i);
+            if ([self hasBrickAtPosition:p]) {
+                brickPositions.push_back(p);
             }
         }
     }

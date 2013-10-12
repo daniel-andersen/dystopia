@@ -39,6 +39,8 @@
 - (void)showMarker;
 - (void)hideMarker;
 
+- (bool)isValidPosition:(cv::Point)p;
+
 @property (nonatomic) cv::Point position;
 
 @property (nonatomic) bool recognizedOnBoard;

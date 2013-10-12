@@ -26,7 +26,7 @@
 #import "MoveableLocationsView.h"
 #import "BoardUtil.h"
 
-#define MOVEABLE_LOCATIONS_APPEAR_DURATION 1000
+#define MOVEABLE_LOCATIONS_APPEAR_DURATION 1.0f
 
 @interface MoveableLocationsView () {
     cv::vector<cv::Point> locations;
@@ -95,6 +95,7 @@
     for (int i = 0; i < locations.size(); i++) {
         UIView *view = [[UIView alloc] initWithFrame:[[BoardUtil instance] brickScreenRect:locations[i]]];
         view.backgroundColor = moveableLocationColor;
+        [self addSubview:view];
     }
 }
 

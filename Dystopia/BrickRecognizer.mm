@@ -31,7 +31,8 @@
 
 #define HISTOGRAM_BIN_COUNT 4
 
-#define BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA 50.0f
+#define BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA 80.0f
+#define BRICK_RECOGNITION_MINIMUM_MEDIAN_ACCEPT 40.0f
 
 BrickRecognizer *brickRecognizerInstance = nil;
 
@@ -92,8 +93,8 @@ BrickRecognizer *brickRecognizerInstance = nil;
         cv::Mat histogram = [self calculateHistogramFromImage:brickImage binCount:256];
         float mode = [self calculateModeOfHistogram:histogram binCount:256 brickSize:brickSize];
         float median = [self calculateMedianOfHistogram:histogram binCount:256 brickSize:brickSize];
-        //NSLog(@"Mode for %i: %f", i, mode);
-        if (MIN(mode, median) < medianMax - BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
+        //NSLog(@"--> %i: %f - %f", i, mode, median);
+        if (MIN(mode, median) < medianMin + BRICK_RECOGNITION_MINIMUM_MEDIAN_ACCEPT) {
             positions.push_back(locations[i]);
         }
     }

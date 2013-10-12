@@ -137,6 +137,7 @@
         }
     }
     if (heroToMove != nil) {
+        NSLog(@"Player %i turn", heroToMove.heroType);
         [heroesToMove removeObject:heroToMove];
         [[Board instance] showMoveableLocations:[heroToMove floodFillMoveablePositions]];
     }
@@ -200,7 +201,7 @@
             continue;
         }
         for (int i = 0; i < positions.size(); i++) {
-            if (positions[i] == hero.position) {
+            if (positions[i].x == hero.position.x && positions[i].y == hero.position.y) {
                 NSLog(@"Hero %i found!", i);
                 hero.recognizedOnBoard = YES;
                 hero.active = YES;

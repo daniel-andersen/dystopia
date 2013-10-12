@@ -29,7 +29,6 @@ const int HERO_MOVEMENT_LENGTH[HEROES_COUNT] = {4, 8, 8, 6, 5};
 const NSArray *HERO_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.png", @"marker_archor.png", @"marker_elf.png", @"marker_warrior.png", @"marker_wizard.png", nil];
 
 @interface HeroFigure () {
-    int heroType;
     int movementLength;
 }
 
@@ -38,6 +37,7 @@ const NSArray *HERO_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.png"
 @implementation HeroFigure
 
 @synthesize active;
+@synthesize heroType;
 
 - (id)initWithHeroType:(int)type position:(cv::Point)p {
     if (self = [super initWithPosition:p]) {
@@ -50,7 +50,7 @@ const NSArray *HERO_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.png"
     heroType = type;
     [self reset];
     super.brickView.image = [UIImage imageNamed:[HERO_MARKER_IMAGE objectAtIndex:heroType]];
-    super.brickView.viewAlpha = 0.7f;
+    super.brickView.viewAlpha = 1.0f;
 }
 
 - (void)reset {
