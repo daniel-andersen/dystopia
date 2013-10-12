@@ -32,7 +32,6 @@
 #define HISTOGRAM_BIN_COUNT 4
 
 #define BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA 80.0f
-#define BRICK_RECOGNITION_MINIMUM_MEDIAN_ACCEPT 40.0f
 
 BrickRecognizer *brickRecognizerInstance = nil;
 
@@ -60,16 +59,7 @@ BrickRecognizer *brickRecognizerInstance = nil;
     }
     
     cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:locations inImage:image];
-
-    float maxProb = 0.0f;
-    int maxProbIndex = 0;
-    for (int i = 0; i < locations.size(); i++) {
-        if (probabilities[i] > maxProb) {
-            maxProb = probabilities[i];
-            maxProbIndex = i;
-        }
-    }
-    return locations[maxProbIndex];
+    return [self maxProbabilityPositionFromLocations:locations probabilities:probabilities];
 }
 
 - (cv::vector<cv::Point>)positionOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image controlPoints:(cv::vector<cv::Point>)controlPoints {
@@ -79,23 +69,33 @@ BrickRecognizer *brickRecognizerInstance = nil;
     cv::Mat allBricksImage = [self tiledImageFromLocations:allLocations inImage:image];
     
     MedianMinMax medianMinMax = [self medianMinMaxFromLocations:allLocations inTiledImage:allBricksImage brickSize:brickSize];
-    //NSLog(@"Median: %f - %f = %f", medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
+    NSLog(@"Median: %f - %f = %f", medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
     if (medianMinMax.max - medianMinMax.min < BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
         return cv::vector<cv::Point>();
     }
     
     cv::vector<cv::Point> positions;
     for (int i = 0; i < locations.size(); i++) {
-        cv::Mat brickImage = [self extractBrickImageFromIndex:i inTiledImage:allBricksImage brickSize:brickSize];
-        cv::Mat histogram = [self calculateHistogramFromImage:brickImage binCount:256];
-        float mode = [self calculateModeOfHistogram:histogram binCount:256 brickSize:brickSize];
-        float median = [self calculateMedianOfHistogram:histogram binCount:256 brickSize:brickSize];
-        //NSLog(@"--> %i: %f - %f", i, mode, median);
-        if (MIN(mode, median) < medianMinMax.min + BRICK_RECOGNITION_MINIMUM_MEDIAN_ACCEPT) {
+        cv::vector<cv::Point> brickLocations = [self allLocationsFromLocation:locations[i] controlPoints:controlPoints];
+        cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:brickLocations inImage:image];
+        cv::Point maxProbPosition = [self maxProbabilityPositionFromLocations:locations probabilities:probabilities];
+        if (maxProbPosition == locations[i]) {
             positions.push_back(locations[i]);
         }
     }
     return positions;
+}
+
+- (cv::Point)maxProbabilityPositionFromLocations:(cv::vector<cv::Point>)locations probabilities:(cv::vector<float>)probabilities {
+    float maxProb = 0.0f;
+    int maxProbIndex = 0;
+    for (int i = 0; i < locations.size(); i++) {
+        if (probabilities[i] > maxProb) {
+            maxProb = probabilities[i];
+            maxProbIndex = i;
+        }
+    }
+    return locations[maxProbIndex];
 }
 
 - (MedianMinMax)medianMinMaxFromLocations:(cv::vector<cv::Point>)locations inTiledImage:(cv::Mat)tiledImage brickSize:(CGSize)brickSize {
@@ -113,6 +113,15 @@ BrickRecognizer *brickRecognizerInstance = nil;
 - (cv::Mat)tiledImageFromLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image {
     CGSize brickSize = [[BoardUtil instance] singleBrickScreenSizeFromBoardSize:CGSizeMake(image.cols, image.rows)];
     return [self prepareImageWithoutEqualizing:image withLocations:locations brickSize:brickSize];
+}
+
+- (cv::vector<cv::Point>)allLocationsFromLocation:(cv::Point)location controlPoints:(cv::vector<cv::Point>)controlPoints {
+    cv::vector<cv::Point> allLocations;
+    allLocations.push_back(location);
+    for (int i = 0; i < controlPoints.size(); i++) {
+        allLocations.push_back(controlPoints[i]);
+    }
+    return allLocations;
 }
 
 - (cv::vector<cv::Point>)allLocationsFromLocations:(cv::vector<cv::Point>)locations controlPoints:(cv::vector<cv::Point>)controlPoints {

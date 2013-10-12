@@ -145,11 +145,9 @@
     heroToMove = nil;
     for (HeroFigure *hero in heroesToMove) {
         if (heroToMove == nil && hero.active && hero.recognizedOnBoard) {
-            NSLog(@"Show %i", hero.heroType);
             heroToMove = hero;
             [hero.markerView show];
         } else {
-            NSLog(@"Hide %i", hero.heroType);
             [hero.markerView hide];
         }
     }
@@ -191,11 +189,11 @@
         return;
     }
     cv::Point position;
-    NSLog(@"%i", heroToMove != nil);
     @synchronized([BoardCalibrator instance].boardImageLock) {
         position = [[BrickRecognizer instance] positionOfBrickAtLocations:[heroToMove floodFillMoveablePositions] inImage:[BoardCalibrator instance].boardImage controlPoints:[[Board instance] randomControlPoints:10]];
     };
     if (position != heroToMove.position && position.x != -1) {
+        NSLog(@"Hero %i moved to %i, %i", heroToMove.heroType, position.x, position.y);
         heroToMove.position = position;
         [self startNextPlayerTurn];
     }
@@ -231,7 +229,7 @@
         }
         for (int i = 0; i < positions.size(); i++) {
             if (positions[i] == hero.position) {
-                NSLog(@"Hero %i found!", hero.heroType);
+                NSLog(@"Hero %i found at %i, %i", hero.heroType, hero.position.x, hero.position.y);
                 hero.recognizedOnBoard = YES;
                 hero.active = YES;
                 [hero showMarker];

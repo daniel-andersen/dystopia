@@ -50,7 +50,7 @@ const NSArray *HERO_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.png"
     heroType = type;
     [self reset];
     super.brickView.image = [UIImage imageNamed:[HERO_MARKER_IMAGE objectAtIndex:heroType]];
-    super.brickView.viewAlpha = 1.0f;
+    super.brickView.viewAlpha = 0.9f;
 }
 
 - (void)reset {
