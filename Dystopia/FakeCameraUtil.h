@@ -27,8 +27,14 @@
 
 @interface FakeCameraUtil : NSObject
 
-+ (UIImage *)fakePerspectiveOnImage:(UIImage *)image;
-+ (UIImage *)rotateImageToLandscapeMode:(UIImage *)image;
-+ (UIImage *)fakeOutputImage;
++ (FakeCameraUtil *)instance;
+
+- (UIImage *)fakePerspectiveOnImage:(UIImage *)image;
+- (UIImage *)rotateImageToLandscapeMode:(UIImage *)image;
+- (UIImage *)fakeOutputImage;
+
+- (UIImage *)drawBricksOnImage:(UIImage *)image;
+
+- (void)clickAtPoint:(cv::Point)p;
 
 @end

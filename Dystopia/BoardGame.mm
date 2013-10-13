@@ -29,20 +29,9 @@
 #import "ExternalDisplay.h"
 #import "PreviewableViewController.h"
 
-#define BOARD_GAME_STATE_INITIALIZING         0
-#define BOARD_GAME_STATE_PLACE_HEROES         1
-#define BOARD_GAME_STATE_PLAYERS_TURN_INITIAL 2
-#define BOARD_GAME_STATE_PLAYERS_TURN         3
-#define BOARD_GAME_STATE_MONSTERS_TURN        4
-
 @interface BoardGame () {
-    id<BoardGameProtocol> delegate;
-
     UIView *boardRecognizedView;
 
-    int level;
-    int state;
-    
     NSMutableArray *heroesToMove;
     HeroFigure *heroToMove;
 
@@ -56,9 +45,23 @@
 
 @implementation BoardGame
 
-- (id)initWithFrame:(CGRect)frame delegate:(id<BoardGameProtocol>)d {
-    if (self = [super initWithFrame:frame]) {
-        delegate = d;
+BoardGame *boardGameInstance;
+
+@synthesize delegate;
+@synthesize state;
+@synthesize level;
+
++ (BoardGame *)instance {
+    @synchronized(self) {
+        if (boardGameInstance == nil) {
+            boardGameInstance = [[BoardGame alloc] init];
+        }
+        return boardGameInstance;
+    }
+}
+
+- (id)init {
+    if (self = [super init]) {
         [self initialize];
     }
     return self;

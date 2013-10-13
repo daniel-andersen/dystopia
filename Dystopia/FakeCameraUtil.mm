@@ -26,12 +26,40 @@
 #import "FakeCameraUtil.h"
 #import "UIImage+OpenCV.h"
 #import "CameraUtil.h"
+#import "BoardGame.h"
+
+@interface FakeCameraUtil () {
+    UIImage *fakeCameraImage;
+    int brickChecked[BOARD_HEIGHT][BOARD_WIDTH];
+}
+
+@end
 
 @implementation FakeCameraUtil
 
-UIImage *fakeCameraImage = nil;
+FakeCameraUtil *fakeCameraUtilInstance = nil;
 
-+ (UIImage *)fakePerspectiveOnImage:(UIImage *)image {
++ (FakeCameraUtil *)instance {
+    @synchronized(self) {
+        if (fakeCameraUtilInstance == nil) {
+            fakeCameraUtilInstance = [[FakeCameraUtil alloc] init];
+        }
+        return fakeCameraUtilInstance;
+    }
+}
+
+- (id)init {
+    if (self = [super init]) {
+        for (int i = 0; i < BOARD_HEIGHT; i++) {
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                brickChecked[i][j] = 0;
+            }
+        }
+    }
+    return self;
+}
+
+- (UIImage *)fakePerspectiveOnImage:(UIImage *)image {
     FourPoints srcPoints = {
         .p1 = CGPointMake(0.0f, 0.0f),
         .p2 = CGPointMake(image.size.width, 0.0f),
@@ -49,15 +77,40 @@ UIImage *fakeCameraImage = nil;
     return [UIImage imageWithCVMat:outputImg];
 }
 
-+ (UIImage *)rotateImageToLandscapeMode:(UIImage *)image {
+- (UIImage *)rotateImageToLandscapeMode:(UIImage *)image {
     return [[UIImage alloc] initWithCGImage:image.CGImage scale:image.scale orientation:UIImageOrientationLeftMirrored];
 }
 
-+ (UIImage *)fakeOutputImage {
+- (UIImage *)fakeOutputImage {
     if (fakeCameraImage == nil) {
         fakeCameraImage = [UIImage imageNamed:@"fake_board_6.png"];
     }
     return fakeCameraImage;
+}
+
+- (UIImage *)drawBricksOnImage:(UIImage *)image {
+    UIGraphicsBeginImageContextWithOptions(image.size, YES, 1.0f);
+    
+    [image drawAtPoint:CGPointMake(0.0f, 0.0f)];
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            if (brickChecked[i][j]) {
+                CGContextSetFillColorWithColor(context, [UIColor blackColor].CGColor);
+                CGContextFillRect(context, [[BoardUtil instance] brickScreenRect:cv::Point(j, i)]);
+            }
+        }
+    }
+
+    UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return outputImage;
+}
+
+- (void)clickAtPoint:(cv::Point)p {
+    brickChecked[p.y][p.x] = !brickChecked[p.y][p.x];
 }
 
 @end

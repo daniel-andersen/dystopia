@@ -28,6 +28,12 @@
 #import "RotatedView.h"
 #import "Board.h"
 
+#define BOARD_GAME_STATE_INITIALIZING         0
+#define BOARD_GAME_STATE_PLACE_HEROES         1
+#define BOARD_GAME_STATE_PLAYERS_TURN_INITIAL 2
+#define BOARD_GAME_STATE_PLAYERS_TURN         3
+#define BOARD_GAME_STATE_MONSTERS_TURN        4
+
 @protocol BoardGameProtocol <NSObject>
 
 - (void)boardGameFinished;
@@ -36,10 +42,15 @@
 
 @interface BoardGame : RotatedView
 
-- (id)initWithFrame:(CGRect)frame delegate:(id<BoardGameProtocol>)d;
++ (BoardGame *)instance;
 
 - (void)startWithLevel:(int)l;
 
 - (void)update;
+
+@property (nonatomic) id<BoardGameProtocol> delegate;
+
+@property (nonatomic) int level;
+@property (nonatomic) int state;
 
 @end

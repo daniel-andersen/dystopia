@@ -29,8 +29,7 @@
 #import "CameraUtil.h"
 #import "Util.h"
 #import "UIImage+OpenCV.h"
-
-#import "BrickRecognizer.h"
+#import "FakeCameraUtil.h"
 
 PreviewableViewController *previewInstance = nil;
 
@@ -93,6 +92,9 @@ PreviewableViewController *previewInstance = nil;
     boardPreview.contentMode = UIViewContentModeScaleToFill;
     boardPreview.hidden = YES;
     [overlayView addSubview:boardPreview];
+    
+    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(boardPreviewTap:)];
+    [self.view addGestureRecognizer:tapGestureRecognizer];
 
     [self addBoardBoundsLayer];
     [self addBoardGridLayer];
@@ -128,6 +130,13 @@ PreviewableViewController *previewInstance = nil;
 
 - (void)takeScreenshotButtonPressed:(id)sender {
     takeScreenshot = YES;
+}
+
+- (IBAction)boardPreviewTap:(UIGestureRecognizer *)gestureRecognizer {
+    CGPoint p = [gestureRecognizer locationInView:boardPreview];
+    int x = (p.x / self.view.bounds.size.width) * BOARD_WIDTH;
+    int y = (p.y / self.view.bounds.size.height) * BOARD_HEIGHT;
+    [[FakeCameraUtil instance] clickAtPoint:cv::Point(x, y)];
 }
 
 - (UIButton *)addButtonWithText:(NSString *)text {

@@ -36,7 +36,6 @@
 
     ExternalDislayCalibrationBorderView *externalDislayCalibrationBorderView;
     
-    BoardGame *boardGame;
     Intro *intro;
     
     int gameState;
@@ -164,10 +163,12 @@
 }
 
 - (void)startBoardGame {
+    NSLog(@"Starting game");
     gameState = GAME_STATE_GAME;
-    boardGame = [[BoardGame alloc] initWithFrame:[ExternalDisplay instance].screen.bounds delegate:self];
-    [[ExternalDisplay instance].window insertSubview:boardGame atIndex:0];
-    [boardGame startWithLevel:0];
+    [BoardGame instance].delegate = self;
+    [BoardGame instance].frame = [ExternalDisplay instance].screen.bounds;
+    [[ExternalDisplay instance].window insertSubview:[BoardGame instance] atIndex:0];
+    [[BoardGame instance] startWithLevel:0];
 }
 
 - (void)boardGameFinished {
@@ -179,11 +180,15 @@
 }
 
 - (UIImage *)requestSimulatedImageIfNoCamera {
-    UIImage *image = [FakeCameraUtil fakeOutputImage];
-    /*super.overlayView.hidden = YES;
-    UIImage *image = [UIImage imageWithView:self.view];
-    image = [FakeCameraUtil fakePerspectiveOnImage:image];
-    super.overlayView.hidden = NO;*/
+    //UIImage *image = [[FakeCameraUtil instance] fakeOutputImage];
+    UIImage *image;
+    if (gameState == GAME_STATE_GAME) {
+        image = [UIImage imageWithView:[BoardGame instance]];
+        image = [[FakeCameraUtil instance] drawBricksOnImage:image];
+        image = [[FakeCameraUtil instance] fakePerspectiveOnImage:image];
+    } else {
+        image = [[FakeCameraUtil instance] fakeOutputImage];
+    }
     return image;
 }
 
