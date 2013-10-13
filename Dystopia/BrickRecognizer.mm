@@ -31,7 +31,7 @@
 
 #define HISTOGRAM_BIN_COUNT 4
 
-#define BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA 80.0f
+#define BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA 50.0f
 
 BrickRecognizer *brickRecognizerInstance = nil;
 
@@ -65,20 +65,18 @@ BrickRecognizer *brickRecognizerInstance = nil;
 - (cv::vector<cv::Point>)positionOfBricksAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image controlPoints:(cv::vector<cv::Point>)controlPoints {
     CGSize brickSize = [[BoardUtil instance] singleBrickScreenSizeFromBoardSize:CGSizeMake(image.cols, image.rows)];
 
-    cv::vector<cv::Point> allLocations = [self allLocationsFromLocations:locations controlPoints:controlPoints];
-    cv::Mat allBricksImage = [self tiledImageFromLocations:allLocations inImage:image];
-    
-    MedianMinMax medianMinMax = [self medianMinMaxFromLocations:allLocations inTiledImage:allBricksImage brickSize:brickSize];
-    NSLog(@"Median: %f - %f = %f", medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
-    if (medianMinMax.max - medianMinMax.min < BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
-        return cv::vector<cv::Point>();
-    }
-    
     cv::vector<cv::Point> positions;
     for (int i = 0; i < locations.size(); i++) {
         cv::vector<cv::Point> brickLocations = [self allLocationsFromLocation:locations[i] controlPoints:controlPoints];
+        cv::Mat brickImages = [self tiledImageFromLocations:brickLocations inImage:image];
+        MedianMinMax medianMinMax = [self medianMinMaxFromLocations:brickLocations inTiledImage:brickImages brickSize:brickSize];
+        NSLog(@"Median %i: %f - %f = %f", i, medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
+        if (medianMinMax.max - medianMinMax.min < BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
+            continue;
+        }
+        NSLog(@"Possible brick!");
         cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:brickLocations inImage:image];
-        cv::Point maxProbPosition = [self maxProbabilityPositionFromLocations:locations probabilities:probabilities];
+        cv::Point maxProbPosition = [self maxProbabilityPositionFromLocations:brickLocations probabilities:probabilities];
         if (maxProbPosition == locations[i]) {
             positions.push_back(locations[i]);
         }

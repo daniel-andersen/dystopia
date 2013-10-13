@@ -96,8 +96,13 @@ FakeCameraUtil *fakeCameraUtilInstance = nil;
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
             if (brickChecked[i][j]) {
+                CGRect rect = [[BoardUtil instance] brickScreenRect:cv::Point(j, i)];
+                rect.origin.x += 2.0f;
+                rect.origin.y += 2.0f;
+                rect.size.width -= 4.0f;
+                rect.size.height -= 4.0f;
                 CGContextSetFillColorWithColor(context, [UIColor blackColor].CGColor);
-                CGContextFillRect(context, [[BoardUtil instance] brickScreenRect:cv::Point(j, i)]);
+                CGContextFillRect(context, rect);
             }
         }
     }
