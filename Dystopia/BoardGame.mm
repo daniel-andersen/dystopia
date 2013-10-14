@@ -129,6 +129,7 @@ BoardGame *boardGameInstance;
 
 - (void)startPlayersTurn {
     NSLog(@"Starting players turn");
+    [self endMonstersTurn];
     state = BOARD_GAME_STATE_PLAYERS_TURN;
     heroesToMove = [NSMutableArray array];
     for (HeroFigure *hero in [Board instance].heroFigures) {
@@ -142,10 +143,11 @@ BoardGame *boardGameInstance;
 - (void)startNextPlayerTurn {
     NSLog(@"Next players turn");
     if (heroToMove != nil) {
-        [heroToMove.markerView hide];
+        [heroToMove.markerView show];
         [heroesToMove removeObject:heroToMove];
     }
     heroToMove = nil;
+    [self endTurn];
     for (HeroFigure *hero in heroesToMove) {
         if (heroToMove == nil && hero.active && hero.recognizedOnBoard) {
             heroToMove = hero;
@@ -164,10 +166,32 @@ BoardGame *boardGameInstance;
 
 - (void)startMonstersTurn {
     NSLog(@"Starting monsters turn");
+    [self endPlayersTurn];
+    state = BOARD_GAME_STATE_MONSTERS_TURN;
+}
+
+- (void)endPlayersTurn {
     if (state == BOARD_GAME_STATE_PLAYERS_TURN_INITIAL) {
         [self disableNonRecognizedHeroes];
     }
-    state = BOARD_GAME_STATE_MONSTERS_TURN;
+    [self endTurn];
+}
+
+- (void)endMonstersTurn {
+    [self endTurn];
+}
+
+- (void)endTurn {
+    [self hideMarkers];
+    [[Board instance] refreshBrickMap];
+    [[Board instance] refreshObjectMap];
+}
+
+- (void)hideMarkers {
+    [[Board instance] hideMoveableLocations];
+    for (GameObject *object in [[Board instance] boardObjects]) {
+        [object hideMarker];
+    }
 }
 
 - (void)disableNonRecognizedHeroes {
@@ -197,7 +221,7 @@ BoardGame *boardGameInstance;
     };
     if (position != heroToMove.position && position.x != -1) {
         NSLog(@"Hero %i moved to %i, %i", heroToMove.heroType, position.x, position.y);
-        heroToMove.position = position;
+        [heroToMove moveToPosition:position];
         [self startNextPlayerTurn];
     }
 }

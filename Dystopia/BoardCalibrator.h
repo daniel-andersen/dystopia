@@ -37,7 +37,7 @@
 
 + (BoardCalibrator *)instance;
 
-- (void)initializeWithFrame:(CGRect)frame cameraSession:(CameraSession *)session;
+- (void)initializeWithFrame:(CGRect)frame;
 
 - (void)updateBoundsWithImage:(cv::Mat)image;
 

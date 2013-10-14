@@ -112,6 +112,11 @@
 
 @implementation MoveableGameObject
 
+- (void)moveToPosition:(cv::Point)p {
+    self.position = p;
+    self.frame = [[BoardUtil instance] brickScreenRect:self.position];
+}
+
 - (cv::vector<cv::Point>)moveablePositions {
     [NSException raise:NSInternalInconsistencyException format:@"You must override %@ in a subclass", NSStringFromSelector(_cmd)];
     return cv::vector<cv::Point>();

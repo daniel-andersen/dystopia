@@ -38,7 +38,9 @@
 
 @interface CameraSession : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate>
 
-- (id)initWithDelegate:(id<CameraSessionDelegate>)d;
++ (CameraSession *)instance;
+
+- (id)init;
 
 - (void)start;
 - (void)stop;
@@ -46,7 +48,8 @@
 - (void)lock;
 - (void)unlock;
 
-@property (readonly) bool initialized;
+@property (nonatomic) id<CameraSessionDelegate> delegate;
+@property (nonatomic) bool initialized;
 @property (nonatomic) bool readyToProcessFrame;
 @property (nonatomic) CFTimeInterval delegateProcessFrameInterval;
 

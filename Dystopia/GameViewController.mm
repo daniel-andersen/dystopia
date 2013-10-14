@@ -32,8 +32,6 @@
 #import "BrickRecognizer.h"
 
 @interface GameViewController () {
-    CameraSession *cameraSession;
-
     ExternalDislayCalibrationBorderView *externalDislayCalibrationBorderView;
     
     Intro *intro;
@@ -71,19 +69,19 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [cameraSession start];
+    [[CameraSession instance] start];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
-    [cameraSession stop];
+    [[CameraSession instance] stop];
 }
 
 - (void)initialize {
     self.view.backgroundColor = [UIColor blackColor];
     
-    cameraSession = [[CameraSession alloc] initWithDelegate:self];
+    [CameraSession instance].delegate = self;
 
-    [[BoardCalibrator instance] initializeWithFrame:self.view.bounds cameraSession:cameraSession];
+    [BoardCalibrator instance].frame = self.view.bounds;
     [self.view addSubview:[BoardCalibrator instance]];
 }
 
@@ -129,7 +127,7 @@
 - (void)updateGameStateAccordingToFrame {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setFrameUpdateIntervalAccordingToGameState];
-        cameraSession.readyToProcessFrame = YES;
+        [CameraSession instance].readyToProcessFrame = YES;
     });
 }
 
@@ -142,7 +140,7 @@
 }
 
 - (void)setFrameUpdateIntervalAccordingToGameState {
-    cameraSession.delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_FAST;
+    [CameraSession instance].delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_FAST;
     /*if (boardCalibrator.state != BOARD_CALIBRATION_STATE_CALIBRATED) {
         cameraSession.delegateProcessFrameInterval = CAMERA_SESSION_DELEGATE_INTERVAL_FAST;
     } else {

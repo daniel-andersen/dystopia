@@ -40,13 +40,24 @@
 
 @implementation CameraSession
 
+CameraSession *cameraSessionInstance = nil;
+
+@synthesize delegate;
 @synthesize initialized;
 @synthesize readyToProcessFrame;
 @synthesize delegateProcessFrameInterval;
 
-- (id)initWithDelegate:(id<CameraSessionDelegate>)d {
++ (CameraSession *)instance {
+    @synchronized(self) {
+        if (cameraSessionInstance == nil) {
+            cameraSessionInstance = [[CameraSession alloc] init];
+        }
+        return cameraSessionInstance;
+    }
+}
+
+- (id)init {
     if (self = [super init]) {
-        delegate = d;
         [self initialize];
     }
     return self;

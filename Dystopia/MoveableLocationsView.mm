@@ -96,6 +96,7 @@
         UIView *view = [[UIView alloc] initWithFrame:[[BoardUtil instance] brickScreenRect:locations[i]]];
         view.backgroundColor = moveableLocationColor;
         [self addSubview:view];
+        [views addObject:view];
     }
 }
 

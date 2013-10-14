@@ -54,6 +54,8 @@
 
 @interface MoveableGameObject : GameObject
 
+- (void)moveToPosition:(cv::Point)p;
+
 - (cv::vector<cv::Point>)moveablePositions;
 - (cv::vector<cv::Point>)floodFillMoveablePositions;
 

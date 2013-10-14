@@ -264,7 +264,7 @@ PreviewableViewController *previewInstance = nil;
 
 - (void)previewBoardBounds:(BoardBounds)boardPoints {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (!boardPoints.bounds.defined) {
+        if (!boardPoints.bounds.defined || ![CameraSession instance].initialized) {
             boardBoundsLayer.hidden = YES;
             return;
         }

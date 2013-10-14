@@ -27,9 +27,10 @@
 
 @interface BrickView : UIView
 
-- (id)initWithFrame:(CGRect)frame brickType:(int)b;
+- (id)initWithPosition:(cv::Point)p brickType:(int)b;
 
 @property (readonly) int brickType;
+@property (readonly) cv::Point position;
 @property (nonatomic) bool visible;
 
 @end

@@ -30,8 +30,6 @@
 #import "BoardUtil.h"
 
 @interface BoardCalibrator () {
-    CameraSession *cameraSession;
-    
     UIView *calibrationStateView;
     
     CFAbsoluteTime successTime;
@@ -66,8 +64,7 @@ BoardCalibrator *boardCalibratorInstance = nil;
     return self;
 }
 
-- (void)initializeWithFrame:(CGRect)frame cameraSession:(CameraSession *)session {
-    cameraSession = session;
+- (void)initializeWithFrame:(CGRect)frame {
     [self initialize];
 }
 

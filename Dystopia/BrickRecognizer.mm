@@ -57,7 +57,6 @@ BrickRecognizer *brickRecognizerInstance = nil;
     if (medianMinMax.max - medianMinMax.min < BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
         return cv::Point(-1, -1);
     }
-    
     cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:locations inImage:image];
     return [self maxProbabilityPositionFromLocations:locations probabilities:probabilities];
 }
@@ -70,11 +69,10 @@ BrickRecognizer *brickRecognizerInstance = nil;
         cv::vector<cv::Point> brickLocations = [self allLocationsFromLocation:locations[i] controlPoints:controlPoints];
         cv::Mat brickImages = [self tiledImageFromLocations:brickLocations inImage:image];
         MedianMinMax medianMinMax = [self medianMinMaxFromLocations:brickLocations inTiledImage:brickImages brickSize:brickSize];
-        NSLog(@"Median %i: %f - %f = %f", i, medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
+        //NSLog(@"Median %i: %f - %f = %f", i, medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
         if (medianMinMax.max - medianMinMax.min < BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
             continue;
         }
-        NSLog(@"Possible brick!");
         cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:brickLocations inImage:image];
         cv::Point maxProbPosition = [self maxProbabilityPositionFromLocations:brickLocations probabilities:probabilities];
         if (maxProbPosition == locations[i]) {

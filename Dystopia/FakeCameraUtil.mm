@@ -67,10 +67,10 @@ FakeCameraUtil *fakeCameraUtilInstance = nil;
         .p4 = CGPointMake(0.0f, image.size.height)
     };
     FourPoints dstPoints = {
-        .p1 = CGPointMake(15.0f, 25.0f),
-        .p2 = CGPointMake(image.size.width - 15.0f, 25.0f),
-        .p3 = CGPointMake(image.size.width - 15.0f, image.size.height - 25.0f),
-        .p4 = CGPointMake(15.0f, image.size.height - 25.0f)
+        .p1 = CGPointMake(1.0f, 1.0f),
+        .p2 = CGPointMake(image.size.width - 1.0f, 1.0f),
+        .p3 = CGPointMake(image.size.width - 1.0f, image.size.height - 1.0f),
+        .p4 = CGPointMake(1.0f, image.size.height - 1.0f)
     };
     cv::Mat transformation = [CameraUtil findPerspectiveTransformationSrcPoints:srcPoints dstPoints:dstPoints];
     cv::Mat outputImg = [CameraUtil perspectiveTransformImage:[image CVMat] withTransformation:transformation toSize:image.size];

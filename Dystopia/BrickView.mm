@@ -31,10 +31,12 @@
 @implementation BrickView
 
 @synthesize brickType;
+@synthesize position;
 @synthesize visible;
 
-- (id)initWithFrame:(CGRect)frame brickType:(int)b {
-    if (self = [super initWithFrame:frame]) {
+- (id)initWithPosition:(cv::Point)p brickType:(int)b {
+    if (self = [super initWithFrame:[[BoardUtil instance] brickTypeFrame:b position:p]]) {
+        position = p;
         brickType = b;
         [self initialize];
     }

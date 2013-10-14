@@ -30,8 +30,6 @@
 #import "HeroFigure.h"
 #import "MonsterFigure.h"
 
-#define BOARD_BRICK_VIEWS_COUNT 50
-
 @interface Board : UIView
 
 + (Board *)instance;
@@ -41,9 +39,15 @@
 - (void)loadLevel:(int)l;
 
 - (void)showMoveableLocations:(cv::vector<cv::Point>)locations;
+- (void)hideMoveableLocations;
 
 - (bool)hasBrickAtPosition:(cv::Point)position;
 - (bool)hasObjectAtPosition:(cv::Point)position;
+
+- (void)refreshBrickMap;
+- (void)refreshObjectMap;
+
+- (NSMutableArray *)boardObjects;
 
 - (cv::vector<cv::Point>)randomControlPoints:(int)count;
 

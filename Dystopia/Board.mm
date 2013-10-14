@@ -32,8 +32,7 @@
     int brickMap[BOARD_HEIGHT][BOARD_WIDTH];
     int objectMap[BOARD_HEIGHT][BOARD_WIDTH];
     
-    BrickView *brickViews[BOARD_BRICK_VIEWS_COUNT];
-    int brickViewsCount;
+    NSMutableArray *brickViews;
 
     MoveableLocationsView *moveableLocationsView;
     
@@ -83,25 +82,11 @@ Board *boardInstance = nil;
     level = l;
     [self loadBoard];
     [self setupBorderView];
-    [self setupBrickViews];
     [self initializeFigures];
 }
 
 - (void)loadBoard {
-    for (int i = 0; i < BOARD_HEIGHT; i++) {
-        for (int j = 0; j < BOARD_WIDTH; j++) {
-            brickMap[i][j] = -1;
-        }
-    }
-}
-
-- (void)setupBorderView {
-    borderView = [[BorderView alloc] initWithFrame:self.bounds];
-    [self addSubview:borderView];
-}
-
-- (void)setupBrickViews {
-    brickViewsCount = 0;
+    brickViews = [NSMutableArray array];
     [self addBrickOfType:2 atPosition:cv::Point(3, 3)];
     [self addBrickOfType:2 atPosition:cv::Point(6, 3)];
     [self addBrickOfType:8 atPosition:cv::Point(7, 6)];
@@ -111,10 +96,15 @@ Board *boardInstance = nil;
     [self addBrickOfType:5 atPosition:cv::Point(8, 10)];
     [self addBrickOfType:5 atPosition:cv::Point(11, 10)];
     [self addBrickOfType:1 atPosition:cv::Point(14, 9)];
-    for (int i = 0; i < brickViewsCount; i++) {
-        [self addSubview:brickViews[i]];
+    for (BrickView *brickView in brickViews) {
+        [self addSubview:brickView];
     }
-    [self refreshBrickPositions];
+    [self refreshBrickMap];
+}
+
+- (void)setupBorderView {
+    borderView = [[BorderView alloc] initWithFrame:self.bounds];
+    [self addSubview:borderView];
 }
 
 - (void)refreshBrickPositions {
@@ -127,6 +117,23 @@ Board *boardInstance = nil;
             }
         }
     }
+}
+
+- (void)refreshBrickMap {
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            brickMap[i][j] = -1;
+        }
+    }
+    for (BrickView *brickView in brickViews) {
+        CGSize size = [[BoardUtil instance] brickTypeBoardSize:brickView.brickType];
+        for (int i = 0; i < size.height; i++) {
+            for (int j = 0; j < size.width; j++) {
+                brickMap[i + brickView.position.y][j + brickView.position.x] = brickView.brickType;
+            }
+        }
+    }
+    [self refreshBrickPositions];
 }
 
 - (void)refreshObjectMap {
@@ -142,17 +149,15 @@ Board *boardInstance = nil;
 }
 
 - (void)addBrickOfType:(int)type atPosition:(cv::Point)position {
-    brickViews[brickViewsCount++] = [[BrickView alloc] initWithFrame:[[BoardUtil instance] brickTypeFrame:type position:position] brickType:type];
-    CGSize size = [[BoardUtil instance] brickTypeBoardSize:type];
-    for (int i = 0; i < size.height; i++) {
-        for (int j = 0; j< size.width; j++) {
-            brickMap[i + (int)position.y][j + (int)position.x] = type;
-        }
-    }
+    [brickViews addObject:[[BrickView alloc] initWithPosition:position brickType:type]];
 }
 
 - (void)showMoveableLocations:(cv::vector<cv::Point>)locations {
     [moveableLocationsView showLocations:locations];
+}
+
+- (void)hideMoveableLocations {
+    [moveableLocationsView hideLocations];
 }
 
 - (bool)hasBrickAtPosition:(cv::Point)position {
