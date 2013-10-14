@@ -38,10 +38,13 @@
 @synthesize recognizedOnBoard;
 @synthesize brickView;
 @synthesize markerView;
+@synthesize active;
+@synthesize type;
 
-- (id)initWithPosition:(cv::Point)p {
+- (id)initWithPosition:(cv::Point)p type:(int)t {
     if (self = [super init]) {
         position = p;
+        type = t;
         [self initialize];
     }
     return self;
@@ -111,6 +114,8 @@
 
 
 @implementation MoveableGameObject
+
+@synthesize movementLength;
 
 - (void)moveToPosition:(cv::Point)p {
     self.position = p;

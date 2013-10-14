@@ -29,7 +29,7 @@
 
 @interface GameObject : UIView
 
-- (id)initWithPosition:(cv::Point)p;
+- (id)initWithPosition:(cv::Point)p type:(int)t;
 
 - (void)initialize;
 
@@ -48,6 +48,9 @@
 @property (nonatomic) AnimatableBrickView *brickView;
 @property (nonatomic) AnimatableBrickView *markerView;
 
+@property (nonatomic) bool active;
+@property (nonatomic) int type;
+
 @end
 
 
@@ -60,5 +63,7 @@
 - (cv::vector<cv::Point>)floodFillMoveablePositions;
 
 - (bool)canMoveToLocation:(cv::Point)location withMovementCount:(int)movementCount;
+
+@property (nonatomic) int movementLength;
 
 @end

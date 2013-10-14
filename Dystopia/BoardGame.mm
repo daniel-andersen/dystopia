@@ -36,7 +36,7 @@
     HeroFigure *heroToMove;
 
     NSMutableArray *monstersToMove;
-    HeroFigure *monsterToMove;
+    MonsterFigure *monsterToMove;
     
     bool isUpdating;
 }
@@ -157,7 +157,7 @@ BoardGame *boardGameInstance;
         }
     }
     if (heroToMove != nil) {
-        NSLog(@"Player %i turn", heroToMove.heroType);
+        NSLog(@"Player %i turn", heroToMove.type);
         [[Board instance] showMoveableLocations:[heroToMove floodFillMoveablePositions]];
     } else {
         [self startMonstersTurn];
@@ -168,6 +168,37 @@ BoardGame *boardGameInstance;
     NSLog(@"Starting monsters turn");
     [self endPlayersTurn];
     state = BOARD_GAME_STATE_MONSTERS_TURN;
+    monstersToMove = [NSMutableArray array];
+    for (MonsterFigure *monster in [Board instance].monsterFigures) {
+        if (monster.active) {
+            [monstersToMove addObject:monster];
+        }
+    }
+    [self startNextMonsterTurn];
+}
+
+- (void)startNextMonsterTurn {
+    NSLog(@"Next monsters turn");
+    if (monsterToMove != nil) {
+        [monsterToMove.markerView show];
+        [monstersToMove removeObject:monsterToMove];
+    }
+    monsterToMove = nil;
+    [self endTurn];
+    for (MonsterFigure *monster in monstersToMove) {
+        if (monsterToMove == nil && monster.active && monster.recognizedOnBoard) {
+            monsterToMove = monster;
+            [monster.markerView show];
+        } else {
+            [monsterToMove.markerView hide];
+        }
+    }
+    if (monsterToMove != nil) {
+        NSLog(@"Monster %i turn", monsterToMove.type);
+        [[Board instance] showMoveableLocations:[monsterToMove floodFillMoveablePositions]];
+    } else {
+        [self startPlayersTurn];
+    }
 }
 
 - (void)endPlayersTurn {
@@ -220,7 +251,7 @@ BoardGame *boardGameInstance;
         position = [[BrickRecognizer instance] positionOfBrickAtLocations:[heroToMove floodFillMoveablePositions] inImage:[BoardCalibrator instance].boardImage controlPoints:[[Board instance] randomControlPoints:10]];
     };
     if (position != heroToMove.position && position.x != -1) {
-        NSLog(@"Hero %i moved to %i, %i", heroToMove.heroType, position.x, position.y);
+        NSLog(@"Hero %i moved to %i, %i", heroToMove.type, position.x, position.y);
         [heroToMove moveToPosition:position];
         [self startNextPlayerTurn];
     }
@@ -256,7 +287,7 @@ BoardGame *boardGameInstance;
         }
         for (int i = 0; i < positions.size(); i++) {
             if (positions[i] == hero.position) {
-                NSLog(@"Hero %i found at %i, %i", hero.heroType, hero.position.x, hero.position.y);
+                NSLog(@"Hero %i found at %i, %i", hero.type, hero.position.x, hero.position.y);
                 hero.recognizedOnBoard = YES;
                 hero.active = YES;
                 [hero showMarker];

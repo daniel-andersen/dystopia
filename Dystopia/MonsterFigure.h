@@ -33,6 +33,4 @@
 
 @interface MonsterFigure : MoveableGameObject
 
-- (id)initWithMonsterType:(int)type position:(cv::Point)p;
-
 @end

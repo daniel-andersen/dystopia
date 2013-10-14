@@ -37,9 +37,4 @@
 
 @interface HeroFigure : MoveableGameObject
 
-- (id)initWithHeroType:(int)type position:(cv::Point)p;
-
-@property (nonatomic) bool active;
-@property (nonatomic) int heroType;
-
 @end

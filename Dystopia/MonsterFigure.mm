@@ -29,34 +29,25 @@ const int MONSTER_MOVEMENT_LENGTH[MONSTERS_COUNT] = {4, 8, 8, 6, 5};
 const NSArray *MONSTER_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.png", nil];
 
 @interface MonsterFigure () {
-    int monsterType;
-    int movementLength;
 }
 
 @end
 
 @implementation MonsterFigure
 
-- (id)initWithMonsterType:(int)type position:(cv::Point)p {
-    if (self = [super initWithPosition:p]) {
-        [self initializeWithMonsterType:type];
-    }
-    return self;
-}
-
-- (void)initializeWithMonsterType:(int)type {
-    monsterType = type;
+- (void)initialize {
+    [super initialize];
     [self reset];
-    super.brickView.image = [UIImage imageNamed:[MONSTER_MARKER_IMAGE objectAtIndex:monsterType]];
-    super.brickView.viewAlpha = 0.7f;
+    super.brickView.image = [UIImage imageNamed:[MONSTER_MARKER_IMAGE objectAtIndex:self.type]];
+    super.brickView.viewAlpha = 0.9f;
 }
 
 - (void)reset {
-    movementLength = MONSTER_MOVEMENT_LENGTH[monsterType];
+    self.movementLength = MONSTER_MOVEMENT_LENGTH[self.type];
 }
 
 - (bool)canMoveToLocation:(cv::Point)location withMovementCount:(int)movementCount {
-    return movementCount <= movementLength;
+    return movementCount <= self.movementLength;
 }
 
 @end

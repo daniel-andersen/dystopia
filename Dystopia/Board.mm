@@ -180,10 +180,10 @@ Board *boardInstance = nil;
         }
     }
     heroFigures = [NSMutableArray array];
-    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_WIZARD position:cv::Point(4, 3)]];
-    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_WARRIOR position:cv::Point(5, 5)]];
-    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_DWERF position:cv::Point(6, 4)]];
-    [heroFigures addObject:[[HeroFigure alloc] initWithHeroType:HERO_ELF position:cv::Point(7, 3)]];
+    [heroFigures addObject:[[HeroFigure alloc] initWithPosition:cv::Point(4, 3) type:HERO_WIZARD]];
+    [heroFigures addObject:[[HeroFigure alloc] initWithPosition:cv::Point(5, 5) type:HERO_WARRIOR]];
+    [heroFigures addObject:[[HeroFigure alloc] initWithPosition:cv::Point(6, 4) type:HERO_DWERF]];
+    [heroFigures addObject:[[HeroFigure alloc] initWithPosition:cv::Point(7, 3) type:HERO_ELF]];
     for (HeroFigure *hero in heroFigures) {
         [self addSubview:hero];
     }
