@@ -30,7 +30,12 @@
 - (void)show;
 - (void)hide;
 
+- (void)startPulsing;
+- (void)stopPulsing;
+
 @property (nonatomic) float viewAlpha;
+@property (nonatomic) float pulseAlpha;
+
 @property (nonatomic) bool visible;
 @property (nonatomic) bool animating;
 

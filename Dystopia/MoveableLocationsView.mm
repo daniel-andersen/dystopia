@@ -27,6 +27,7 @@
 #import "BoardUtil.h"
 
 #define MOVEABLE_LOCATIONS_APPEAR_DURATION 1.0f
+#define MOVEABLE_LOCATIONS_REAPPEAR_DURATION 1.5f
 
 @interface MoveableLocationsView () {
     cv::vector<cv::Point> locations;
@@ -56,7 +57,7 @@
     locations = l;
     if (!self.hidden) {
         [self hideLocations];
-        [self performSelector:@selector(createAndShowLocations) withObject:nil afterDelay:(MOVEABLE_LOCATIONS_APPEAR_DURATION * 1.5f)];
+        [self performSelector:@selector(createAndShowLocations) withObject:nil afterDelay:(MOVEABLE_LOCATIONS_REAPPEAR_DURATION)];
     } else {
         [self createAndShowLocations];
     }

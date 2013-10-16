@@ -27,6 +27,8 @@
 #import "BoardUtil.h"
 #import "Board.h"
 
+#define MARKER_BLINKING_SPEED 0.5f
+
 @interface GameObject () {
 }
 
@@ -66,6 +68,7 @@
 - (void)initializeMarkerView {
     markerView = [[AnimatableBrickView alloc] init];
     markerView.viewAlpha = 0.7f;
+    markerView.pulseAlpha = 0.3f;
     markerView.image = [UIImage imageNamed:@"brick_marker.png"];
     markerView.alpha = 0.0f;
     [self addSubview:markerView];
@@ -103,6 +106,14 @@
 
 - (void)hideMarker {
     [markerView hide];
+}
+
+- (void)startMarkerPulsing {
+    [markerView startPulsing];
+}
+
+- (void)stopMarkerPulsing {
+    [markerView stopPulsing];
 }
 
 - (bool)isValidPosition:(cv::Point)p {

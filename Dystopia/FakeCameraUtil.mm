@@ -88,6 +88,33 @@ FakeCameraUtil *fakeCameraUtilInstance = nil;
     return fakeCameraImage;
 }
 
+- (UIImage *)drawBricksWithSize:(CGSize)size {
+    UIGraphicsBeginImageContextWithOptions(size, NO, 1.0f);
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            if (brickChecked[i][j]) {
+                CGRect rectRotated = [[BoardUtil instance] brickScreenRect:cv::Point(j, i)];
+                CGRect rect = CGRectMake(size.width - rectRotated.origin.y - rectRotated.size.height, rectRotated.origin.x, rectRotated.size.height, rectRotated.size.width);
+                rect.origin.x += 2.0f;
+                rect.origin.y += 2.0f;
+                rect.size.width -= 4.0f;
+                rect.size.height -= 4.0f;
+                CGContextSetFillColorWithColor(context, [UIColor blackColor].CGColor);
+                CGContextFillRect(context, rect);
+            }
+        }
+    }
+    
+    UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return outputImage;
+}
+
 - (UIImage *)drawBricksOnImage:(UIImage *)image {
     UIGraphicsBeginImageContextWithOptions(image.size, YES, 1.0f);
     

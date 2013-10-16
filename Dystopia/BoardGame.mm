@@ -29,14 +29,13 @@
 #import "ExternalDisplay.h"
 #import "PreviewableViewController.h"
 
+#define BOARD_GAME_NEXT_OBJECT_DELAY 1.5f
+
 @interface BoardGame () {
     UIView *boardRecognizedView;
 
-    NSMutableArray *heroesToMove;
-    HeroFigure *heroToMove;
-
-    NSMutableArray *monstersToMove;
-    MonsterFigure *monsterToMove;
+    NSMutableArray *objectsToMoveInTurn;
+    MoveableGameObject *objectToMove;
     
     bool isUpdating;
 }
@@ -108,6 +107,10 @@ BoardGame *boardGameInstance;
             [self updatePlayersTurn];
             return;
         }
+        if (state == BOARD_GAME_STATE_MONSTERS_TURN) {
+            [self updateMonstersTurn];
+            return;
+        }
     } @finally {
         isUpdating = NO;
     }
@@ -131,35 +134,14 @@ BoardGame *boardGameInstance;
     NSLog(@"Starting players turn");
     [self endMonstersTurn];
     state = BOARD_GAME_STATE_PLAYERS_TURN;
-    heroesToMove = [NSMutableArray array];
-    for (HeroFigure *hero in [Board instance].heroFigures) {
-        if (hero.active) {
-            [heroesToMove addObject:hero];
-        }
-    }
+    [self startTurnWithObjects:[Board instance].heroFigures];
     [self startNextPlayerTurn];
 }
 
 - (void)startNextPlayerTurn {
     NSLog(@"Next players turn");
-    if (heroToMove != nil) {
-        [heroToMove.markerView show];
-        [heroesToMove removeObject:heroToMove];
-    }
-    heroToMove = nil;
-    [self endTurn];
-    for (HeroFigure *hero in heroesToMove) {
-        if (heroToMove == nil && hero.active && hero.recognizedOnBoard) {
-            heroToMove = hero;
-            [hero.markerView show];
-        } else {
-            [hero.markerView hide];
-        }
-    }
-    if (heroToMove != nil) {
-        NSLog(@"Player %i turn", heroToMove.type);
-        [[Board instance] showMoveableLocations:[heroToMove floodFillMoveablePositions]];
-    } else {
+    [self nextObjectTurn];
+    if (objectToMove == nil) {
         [self startMonstersTurn];
     }
 }
@@ -168,36 +150,45 @@ BoardGame *boardGameInstance;
     NSLog(@"Starting monsters turn");
     [self endPlayersTurn];
     state = BOARD_GAME_STATE_MONSTERS_TURN;
-    monstersToMove = [NSMutableArray array];
-    for (MonsterFigure *monster in [Board instance].monsterFigures) {
-        if (monster.active) {
-            [monstersToMove addObject:monster];
-        }
-    }
+    [self startTurnWithObjects:[Board instance].monsterFigures];
     [self startNextMonsterTurn];
 }
 
 - (void)startNextMonsterTurn {
     NSLog(@"Next monsters turn");
-    if (monsterToMove != nil) {
-        [monsterToMove.markerView show];
-        [monstersToMove removeObject:monsterToMove];
+    [self nextObjectTurn];
+    if (objectToMove == nil) {
+        [self startPlayersTurn];
     }
-    monsterToMove = nil;
-    [self endTurn];
-    for (MonsterFigure *monster in monstersToMove) {
-        if (monsterToMove == nil && monster.active && monster.recognizedOnBoard) {
-            monsterToMove = monster;
-            [monster.markerView show];
-        } else {
-            [monsterToMove.markerView hide];
+}
+
+- (void)startTurnWithObjects:(NSMutableArray *)objects {
+    objectsToMoveInTurn = [NSMutableArray array];
+    for (MoveableGameObject *object in objects) {
+        if (object.active) {
+            [objectsToMoveInTurn addObject:object];
         }
     }
-    if (monsterToMove != nil) {
-        NSLog(@"Monster %i turn", monsterToMove.type);
-        [[Board instance] showMoveableLocations:[monsterToMove floodFillMoveablePositions]];
-    } else {
-        [self startPlayersTurn];
+}
+
+- (void)nextObjectTurn {
+    if (objectToMove != nil) {
+        [self hideMarkerViewForObject:objectToMove];
+        [objectsToMoveInTurn removeObject:objectToMove];
+        objectToMove = nil;
+    }
+    [self endTurn];
+    for (MoveableGameObject *object in objectsToMoveInTurn) {
+        if (objectToMove == nil && object.active && object.recognizedOnBoard) {
+            objectToMove = object;
+            [self performSelector:@selector(showPulsingMarkerViewForObject:) withObject:object afterDelay:BOARD_GAME_NEXT_OBJECT_DELAY];
+        } else {
+            [self hideMarkerViewForObject:object];
+        }
+    }
+    if (objectToMove != nil) {
+        NSLog(@"Object %i turn", objectToMove.type);
+        [[Board instance] showMoveableLocations:[objectToMove floodFillMoveablePositions]];
     }
 }
 
@@ -226,34 +217,53 @@ BoardGame *boardGameInstance;
 }
 
 - (void)disableNonRecognizedHeroes {
+    NSMutableArray *remainingFigures = [NSMutableArray array];
     for (HeroFigure *hero in [Board instance].heroFigures) {
         if (!hero.recognizedOnBoard) {
+            [hero hideBrick];
             hero.active = NO;
+        } else {
+            [remainingFigures addObject:hero];
         }
     }
+    [Board instance].heroFigures = remainingFigures;
 }
 
 - (void)updatePlayersTurnInitial {
     [self updateInitialHeroPositions];
     for (HeroFigure *hero in [Board instance].heroFigures) {
-        if (hero != heroToMove) {
+        if (hero != objectToMove) {
             [hero hideMarker];
         }
     }
 }
 
 - (void)updatePlayersTurn {
+    if ([self updateObjectMovement]) {
+        [self startNextPlayerTurn];
+    }
+}
+
+- (void)updateMonstersTurn {
+    if ([self updateObjectMovement]) {
+        [self startNextMonsterTurn];
+    }
+}
+
+- (bool)updateObjectMovement {
     if (![self isBoardReadyForStateUpdate]) {
-        return;
+        return NO;
     }
     cv::Point position;
     @synchronized([BoardCalibrator instance].boardImageLock) {
-        position = [[BrickRecognizer instance] positionOfBrickAtLocations:[heroToMove floodFillMoveablePositions] inImage:[BoardCalibrator instance].boardImage controlPoints:[[Board instance] randomControlPoints:10]];
+        position = [[BrickRecognizer instance] positionOfBrickAtLocations:[objectToMove floodFillMoveablePositions] inImage:[BoardCalibrator instance].boardImage];
     };
-    if (position != heroToMove.position && position.x != -1) {
-        NSLog(@"Hero %i moved to %i, %i", heroToMove.type, position.x, position.y);
-        [heroToMove moveToPosition:position];
-        [self startNextPlayerTurn];
+    if (position != objectToMove.position && position.x != -1) {
+        NSLog(@"Object %i moved to %i, %i", objectToMove.type, position.x, position.y);
+        [objectToMove moveToPosition:position];
+        return YES;
+    } else {
+        return NO;
     }
 }
 
@@ -293,12 +303,30 @@ BoardGame *boardGameInstance;
                 [hero showMarker];
                 [hero hideBrick];
                 if (state == BOARD_GAME_STATE_PLAYERS_TURN_INITIAL) {
-                    [heroesToMove addObject:hero];
+                    [objectsToMoveInTurn addObject:hero];
                 }
                 break;
             }
         }
     }
+}
+
+- (void)showPulsingMarkerViewForObject:(GameObject *)object {
+    [self bringSubviewToFront:object];
+    [object startMarkerPulsing];
+}
+
+- (void)showBrickViewForObject:(GameObject *)object {
+    [self bringSubviewToFront:object];
+    [object showBrick];
+}
+
+- (void)hideMarkerViewForObject:(GameObject *)object {
+    [object hideMarker];
+}
+
+- (void)hideBrickViewForObject:(GameObject *)object {
+    [object hideBrick];
 }
 
 - (bool)isBoardReadyForStateUpdate {

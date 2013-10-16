@@ -32,6 +32,7 @@
 #define HISTOGRAM_BIN_COUNT 4
 
 #define BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA 50.0f
+#define BRICK_RECOGNITION_MINIMUM_PROBABILITY 0.5f
 
 BrickRecognizer *brickRecognizerInstance = nil;
 
@@ -46,18 +47,22 @@ BrickRecognizer *brickRecognizerInstance = nil;
     }
 }
 
-- (cv::Point)positionOfBrickAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image controlPoints:(cv::vector<cv::Point>)controlPoints {
+- (cv::Point)positionOfBrickAtLocations:(cv::vector<cv::Point>)locations inImage:(cv::Mat)image {
     CGSize brickSize = [[BoardUtil instance] singleBrickScreenSizeFromBoardSize:CGSizeMake(image.cols, image.rows)];
     
-    cv::vector<cv::Point> allLocations = [self allLocationsFromLocations:locations controlPoints:controlPoints];
-    cv::Mat allBricksImage = [self tiledImageFromLocations:allLocations inImage:image];
+    cv::Mat brickImages = [self tiledImageFromLocations:locations inImage:image];
     
-    MedianMinMax medianMinMax = [self medianMinMaxFromLocations:allLocations inTiledImage:allBricksImage brickSize:brickSize];
-    //NSLog(@"Median: %f - %f = %f", medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
+    MedianMinMax medianMinMax = [self medianMinMaxFromLocations:locations inTiledImage:brickImages brickSize:brickSize];
+    NSLog(@"Median: %f - %f = %f", medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
     if (medianMinMax.max - medianMinMax.min < BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
         return cv::Point(-1, -1);
     }
     cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:locations inImage:image];
+    float maxProbability = [self maxProbabilityFromProbabilities:probabilities];
+    NSLog(@"%f", maxProbability);
+    if (maxProbability < BRICK_RECOGNITION_MINIMUM_PROBABILITY) {
+        return cv::Point(-1, -1);
+    }
     return [self maxProbabilityPositionFromLocations:locations probabilities:probabilities];
 }
 
@@ -80,6 +85,14 @@ BrickRecognizer *brickRecognizerInstance = nil;
         }
     }
     return positions;
+}
+
+- (float)maxProbabilityFromProbabilities:(cv::vector<float>)probabilities {
+    float maxProb = 0.0f;
+    for (int i = 0; i < probabilities.size(); i++) {
+        maxProb = MAX(maxProb, probabilities[i]);
+    }
+    return maxProb;
 }
 
 - (cv::Point)maxProbabilityPositionFromLocations:(cv::vector<cv::Point>)locations probabilities:(cv::vector<float>)probabilities {

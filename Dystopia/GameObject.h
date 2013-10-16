@@ -39,6 +39,9 @@
 - (void)showMarker;
 - (void)hideMarker;
 
+- (void)startMarkerPulsing;
+- (void)stopMarkerPulsing;
+
 - (bool)isValidPosition:(cv::Point)p;
 
 @property (nonatomic) cv::Point position;

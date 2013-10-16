@@ -99,9 +99,9 @@
     [[ExternalDisplay instance].window addSubview:externalDislayCalibrationBorderView];
     [ExternalDisplay instance].window.hidden = [ExternalDisplay instance].externalDisplayFound ? NO : YES;
     
-    if (![ExternalDisplay instance].externalDisplayFound) {
+    //if (![ExternalDisplay instance].externalDisplayFound) {
         [self startGame];
-    }
+    //}
 }
 
 - (void)startGame {
@@ -167,6 +167,9 @@
     [BoardGame instance].frame = [ExternalDisplay instance].screen.bounds;
     [[ExternalDisplay instance].window insertSubview:[BoardGame instance] atIndex:0];
     [[BoardGame instance] startWithLevel:0];
+    if (![CameraSession instance].initialized) {
+        [self prepareSimulatorView];
+    }
 }
 
 - (void)boardGameFinished {
@@ -191,11 +194,11 @@
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskLandscapeRight;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    return UIInterfaceOrientationIsPortrait(interfaceOrientation);
+    return UIInterfaceOrientationIsLandscape(interfaceOrientation);
 }
 
 - (BOOL)shouldAutorotate {

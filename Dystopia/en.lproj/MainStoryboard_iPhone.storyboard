@@ -9,7 +9,6 @@
         <scene sceneID="Nbc-l5-NoO">
             <objects>
                 <navigationController wantsFullScreenLayout="YES" definesPresentationContext="YES" navigationBarHidden="YES" id="oqh-3u-mec" sceneMemberID="viewController">
-                    <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ueD-dl-pqj">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>

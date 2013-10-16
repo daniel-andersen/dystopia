@@ -33,6 +33,7 @@
 - (UIImage *)rotateImageToLandscapeMode:(UIImage *)image;
 - (UIImage *)fakeOutputImage;
 
+- (UIImage *)drawBricksWithSize:(CGSize)size;
 - (UIImage *)drawBricksOnImage:(UIImage *)image;
 
 - (void)clickAtPoint:(cv::Point)p;

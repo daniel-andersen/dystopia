@@ -30,6 +30,7 @@
 #import "Util.h"
 #import "UIImage+OpenCV.h"
 #import "FakeCameraUtil.h"
+#import "BoardGame.h"
 
 PreviewableViewController *previewInstance = nil;
 
@@ -41,6 +42,7 @@ PreviewableViewController *previewInstance = nil;
     
     UIImageView *cameraPreview;
     UIImageView *boardPreview;
+    UIImageView *simulatorBricksView;
     
     UIButton *boardButton;
     UIButton *cameraPreviewButton;
@@ -111,6 +113,14 @@ PreviewableViewController *previewInstance = nil;
     [cameraPreviewButton addTarget:self action:@selector(cameraPreviewButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [takeScreenshotButton addTarget:self action:@selector(takeScreenshotButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     cameraPreviewButton.enabled = NO;
+}
+
+- (void)prepareSimulatorView {
+    [cameraPreview addSubview:[BoardGame instance]];
+    cameraPreview.transform = CGAffineTransformMakeRotation(-M_PI_2);
+
+    simulatorBricksView = [[UIImageView alloc] initWithFrame:cameraPreview.bounds];
+    [cameraPreview addSubview:simulatorBricksView];
 }
 
 - (void)boardButtonPressed:(id)sender {
@@ -244,7 +254,11 @@ PreviewableViewController *previewInstance = nil;
 
 - (void)previewCamera:(UIImage *)image {
     if (cameraPreview.hidden == NO) {
-        cameraPreview.image = image;
+        if ([CameraSession instance].initialized) {
+            cameraPreview.image = image;
+        } else {
+            simulatorBricksView.image = [[FakeCameraUtil instance] drawBricksWithSize:simulatorBricksView.frame.size];
+        }
     }
 }
 

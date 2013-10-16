@@ -26,13 +26,17 @@
 #import "AnimatableBrickView.h"
 
 #define GAME_OBJECT_BRICK_ANIMATION_DURATION 1.0f
+#define GAME_OBJECT_BRICK_PULSING_DURATION 2.0f
 
 #define GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_UNCHANGED 0
 #define GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_VISIBLE   1
 #define GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_HIDDEN    2
+#define GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_PULSING   3
 
 @interface AnimatableBrickView () {
     int animationEndTransitionState;
+    bool pulsing;
+    int pulseAnimation;
 }
 
 @end
@@ -40,14 +44,17 @@
 @implementation AnimatableBrickView
 
 @synthesize viewAlpha = _viewAlpha;
+@synthesize pulseAlpha;
 @synthesize visible;
 @synthesize animating;
 
 - (id)init {
     if (self = [super init]) {
         animating = NO;
+        pulsing = NO;
         visible = NO;
         _viewAlpha = 1.0f;
+        pulseAlpha = 0.5f;
     }
     return self;
 }
@@ -57,7 +64,7 @@
         if (visible) {
             return;
         }
-        if (animating) {
+        if (animating && !pulsing) {
             animationEndTransitionState = GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_VISIBLE;
             return;
         }
@@ -68,7 +75,7 @@
         self.alpha = 0.0f;
         self.transform = CGAffineTransformMakeScale(2.0f, 2.0f);
         [UIView animateWithDuration:GAME_OBJECT_BRICK_ANIMATION_DURATION animations:^{
-            self.alpha = self.viewAlpha;
+            self.alpha = animationEndTransitionState != GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_PULSING ? self.viewAlpha : self.pulseAlpha;
             self.transform = CGAffineTransformIdentity;
         } completion:^(BOOL finished) {
             if (finished) {
@@ -84,12 +91,13 @@
         if (!visible) {
             return;
         }
-        if (animating) {
+        if (animating && !pulsing) {
             animationEndTransitionState = GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_HIDDEN;
             return;
         }
         animating = YES;
         visible = NO;
+        [self stopPulsing];
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         self.transform = CGAffineTransformIdentity;
@@ -111,8 +119,45 @@
         [self show];
     } else if (animationEndTransitionState == GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_VISIBLE) {
         [self hide];
+    } else if (animationEndTransitionState == GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_PULSING) {
+        [self startPulsing];
     }
     animationEndTransitionState = GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_UNCHANGED;
+}
+
+- (void)startPulsing {
+    if (pulsing) {
+        return;
+    }
+    if (!visible) {
+        animationEndTransitionState = GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_PULSING;
+        [self show];
+    } else {
+        pulsing = YES;
+        pulseAnimation = 1;
+        [self animatePulse];
+    }
+}
+
+- (void)stopPulsing {
+    pulsing = NO;
+}
+
+- (void)animatePulse {
+    if (!pulsing) {
+        return;
+    }
+    animating = YES;
+    pulseAnimation = !pulseAnimation;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        float alpha = pulseAnimation == 0 ? self.viewAlpha : self.pulseAlpha;
+        float scale = pulseAnimation == 0 ? 1.0f : 0.95f;
+        [UIView animateWithDuration:(GAME_OBJECT_BRICK_PULSING_DURATION / 2.0f) animations:^{
+            self.alpha = alpha;
+            self.transform = CGAffineTransformMakeScale(scale, scale);
+        }];
+    });
+    [self performSelector:@selector(animatePulse) withObject:nil afterDelay:(GAME_OBJECT_BRICK_PULSING_DURATION / 2.0f)];
 }
 
 - (void)setViewAlpha:(float)viewAlpha {

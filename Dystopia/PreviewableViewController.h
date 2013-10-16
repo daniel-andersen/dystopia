@@ -32,6 +32,8 @@
 
 + (PreviewableViewController *)instance;
 
+- (void)prepareSimulatorView;
+
 - (void)previewFrame:(UIImage *)image;
 - (void)previewProbabilityOfBrick:(float)probability x:(int)x y:(int)y;
 
