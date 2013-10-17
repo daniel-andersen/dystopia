@@ -29,10 +29,10 @@
 #import "BrickRecognizer.h"
 #import "UIImage+OpenCV.h"
 
-#define HISTOGRAM_BIN_COUNT 4
+#define HISTOGRAM_BIN_COUNT 8
 
 #define BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA 50.0f
-#define BRICK_RECOGNITION_MINIMUM_PROBABILITY 0.5f
+#define BRICK_RECOGNITION_MINIMUM_PROBABILITY 0.4f
 
 BrickRecognizer *brickRecognizerInstance = nil;
 
@@ -53,16 +53,18 @@ BrickRecognizer *brickRecognizerInstance = nil;
     cv::Mat brickImages = [self tiledImageFromLocations:locations inImage:image];
     
     MedianMinMax medianMinMax = [self medianMinMaxFromLocations:locations inTiledImage:brickImages brickSize:brickSize];
-    NSLog(@"Median: %f - %f = %f", medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
+    //NSLog(@"Median: %f - %f = %f", medianMinMax.min, medianMinMax.max, medianMinMax.max - medianMinMax.min);
     if (medianMinMax.max - medianMinMax.min < BRICK_RECOGNITION_MINIMUM_MEDIAN_DELTA) {
         return cv::Point(-1, -1);
     }
     cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:locations inImage:image];
     float maxProbability = [self maxProbabilityFromProbabilities:probabilities];
-    NSLog(@"%f", maxProbability);
-    if (maxProbability < BRICK_RECOGNITION_MINIMUM_PROBABILITY) {
+    float secondMaxProbability = [self secondMaxProbabilityFromProbabilities:probabilities];
+    //NSLog(@"%f", maxProbability);
+    if (maxProbability < BRICK_RECOGNITION_MINIMUM_PROBABILITY || secondMaxProbability >= BRICK_RECOGNITION_MINIMUM_PROBABILITY) {
         return cv::Point(-1, -1);
     }
+    //NSLog(@"BRICK!");
     return [self maxProbabilityPositionFromLocations:locations probabilities:probabilities];
 }
 
@@ -79,6 +81,11 @@ BrickRecognizer *brickRecognizerInstance = nil;
             continue;
         }
         cv::vector<float> probabilities = [self probabilitiesOfBricksAtLocations:brickLocations inImage:image];
+        float maxProbability = [self maxProbabilityFromProbabilities:probabilities];
+        float secondMaxProbability = [self secondMaxProbabilityFromProbabilities:probabilities];
+        if (maxProbability < BRICK_RECOGNITION_MINIMUM_PROBABILITY || secondMaxProbability >= BRICK_RECOGNITION_MINIMUM_PROBABILITY) {
+            continue;
+        }
         cv::Point maxProbPosition = [self maxProbabilityPositionFromLocations:brickLocations probabilities:probabilities];
         if (maxProbPosition == locations[i]) {
             positions.push_back(locations[i]);
@@ -93,6 +100,18 @@ BrickRecognizer *brickRecognizerInstance = nil;
         maxProb = MAX(maxProb, probabilities[i]);
     }
     return maxProb;
+}
+
+- (float)secondMaxProbabilityFromProbabilities:(cv::vector<float>)probabilities {
+    float maxProb = 0.0f;
+    float secondMaxProb = 0.0f;
+    for (int i = 0; i < probabilities.size(); i++) {
+        if (probabilities[i] > maxProb) {
+            secondMaxProb = maxProb;
+            maxProb = probabilities[i];
+        }
+    }
+    return secondMaxProb;
 }
 
 - (cv::Point)maxProbabilityPositionFromLocations:(cv::vector<cv::Point>)locations probabilities:(cv::vector<float>)probabilities {

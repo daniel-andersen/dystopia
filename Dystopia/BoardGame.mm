@@ -37,6 +37,8 @@
     NSMutableArray *objectsToMoveInTurn;
     MoveableGameObject *objectToMove;
     
+    NSMutableArray *heroFigureMoveOrder;
+    
     bool isUpdating;
 }
 
@@ -119,6 +121,7 @@ BoardGame *boardGameInstance;
 - (void)startPlaceHeroes {
     NSLog(@"Starting place heroes");
     state = BOARD_GAME_STATE_PLACE_HEROES;
+    heroFigureMoveOrder = [NSMutableArray array];
     for (HeroFigure *hero in [Board instance].heroFigures) {
         [hero showBrick];
     }
@@ -126,15 +129,17 @@ BoardGame *boardGameInstance;
 
 - (void)startInitialPlayersTurn {
     NSLog(@"Starting players turn (initial)");
-    [self startPlayersTurn];
+    [self endMonstersTurn];
     state = BOARD_GAME_STATE_PLAYERS_TURN_INITIAL;
+    [self startTurnWithObjects:[Board instance].heroFigures];
+    [self startNextPlayerTurn];
 }
 
 - (void)startPlayersTurn {
     NSLog(@"Starting players turn");
     [self endMonstersTurn];
     state = BOARD_GAME_STATE_PLAYERS_TURN;
-    [self startTurnWithObjects:[Board instance].heroFigures];
+    [self startTurnWithObjects:heroFigureMoveOrder];
     [self startNextPlayerTurn];
 }
 
@@ -302,6 +307,7 @@ BoardGame *boardGameInstance;
                 hero.active = YES;
                 [hero showMarker];
                 [hero hideBrick];
+                [heroFigureMoveOrder addObject:hero];
                 if (state == BOARD_GAME_STATE_PLAYERS_TURN_INITIAL) {
                     [objectsToMoveInTurn addObject:hero];
                 }
