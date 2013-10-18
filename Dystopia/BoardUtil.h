@@ -58,6 +58,7 @@
 
 - (CGPoint)brickScreenPosition:(cv::Point)brickBoardPosition;
 - (CGRect)brickScreenRect:(cv::Point)brickBoardPosition;
+- (CGRect)bricksScreenRectPosition1:(cv::Point)p1 position2:(cv::Point)p2;
 
 - (CGRect)brickTypeFrame:(int)brickType position:(cv::Point)position;
 

@@ -90,6 +90,8 @@
 		65F8D2E517F363F400FE41DF /* bricks9.png in Resources */ = {isa = PBXBuildFile; fileRef = 65F8D2E417F363F400FE41DF /* bricks9.png */; };
 		65F8D2E817F4184100FE41DF /* GameObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65F8D2E717F4184000FE41DF /* GameObject.mm */; };
 		65F8D2EC17F41F7B00FE41DF /* brick_marker.png in Resources */ = {isa = PBXBuildFile; fileRef = 65F8D2EB17F41F7B00FE41DF /* brick_marker.png */; };
+		65FE8C67181154AD00DC6218 /* door1_vertical.png in Resources */ = {isa = PBXBuildFile; fileRef = 65FE8C66181154AD00DC6218 /* door1_vertical.png */; };
+		65FE8C691811585600DC6218 /* door1_horizontal.png in Resources */ = {isa = PBXBuildFile; fileRef = 65FE8C681811585600DC6218 /* door1_horizontal.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -207,6 +209,8 @@
 		65F8D2E617F4184000FE41DF /* GameObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
 		65F8D2E717F4184000FE41DF /* GameObject.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GameObject.mm; sourceTree = "<group>"; };
 		65F8D2EB17F41F7B00FE41DF /* brick_marker.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = brick_marker.png; path = markers/brick_marker.png; sourceTree = "<group>"; };
+		65FE8C66181154AD00DC6218 /* door1_vertical.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = door1_vertical.png; sourceTree = "<group>"; };
+		65FE8C681811585600DC6218 /* door1_horizontal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = door1_horizontal.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -396,6 +400,7 @@
 		65B930AD17806BE800312B88 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				65FE8C65181154AD00DC6218 /* Doors */,
 				65DCC50B180427490082785F /* Simulator */,
 				6552705117B1733000784CD7 /* Board */,
 				650D4298178F366700D89CEB /* Bricks */,
@@ -514,6 +519,16 @@
 			name = Markers;
 			sourceTree = "<group>";
 		};
+		65FE8C65181154AD00DC6218 /* Doors */ = {
+			isa = PBXGroup;
+			children = (
+				65FE8C66181154AD00DC6218 /* door1_vertical.png */,
+				65FE8C681811585600DC6218 /* door1_horizontal.png */,
+			);
+			name = Doors;
+			path = doors;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -575,6 +590,7 @@
 				650D4219178B335500D89CEB /* icon_57x57.png in Resources */,
 				650D421B178B335F00D89CEB /* icon_114x114.png in Resources */,
 				650D4240178DEDAE00D89CEB /* trollsahead_logo.png in Resources */,
+				65FE8C691811585600DC6218 /* door1_horizontal.png in Resources */,
 				650D428E178F365F00D89CEB /* bricks1.png in Resources */,
 				656AECA017FAEA95004CB86B /* marker_warrior.png in Resources */,
 				650D428F178F365F00D89CEB /* bricks2.png in Resources */,
@@ -606,6 +622,7 @@
 				65AAD04017C2468B003BFC4C /* dystopia_logo.png in Resources */,
 				658AF18518058D0B00BFF6A4 /* fake_board_5.png in Resources */,
 				65F8D2E517F363F400FE41DF /* bricks9.png in Resources */,
+				65FE8C67181154AD00DC6218 /* door1_vertical.png in Resources */,
 				65F8D2EC17F41F7B00FE41DF /* brick_marker.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

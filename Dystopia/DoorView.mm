@@ -39,6 +39,15 @@
 }
 
 - (void)initializeDoor {
+    self.layer.contents = (id)[self doorImage].CGImage;
+}
+
+- (UIImage *)doorImage {
+    if (ABS(self.position1.x - self.position2.x) == 0) {
+        return [UIImage imageNamed:@"door1_horizontal.png"];
+    } else {
+        return [UIImage imageNamed:@"door1_vertical.png"];
+    }
 }
 
 @end
