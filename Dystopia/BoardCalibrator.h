@@ -43,10 +43,10 @@
 
 - (cv::Mat)perspectiveCorrectImage:(cv::Mat)image;
 
-@property (readonly) int state;
-@property (readonly) BoardBounds boardBounds;
-@property (readonly) cv::Mat boardImage;
-@property (nonatomic) NSObject *boardImageLock;
-@property (readonly) FourPoints screenPoints;
+@property (nonatomic, readonly) int state;
+@property (nonatomic, readonly) BoardBounds boardBounds;
+@property (nonatomic, readonly) cv::Mat boardImage;
+@property (nonatomic, retain) NSObject *boardImageLock;
+@property (nonatomic, readonly) FourPoints screenPoints;
 
 @end

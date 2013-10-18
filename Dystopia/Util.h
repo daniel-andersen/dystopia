@@ -46,6 +46,8 @@ typedef struct {
 + (bool)isLandscapeOrientation;
 + (bool)isPortraitOrientation;
 
++ (UIImage *)radialGradientWithSize:(CGSize)size centerPosition:(CGPoint)p radius:(float)radius;
+
 + (void)saveImage:(UIImage *)image toDocumentsFolderWithPrefix:(NSString *)prefix;
 
 @end

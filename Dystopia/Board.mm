@@ -27,12 +27,15 @@
 #import "BorderView.h"
 #import "ExternalDisplay.h"
 #import "MoveableLocationsView.h"
+#import "DoorView.h"
 
 @interface Board () {
     int brickMap[BOARD_HEIGHT][BOARD_WIDTH];
+    int brickVisibilityMap[BOARD_HEIGHT][BOARD_WIDTH];
     int objectMap[BOARD_HEIGHT][BOARD_WIDTH];
     
     NSMutableArray *brickViews;
+    NSMutableArray *connectionsViews;
 
     MoveableLocationsView *moveableLocationsView;
     
@@ -99,6 +102,22 @@ Board *boardInstance = nil;
     for (BrickView *brickView in brickViews) {
         [self addSubview:brickView];
     }
+
+    connectionsViews = [NSMutableArray array];
+    [self addDoorAtPosition1:cv::Point(7, 5) position2:cv::Point(7, 6) type:DOOR_TYPE_NORMAL];
+    [self addDoorAtPosition1:cv::Point(7, 14) position2:cv::Point(7, 15) type:DOOR_TYPE_NORMAL];
+    [self addDoorAtPosition1:cv::Point(13, 10) position2:cv::Point(14, 10) type:DOOR_TYPE_NORMAL];
+    [self addConnectionViewAtPosition1:cv::Point(7, 10) position2:cv::Point(8, 10) type:CONNECTION_TYPE_CORNER];
+    [self addConnectionViewAtPosition1:cv::Point(5, 4) position2:cv::Point(6, 5) type:CONNECTION_TYPE_VIEW_GLUE];
+    [self addConnectionViewAtPosition1:cv::Point(7, 8) position2:cv::Point(7, 9) type:CONNECTION_TYPE_VIEW_GLUE];
+    [self addConnectionViewAtPosition1:cv::Point(7, 11) position2:cv::Point(7, 12) type:CONNECTION_TYPE_VIEW_GLUE];
+    [self addConnectionViewAtPosition1:cv::Point(10, 10) position2:cv::Point(11, 10) type:CONNECTION_TYPE_VIEW_GLUE];
+    for (ConnectionView *connectionView in connectionsViews) {
+        [self addSubview:connectionView];
+    }
+
+    [self makeBrickViewVisible:[brickViews objectAtIndex:0]];
+
     [self refreshBrickMap];
 }
 
@@ -107,12 +126,42 @@ Board *boardInstance = nil;
     [self addSubview:borderView];
 }
 
+- (void)addConnectionViewAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 type:(int)type {
+    [connectionsViews addObject:[[ConnectionView alloc] initWithPosition1:position1 position2:position2 type:type]];
+}
+
+- (void)addDoorAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 type:(int)type {
+    [connectionsViews addObject:[[DoorView alloc] initWithPosition1:position1 position2:position2 doorType:type]];
+}
+
+- (void)addBrickOfType:(int)type atPosition:(cv::Point)position {
+    [brickViews addObject:[[BrickView alloc] initWithPosition:position type:type]];
+}
+
+- (void)makeBrickViewVisible:(BrickView *)brickView {
+    if (brickView.visible) {
+        return;
+    }
+    [brickView show];
+    for (ConnectionView *connectionView in connectionsViews) {
+        if ([connectionView isNextToBrickView:brickView]) {
+            [connectionView show];
+            if (connectionView.type == CONNECTION_TYPE_VIEW_GLUE) {
+                [self makeBrickViewVisible:connectionView.brickView1];
+                [self makeBrickViewVisible:connectionView.brickView2];
+            }
+            [connectionView reveilConnection];
+        }
+    }
+    [self refreshBrickMap];
+}
+
 - (void)refreshBrickPositions {
     brickPositions = cv::vector<cv::Point>();
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
             cv::Point p = cv::Point(j, i);
-            if ([self hasBrickAtPosition:p]) {
+            if ([self hasVisibleBrickAtPosition:p]) {
                 brickPositions.push_back(p);
             }
         }
@@ -123,13 +172,14 @@ Board *boardInstance = nil;
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
             brickMap[i][j] = -1;
+            brickVisibilityMap[i][j] = BOARD_BRICK_NONE;
         }
     }
     for (BrickView *brickView in brickViews) {
-        CGSize size = [[BoardUtil instance] brickTypeBoardSize:brickView.brickType];
-        for (int i = 0; i < size.height; i++) {
-            for (int j = 0; j < size.width; j++) {
-                brickMap[i + brickView.position.y][j + brickView.position.x] = brickView.brickType;
+        for (int i = 0; i < brickView.size.height; i++) {
+            for (int j = 0; j < brickView.size.width; j++) {
+                brickMap[i + brickView.position.y][j + brickView.position.x] = brickView.type;
+                brickVisibilityMap[i + brickView.position.y][j + brickView.position.x] = brickView.visible ? BOARD_BRICK_VISIBLE : BOARD_BRICK_INVISIBLE;
             }
         }
     }
@@ -148,8 +198,23 @@ Board *boardInstance = nil;
     }
 }
 
-- (void)addBrickOfType:(int)type atPosition:(cv::Point)position {
-    [brickViews addObject:[[BrickView alloc] initWithPosition:position brickType:type]];
+- (bool)shouldOpenDoorAtPosition:(cv::Point)position {
+    for (ConnectionView *connectionView in connectionsViews) {
+        if ([connectionView canOpen] && [connectionView isAtPosition:position]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)openDoorAtPosition:(cv::Point)position {
+    for (ConnectionView *connectionView in connectionsViews) {
+        if ([connectionView canOpen] && [connectionView isAtPosition:position]) {
+            [self makeBrickViewVisible:connectionView.brickView1];
+            [self makeBrickViewVisible:connectionView.brickView2];
+            [connectionView openConnection];
+        }
+    }
 }
 
 - (void)showMoveableLocations:(cv::vector<cv::Point>)locations {
@@ -164,8 +229,22 @@ Board *boardInstance = nil;
     return position.x >= 0 && position.y >= 0 && position.x < BOARD_WIDTH && position.y < BOARD_HEIGHT && brickMap[position.y][position.x] != -1;
 }
 
+- (bool)hasVisibleBrickAtPosition:(cv::Point)position {
+    return position.x >= 0 && position.y >= 0 && position.x < BOARD_WIDTH && position.y < BOARD_HEIGHT && brickVisibilityMap[position.y][position.x] == BOARD_BRICK_VISIBLE;
+}
+
 - (bool)hasObjectAtPosition:(cv::Point)position {
     return position.x >= 0 && position.y >= 0 && position.x < BOARD_WIDTH && position.y < BOARD_HEIGHT && objectMap[position.y][position.x] != -1;
+}
+
+- (BrickView *)brickViewAtPosition:(cv::Point)p {
+    for (BrickView *brickView in brickViews) {
+        if (p.x >= brickView.position.x && p.x < brickView.position.x + brickView.size.width &&
+            p.y >= brickView.position.y && p.y < brickView.position.y + brickView.size.height) {
+            return brickView;
+        }
+    }
+    return nil;
 }
 
 - (void)initializeFigures {

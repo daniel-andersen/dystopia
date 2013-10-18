@@ -30,6 +30,7 @@
 #import "PreviewableViewController.h"
 
 #define BOARD_GAME_NEXT_OBJECT_DELAY 1.5f
+#define BOARD_GAME_NEXT_OBJECT_PAUSE 1.0f
 
 @interface BoardGame () {
     UIView *boardRecognizedView;
@@ -95,7 +96,8 @@ BoardGame *boardGameInstance;
     }
     @try {
         if (state == BOARD_GAME_STATE_INITIALIZING) {
-            [self startPlaceHeroes];
+            state = BOARD_GAME_WAITING_FOR_INITIALIZED;
+            [self performSelector:@selector(startPlaceHeroes) withObject:nil afterDelay:BRICKVIEW_OPEN_DOOR_DURATION];
             return;
         }
         if (state == BOARD_GAME_STATE_PLACE_HEROES) {
@@ -129,45 +131,38 @@ BoardGame *boardGameInstance;
 
 - (void)startInitialPlayersTurn {
     NSLog(@"Starting players turn (initial)");
-    [self endMonstersTurn];
     state = BOARD_GAME_STATE_PLAYERS_TURN_INITIAL;
-    [self startTurnWithObjects:[Board instance].heroFigures];
-    [self startNextPlayerTurn];
+    [self setObjectsToMove:[Board instance].heroFigures];
+    [self nextObjectTurn];
+}
+
+- (void)startNewTurns {
+    switch (state) {
+        case BOARD_GAME_STATE_PLAYERS_TURN_INITIAL:
+            [self disableNonRecognizedHeroes];
+        case BOARD_GAME_STATE_PLAYERS_TURN:
+            [self startMonstersTurn];
+            break;
+        case BOARD_GAME_STATE_MONSTERS_TURN:
+            [self startPlayersTurn];
+            break;
+    }
+    [self nextObjectTurn];
 }
 
 - (void)startPlayersTurn {
     NSLog(@"Starting players turn");
-    [self endMonstersTurn];
     state = BOARD_GAME_STATE_PLAYERS_TURN;
-    [self startTurnWithObjects:heroFigureMoveOrder];
-    [self startNextPlayerTurn];
-}
-
-- (void)startNextPlayerTurn {
-    NSLog(@"Next players turn");
-    [self nextObjectTurn];
-    if (objectToMove == nil) {
-        [self startMonstersTurn];
-    }
+    [self setObjectsToMove:heroFigureMoveOrder];
 }
 
 - (void)startMonstersTurn {
     NSLog(@"Starting monsters turn");
-    [self endPlayersTurn];
     state = BOARD_GAME_STATE_MONSTERS_TURN;
-    [self startTurnWithObjects:[Board instance].monsterFigures];
-    [self startNextMonsterTurn];
+    [self setObjectsToMove:[Board instance].monsterFigures];
 }
 
-- (void)startNextMonsterTurn {
-    NSLog(@"Next monsters turn");
-    [self nextObjectTurn];
-    if (objectToMove == nil) {
-        [self startPlayersTurn];
-    }
-}
-
-- (void)startTurnWithObjects:(NSMutableArray *)objects {
+- (void)setObjectsToMove:(NSMutableArray *)objects {
     objectsToMoveInTurn = [NSMutableArray array];
     for (MoveableGameObject *object in objects) {
         if (object.active) {
@@ -176,17 +171,28 @@ BoardGame *boardGameInstance;
     }
 }
 
+- (void)nextObjectTurnAfterPause {
+    [self hideMarkers];
+    if ([[Board instance] shouldOpenDoorAtPosition:objectToMove.position]) {
+        [[Board instance] openDoorAtPosition:objectToMove.position];
+        [self performSelector:@selector(nextObjectTurn) withObject:nil afterDelay:(BRICKVIEW_OPEN_DOOR_DURATION + BOARD_GAME_NEXT_OBJECT_PAUSE)];
+    } else {
+        [self performSelector:@selector(nextObjectTurn) withObject:nil afterDelay:BOARD_GAME_NEXT_OBJECT_PAUSE];
+    }
+}
+
 - (void)nextObjectTurn {
+    [self hideMarkers];
     if (objectToMove != nil) {
-        [self hideMarkerViewForObject:objectToMove];
         [objectsToMoveInTurn removeObject:objectToMove];
         objectToMove = nil;
     }
-    [self endTurn];
+    [[Board instance] refreshBrickMap];
+    [[Board instance] refreshObjectMap];
     for (MoveableGameObject *object in objectsToMoveInTurn) {
         if (objectToMove == nil && object.active && object.recognizedOnBoard) {
             objectToMove = object;
-            [self performSelector:@selector(showPulsingMarkerViewForObject:) withObject:object afterDelay:BOARD_GAME_NEXT_OBJECT_DELAY];
+            [self showPulsingMarkerViewForObject:object];
         } else {
             [self hideMarkerViewForObject:object];
         }
@@ -194,24 +200,13 @@ BoardGame *boardGameInstance;
     if (objectToMove != nil) {
         NSLog(@"Object %i turn", objectToMove.type);
         [[Board instance] showMoveableLocations:[objectToMove floodFillMoveablePositions]];
+    } else {
+        [self startNewTurns];
     }
-}
-
-- (void)endPlayersTurn {
-    if (state == BOARD_GAME_STATE_PLAYERS_TURN_INITIAL) {
-        [self disableNonRecognizedHeroes];
-    }
-    [self endTurn];
-}
-
-- (void)endMonstersTurn {
-    [self endTurn];
 }
 
 - (void)endTurn {
-    [self hideMarkers];
-    [[Board instance] refreshBrickMap];
-    [[Board instance] refreshObjectMap];
+    [self performSelector:@selector(nextObjectTurnAfterPause) withObject:nil afterDelay:BOARD_GAME_NEXT_OBJECT_DELAY];
 }
 
 - (void)hideMarkers {
@@ -245,13 +240,13 @@ BoardGame *boardGameInstance;
 
 - (void)updatePlayersTurn {
     if ([self updateObjectMovement]) {
-        [self startNextPlayerTurn];
+        [self endTurn];
     }
 }
 
 - (void)updateMonstersTurn {
     if ([self updateObjectMovement]) {
-        [self startNextMonsterTurn];
+        [self endTurn];
     }
 }
 

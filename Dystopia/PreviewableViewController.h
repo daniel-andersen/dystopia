@@ -37,6 +37,6 @@
 - (void)previewFrame:(UIImage *)image;
 - (void)previewProbabilityOfBrick:(float)probability x:(int)x y:(int)y;
 
-@property (readonly) UIView *overlayView;
+@property (nonatomic, readonly) UIView *overlayView;
 
 @end

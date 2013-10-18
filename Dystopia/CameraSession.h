@@ -48,8 +48,8 @@
 - (void)lock;
 - (void)unlock;
 
-@property (nonatomic) id<CameraSessionDelegate> delegate;
-@property (nonatomic) bool initialized;
+@property (nonatomic, retain) id<CameraSessionDelegate> delegate;
+@property (nonatomic, readonly) bool initialized;
 @property (nonatomic) bool readyToProcessFrame;
 @property (nonatomic) CFTimeInterval delegateProcessFrameInterval;
 

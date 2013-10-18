@@ -30,6 +30,10 @@
 #import "HeroFigure.h"
 #import "MonsterFigure.h"
 
+#define BOARD_BRICK_NONE      0
+#define BOARD_BRICK_INVISIBLE 1
+#define BOARD_BRICK_VISIBLE   2
+
 @interface Board : UIView
 
 + (Board *)instance;
@@ -38,11 +42,17 @@
 
 - (void)loadLevel:(int)l;
 
+- (bool)shouldOpenDoorAtPosition:(cv::Point)position;
+- (void)openDoorAtPosition:(cv::Point)position;
+
 - (void)showMoveableLocations:(cv::vector<cv::Point>)locations;
 - (void)hideMoveableLocations;
 
 - (bool)hasBrickAtPosition:(cv::Point)position;
+- (bool)hasVisibleBrickAtPosition:(cv::Point)position;
 - (bool)hasObjectAtPosition:(cv::Point)position;
+
+- (BrickView *)brickViewAtPosition:(cv::Point)p;
 
 - (void)refreshBrickMap;
 - (void)refreshObjectMap;
@@ -51,9 +61,9 @@
 
 - (cv::vector<cv::Point>)randomControlPoints:(int)count;
 
-@property (nonatomic) NSMutableArray *heroFigures;
-@property (nonatomic) NSMutableArray *monsterFigures;
+@property (nonatomic, retain) NSMutableArray *heroFigures;
+@property (nonatomic, retain) NSMutableArray *monsterFigures;
 
-@property (nonatomic) cv::vector<cv::Point> brickPositions;
+@property (nonatomic, readonly) cv::vector<cv::Point> brickPositions;
 
 @end

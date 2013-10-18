@@ -23,24 +23,22 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <UIKit/UIKit.h>
+#import "DoorView.h"
+#import "Board.h"
 
-#define GAME_OBJECT_BRICK_ANIMATION_DURATION 1.0f
-#define GAME_OBJECT_BRICK_PULSING_DURATION 2.0f
-#define GAME_OBJECT_BRICK_PULSING_STOP_DURATION 0.5f
+@implementation DoorView
 
-@interface AnimatableBrickView : UIImageView
+@synthesize doorType;
 
-- (void)show;
-- (void)hide;
+- (id)initWithPosition1:(cv::Point)p1 position2:(cv::Point)p2 doorType:(int)t {
+    if (self = [super initWithPosition1:p1 position2:p2 type:CONNECTION_TYPE_DOOR]) {
+        doorType = t;
+        [self initializeDoor];
+    }
+    return self;
+}
 
-- (void)startPulsing;
-- (void)stopPulsing;
-
-@property (nonatomic) float viewAlpha;
-@property (nonatomic) float pulseAlpha;
-
-@property (nonatomic, readonly) bool visible;
-@property (nonatomic, readonly) bool animating;
+- (void)initializeDoor {
+}
 
 @end

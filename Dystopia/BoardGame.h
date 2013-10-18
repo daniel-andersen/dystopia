@@ -29,10 +29,11 @@
 #import "Board.h"
 
 #define BOARD_GAME_STATE_INITIALIZING         0
-#define BOARD_GAME_STATE_PLACE_HEROES         1
-#define BOARD_GAME_STATE_PLAYERS_TURN_INITIAL 2
-#define BOARD_GAME_STATE_PLAYERS_TURN         3
-#define BOARD_GAME_STATE_MONSTERS_TURN        4
+#define BOARD_GAME_WAITING_FOR_INITIALIZED    1
+#define BOARD_GAME_STATE_PLACE_HEROES         2
+#define BOARD_GAME_STATE_PLAYERS_TURN_INITIAL 3
+#define BOARD_GAME_STATE_PLAYERS_TURN         4
+#define BOARD_GAME_STATE_MONSTERS_TURN        5
 
 @protocol BoardGameProtocol <NSObject>
 
@@ -48,9 +49,9 @@
 
 - (void)update;
 
-@property (nonatomic) id<BoardGameProtocol> delegate;
+@property (nonatomic, retain) id<BoardGameProtocol> delegate;
 
-@property (nonatomic) int level;
-@property (nonatomic) int state;
+@property (nonatomic, readonly) int level;
+@property (nonatomic, readonly) int state;
 
 @end

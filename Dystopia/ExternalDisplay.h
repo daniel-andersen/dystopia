@@ -30,11 +30,11 @@
 + (ExternalDisplay *)instance;
 - (void)initialize;
 
-@property (readonly) UIWindow *window;
-@property (readonly) UIScreen *screen;
+@property (nonatomic, readonly) UIWindow *window;
+@property (nonatomic, readonly) UIScreen *screen;
 
-@property (readonly) bool externalDisplayFound;
+@property (nonatomic, readonly) bool externalDisplayFound;
 
-@property (readonly) CGRect widescreenBounds;
+@property (nonatomic, readonly) CGRect widescreenBounds;
 
 @end

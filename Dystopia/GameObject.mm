@@ -130,7 +130,11 @@
 
 - (void)moveToPosition:(cv::Point)p {
     self.position = p;
-    self.frame = [[BoardUtil instance] brickScreenRect:self.position];
+    [self stopMarkerPulsing];
+    [UIView animateWithDuration:GAME_OBJECT_MOVE_ANIMATION_DURATION delay:GAME_OBJECT_BRICK_PULSING_STOP_DURATION options:nil animations:^{
+        self.frame = [[BoardUtil instance] brickScreenRect:self.position];
+    } completion:^(BOOL finished) {
+    }];
 }
 
 - (cv::vector<cv::Point>)moveablePositions {
@@ -148,7 +152,7 @@
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
             cv::Point p = cv::Point(j, i);
-            movementBoard[i][j] = [[Board instance] hasBrickAtPosition:p] && ![[Board instance] hasObjectAtPosition:p] ? 0 : -1;
+            movementBoard[i][j] = [[Board instance] hasVisibleBrickAtPosition:p] && ![[Board instance] hasObjectAtPosition:p] ? 0 : -1;
         }
     }
     movementBoard[self.position.y][self.position.x] = 0;

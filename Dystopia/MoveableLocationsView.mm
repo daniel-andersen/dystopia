@@ -33,6 +33,7 @@
     cv::vector<cv::Point> locations;
     NSMutableArray *views;
     UIColor *moveableLocationColor;
+    bool visible;
 }
 
 @end
@@ -49,13 +50,15 @@
 - (void)initializeGui {
     self.backgroundColor = [UIColor clearColor];
     self.alpha = 0.0f;
+    self.hidden = YES;
+    visible = NO;
     moveableLocationColor = [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:0.3f];
     views = nil;
 }
 
 - (void)showLocations:(cv::vector<cv::Point>)l {
     locations = l;
-    if (!self.hidden) {
+    if (visible) {
         [self hideLocations];
         [self performSelector:@selector(createAndShowLocations) withObject:nil afterDelay:(MOVEABLE_LOCATIONS_REAPPEAR_DURATION)];
     } else {
@@ -64,15 +67,29 @@
 }
 
 - (void)hideLocations {
+    if (!visible) {
+        return;
+    }
     dispatch_async(dispatch_get_main_queue(), ^{
         [UIView animateWithDuration:MOVEABLE_LOCATIONS_APPEAR_DURATION animations:^{
             self.alpha = 0.0f;
         }];
     });
+    [self performSelector:@selector(hideView) withObject:nil afterDelay:MOVEABLE_LOCATIONS_APPEAR_DURATION];
+}
+
+- (void)hideView {
+    self.hidden = YES;
+    visible = NO;
 }
 
 - (void)createAndShowLocations {
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (!visible) {
+            self.alpha = 0.0f;
+            self.hidden = NO;
+            visible = YES;
+        }
         [self createLocationViews];
         [UIView animateWithDuration:MOVEABLE_LOCATIONS_APPEAR_DURATION animations:^{
             self.alpha = 1.0f;

@@ -25,9 +25,6 @@
 
 #import "AnimatableBrickView.h"
 
-#define GAME_OBJECT_BRICK_ANIMATION_DURATION 1.0f
-#define GAME_OBJECT_BRICK_PULSING_DURATION 2.0f
-
 #define GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_UNCHANGED 0
 #define GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_VISIBLE   1
 #define GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_HIDDEN    2
@@ -50,13 +47,18 @@
 
 - (id)init {
     if (self = [super init]) {
-        animating = NO;
-        pulsing = NO;
-        visible = NO;
-        _viewAlpha = 1.0f;
-        pulseAlpha = 0.5f;
+        [self initialize];
     }
     return self;
+}
+
+- (void)initialize {
+    self.hidden = YES;
+    animating = NO;
+    pulsing = NO;
+    visible = NO;
+    _viewAlpha = 1.0f;
+    pulseAlpha = 0.5f;
 }
 
 - (void)show {
@@ -74,6 +76,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self.alpha = 0.0f;
         self.transform = CGAffineTransformMakeScale(2.0f, 2.0f);
+        self.hidden = NO;
         [UIView animateWithDuration:GAME_OBJECT_BRICK_ANIMATION_DURATION animations:^{
             self.alpha = animationEndTransitionState != GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_PULSING ? self.viewAlpha : self.pulseAlpha;
             self.transform = CGAffineTransformIdentity;
@@ -107,6 +110,7 @@
             self.transform = CGAffineTransformMakeScale(0.75f, 0.75f);
         } completion:^(BOOL finished) {
             if (finished) {
+                self.hidden = YES;
                 animating = NO;
                 [self updateState];
             }
@@ -141,6 +145,16 @@
 
 - (void)stopPulsing {
     pulsing = NO;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:GAME_OBJECT_BRICK_PULSING_STOP_DURATION delay:0.0f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+            self.alpha = self.viewAlpha;
+            self.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+        } completion:^(BOOL finished) {
+            if (finished) {
+                animating = NO;
+            }
+        }];
+    });
 }
 
 - (void)animatePulse {

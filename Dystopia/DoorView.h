@@ -25,22 +25,14 @@
 
 #import <UIKit/UIKit.h>
 
-#define GAME_OBJECT_BRICK_ANIMATION_DURATION 1.0f
-#define GAME_OBJECT_BRICK_PULSING_DURATION 2.0f
-#define GAME_OBJECT_BRICK_PULSING_STOP_DURATION 0.5f
+#import "ConnectionView.h"
 
-@interface AnimatableBrickView : UIImageView
+#define DOOR_TYPE_NORMAL 0
 
-- (void)show;
-- (void)hide;
+@interface DoorView : ConnectionView
 
-- (void)startPulsing;
-- (void)stopPulsing;
+- (id)initWithPosition1:(cv::Point)p1 position2:(cv::Point)p2 doorType:(int)t;
 
-@property (nonatomic) float viewAlpha;
-@property (nonatomic) float pulseAlpha;
-
-@property (nonatomic, readonly) bool visible;
-@property (nonatomic, readonly) bool animating;
+@property (nonatomic, readonly) int doorType;
 
 @end

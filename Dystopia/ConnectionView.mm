@@ -23,24 +23,64 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <UIKit/UIKit.h>
+#import "ConnectionView.h"
+#import "Board.h"
 
-#define GAME_OBJECT_BRICK_ANIMATION_DURATION 1.0f
-#define GAME_OBJECT_BRICK_PULSING_DURATION 2.0f
-#define GAME_OBJECT_BRICK_PULSING_STOP_DURATION 0.5f
+@implementation ConnectionView
 
-@interface AnimatableBrickView : UIImageView
+@synthesize position1;
+@synthesize position2;
 
-- (void)show;
-- (void)hide;
+@synthesize brickView1;
+@synthesize brickView2;
 
-- (void)startPulsing;
-- (void)stopPulsing;
+@synthesize type;
 
-@property (nonatomic) float viewAlpha;
-@property (nonatomic) float pulseAlpha;
+@synthesize visible;
+@synthesize open;
 
-@property (nonatomic, readonly) bool visible;
-@property (nonatomic, readonly) bool animating;
+- (id)initWithPosition1:(cv::Point)p1 position2:(cv::Point)p2 type:(int)t {
+    if (self = [super init]) {
+        position1 = p1;
+        position2 = p2;
+        type = t;
+        [self initialize];
+    }
+    return self;
+}
+
+- (void)initialize {
+    brickView1 = [[Board instance] brickViewAtPosition:position1];
+    brickView2 = [[Board instance] brickViewAtPosition:position2];
+    visible = NO;
+    open = NO;
+}
+
+- (void)show {
+    visible = YES;
+}
+
+- (void)openConnection {
+    open = YES;
+}
+
+- (void)reveilConnection {
+    if (type == CONNECTION_TYPE_CORNER) {
+        [brickView1 reveilConnectionFromPosition:position2 toPosition:position1];
+        [brickView2 reveilConnectionFromPosition:position1 toPosition:position2];
+    }
+}
+
+- (bool)isNextToBrickView:(BrickView *)brickView {
+    return brickView == brickView1 || brickView == brickView2;
+}
+
+- (bool)isAtPosition:(cv::Point)p {
+    return p == position1 || p == position2;
+}
+
+- (bool)canOpen {
+    return !open && (type == CONNECTION_TYPE_DOOR || type == CONNECTION_TYPE_CORNER);
+}
 
 @end

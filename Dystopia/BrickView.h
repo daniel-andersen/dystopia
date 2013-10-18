@@ -25,12 +25,22 @@
 
 #import <Foundation/Foundation.h>
 
+#define BRICKVIEW_OPEN_DOOR_DURATION 3.0f
+
 @interface BrickView : UIView
 
-- (id)initWithPosition:(cv::Point)p brickType:(int)b;
+- (id)initWithPosition:(cv::Point)p type:(int)t;
 
-@property (readonly) int brickType;
-@property (readonly) cv::Point position;
-@property (nonatomic) bool visible;
+- (void)reveilConnectionFromPosition:(cv::Point)p1 toPosition:(cv::Point)p2;
+
+- (void)show;
+- (void)showFromPosition:(cv::Point)p;
+
+@property (nonatomic, readonly) int type;
+
+@property (nonatomic) cv::Point position;
+@property (nonatomic) CGSize size;
+
+@property (nonatomic, readonly) bool visible;
 
 @end

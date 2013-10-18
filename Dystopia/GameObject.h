@@ -27,6 +27,8 @@
 
 #import "AnimatableBrickView.h"
 
+#define GAME_OBJECT_MOVE_ANIMATION_DURATION 1.0f
+
 @interface GameObject : UIView
 
 - (id)initWithPosition:(cv::Point)p type:(int)t;
@@ -48,11 +50,11 @@
 
 @property (nonatomic) bool recognizedOnBoard;
 
-@property (nonatomic) AnimatableBrickView *brickView;
-@property (nonatomic) AnimatableBrickView *markerView;
+@property (nonatomic, retain, readonly) AnimatableBrickView *brickView;
+@property (nonatomic, retain, readonly) AnimatableBrickView *markerView;
 
 @property (nonatomic) bool active;
-@property (nonatomic) int type;
+@property (nonatomic, readonly) int type;
 
 @end
 

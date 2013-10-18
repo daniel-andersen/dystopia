@@ -27,24 +27,85 @@
 
 #import "BrickView.h"
 #import "BoardUtil.h"
+#import "Board.h"
+
+@interface BrickView () {
+    CALayer *connectionMaskLayer;
+}
+
+@end
 
 @implementation BrickView
 
-@synthesize brickType;
+@synthesize type;
 @synthesize position;
+@synthesize size;
 @synthesize visible;
 
-- (id)initWithPosition:(cv::Point)p brickType:(int)b {
-    if (self = [super initWithFrame:[[BoardUtil instance] brickTypeFrame:b position:p]]) {
+- (id)initWithPosition:(cv::Point)p type:(int)t {
+    if (self = [super initWithFrame:[[BoardUtil instance] brickTypeFrame:t position:p]]) {
         position = p;
-        brickType = b;
+        type = t;
         [self initialize];
     }
     return self;
 }
 
 - (void)initialize {
-    self.layer.contents = (id)[[BoardUtil instance] brickImageOfType:brickType].CGImage;
+    self.size = [[BoardUtil instance] brickTypeBoardSize:type];
+    self.layer.contents = (id)[[BoardUtil instance] brickImageOfType:type].CGImage;
+    self.alpha = 1.0f;
+    self.hidden = YES;
+    visible = NO;
+    [self createConnectionOverlay];
+}
+
+- (void)createConnectionOverlay {
+    connectionMaskLayer = [CALayer layer];
+    connectionMaskLayer.backgroundColor = [UIColor clearColor].CGColor;
+    connectionMaskLayer.frame = self.layer.bounds;
+    self.layer.mask = connectionMaskLayer;
+}
+
+- (void)reveilConnectionFromPosition:(cv::Point)p1 toPosition:(cv::Point)p2 {
+    if (visible) {
+        return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setupGradientFromPosition:p1 toPosition:p2];
+        self.alpha = 0.0f;
+        self.hidden = NO;
+        [UIView animateWithDuration:BRICKVIEW_OPEN_DOOR_DURATION animations:^{
+            self.alpha = 1.0f;
+        }];
+    });
+}
+
+- (void)setupGradientFromPosition:(cv::Point)p1 toPosition:(cv::Point)p2 {
+    CGPoint p = [[BoardUtil instance] brickScreenPosition:cv::Point(p2.x - self.position.x, p2.y - self.position.y)];
+    connectionMaskLayer.backgroundColor = [UIColor clearColor].CGColor;
+    connectionMaskLayer.contents = (id)[Util radialGradientWithSize:self.bounds.size centerPosition:p radius:MAX(self.bounds.size.width, self.bounds.size.height)].CGImage;
+}
+
+- (void)show {
+    if (visible) {
+        return;
+    }
+    visible = YES;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.hidden = NO;
+        [UIView animateWithDuration:BRICKVIEW_OPEN_DOOR_DURATION animations:^{
+            [CATransaction begin];
+            [CATransaction setAnimationDuration:BRICKVIEW_OPEN_DOOR_DURATION];
+            //self.alpha = 1.0f;
+            connectionMaskLayer.backgroundColor = [UIColor blackColor].CGColor;
+            [CATransaction commit];
+        }];
+    });
+}
+
+- (void)showFromPosition:(cv::Point)p {
+    [self show];
 }
 
 @end

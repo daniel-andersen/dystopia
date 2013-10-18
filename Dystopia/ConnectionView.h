@@ -25,22 +25,35 @@
 
 #import <UIKit/UIKit.h>
 
-#define GAME_OBJECT_BRICK_ANIMATION_DURATION 1.0f
-#define GAME_OBJECT_BRICK_PULSING_DURATION 2.0f
-#define GAME_OBJECT_BRICK_PULSING_STOP_DURATION 0.5f
+#import "BrickView.h"
 
-@interface AnimatableBrickView : UIImageView
+#define CONNECTION_TYPE_VIEW_GLUE 0
+#define CONNECTION_TYPE_DOOR      1
+#define CONNECTION_TYPE_CORNER    2
+
+@interface ConnectionView : UIView
+
+- (id)initWithPosition1:(cv::Point)p1 position2:(cv::Point)p2 type:(int)t;
 
 - (void)show;
-- (void)hide;
+- (void)openConnection;
+- (void)reveilConnection;
 
-- (void)startPulsing;
-- (void)stopPulsing;
+- (bool)isNextToBrickView:(BrickView *)brickView;
+- (bool)isAtPosition:(cv::Point)p;
 
-@property (nonatomic) float viewAlpha;
-@property (nonatomic) float pulseAlpha;
+- (bool)canOpen;
+
+@property (nonatomic, readonly) cv::Point position1;
+@property (nonatomic, readonly) cv::Point position2;
+
+@property (nonatomic, readonly) BrickView *brickView1;
+@property (nonatomic, readonly) BrickView *brickView2;
+
+@property (nonatomic, readonly) int type;
 
 @property (nonatomic, readonly) bool visible;
-@property (nonatomic, readonly) bool animating;
+
+@property (nonatomic, readonly) bool open;
 
 @end

@@ -49,6 +49,8 @@
 		656AECA017FAEA95004CB86B /* marker_warrior.png in Resources */ = {isa = PBXBuildFile; fileRef = 656AEC9B17FAEA95004CB86B /* marker_warrior.png */; };
 		656AECA117FAEA95004CB86B /* marker_wizard.png in Resources */ = {isa = PBXBuildFile; fileRef = 656AEC9C17FAEA95004CB86B /* marker_wizard.png */; };
 		656AECA417FDB2F7004CB86B /* AnimatableBrickView.m in Sources */ = {isa = PBXBuildFile; fileRef = 656AECA317FDB2F7004CB86B /* AnimatableBrickView.m */; };
+		656C3F0618100F4800125B65 /* DoorView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 656C3F0518100F4800125B65 /* DoorView.mm */; };
+		656C3F0C18101DED00125B65 /* ConnectionView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 656C3F0B18101DED00125B65 /* ConnectionView.mm */; };
 		658AF18218058D0B00BFF6A4 /* fake_board_2.png in Resources */ = {isa = PBXBuildFile; fileRef = 658AF17E18058D0B00BFF6A4 /* fake_board_2.png */; };
 		658AF18318058D0B00BFF6A4 /* fake_board_3.png in Resources */ = {isa = PBXBuildFile; fileRef = 658AF17F18058D0B00BFF6A4 /* fake_board_3.png */; };
 		658AF18418058D0B00BFF6A4 /* fake_board_4.png in Resources */ = {isa = PBXBuildFile; fileRef = 658AF18018058D0B00BFF6A4 /* fake_board_4.png */; };
@@ -148,6 +150,10 @@
 		656AEC9C17FAEA95004CB86B /* marker_wizard.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marker_wizard.png; sourceTree = "<group>"; };
 		656AECA217FDB2F7004CB86B /* AnimatableBrickView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimatableBrickView.h; sourceTree = "<group>"; };
 		656AECA317FDB2F7004CB86B /* AnimatableBrickView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnimatableBrickView.m; sourceTree = "<group>"; };
+		656C3F0418100F4800125B65 /* DoorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DoorView.h; sourceTree = "<group>"; };
+		656C3F0518100F4800125B65 /* DoorView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DoorView.mm; sourceTree = "<group>"; };
+		656C3F0A18101DED00125B65 /* ConnectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConnectionView.h; sourceTree = "<group>"; };
+		656C3F0B18101DED00125B65 /* ConnectionView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ConnectionView.mm; sourceTree = "<group>"; };
 		658AF17E18058D0B00BFF6A4 /* fake_board_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fake_board_2.png; sourceTree = "<group>"; };
 		658AF17F18058D0B00BFF6A4 /* fake_board_3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fake_board_3.png; sourceTree = "<group>"; };
 		658AF18018058D0B00BFF6A4 /* fake_board_4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fake_board_4.png; sourceTree = "<group>"; };
@@ -307,6 +313,10 @@
 			children = (
 				650D4299178F40DC00D89CEB /* BrickView.h */,
 				650D429A178F40DD00D89CEB /* BrickView.mm */,
+				656C3F0A18101DED00125B65 /* ConnectionView.h */,
+				656C3F0B18101DED00125B65 /* ConnectionView.mm */,
+				656C3F0418100F4800125B65 /* DoorView.h */,
+				656C3F0518100F4800125B65 /* DoorView.mm */,
 				6552706317B177B300784CD7 /* BorderView.h */,
 				6552706417B177B300784CD7 /* BorderView.mm */,
 				658AF18D18083D7E00BFF6A4 /* MoveableLocationsView.h */,
@@ -627,9 +637,11 @@
 				650D423A178DDF6700D89CEB /* BoardCalibrator.mm in Sources */,
 				650D423D178DE8C100D89CEB /* Intro.mm in Sources */,
 				650D4243178DF27800D89CEB /* RotatedView.m in Sources */,
+				656C3F0618100F4800125B65 /* DoorView.mm in Sources */,
 				650D429B178F40DE00D89CEB /* BrickView.mm in Sources */,
 				650D429E178F41B400D89CEB /* BoardUtil.mm in Sources */,
 				6552706517B177B300784CD7 /* BorderView.mm in Sources */,
+				656C3F0C18101DED00125B65 /* ConnectionView.mm in Sources */,
 				65F5E2B817C1460F00303009 /* ExternalDislayCalibrationBorderView.m in Sources */,
 				65F6109417E2074700D8C0DF /* Util.mm in Sources */,
 				65F6109717E787EE00D8C0DF /* BrickRecognizer.mm in Sources */,

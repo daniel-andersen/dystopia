@@ -39,6 +39,31 @@
     return UIInterfaceOrientationIsPortrait([self interfaceOrientation]);
 }
 
++ (UIImage *)radialGradientWithSize:(CGSize)size centerPosition:(CGPoint)p radius:(float)radius {
+    UIGraphicsBeginImageContextWithOptions(size, NO, 1.0f);
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    size_t colorsCount = 2;
+    float locations[2] = {0.0f, 1.0f};
+    float colors[8] = {
+        1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, 0.0f
+    };
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+	CGGradientRef gradient = CGGradientCreateWithColorComponents(colorSpace, colors, locations, colorsCount);
+    
+    CGContextDrawRadialGradient(context, gradient, p, 0.0f, p, radius, kCGGradientDrawsAfterEndLocation);
+    
+    UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+	CGColorSpaceRelease(colorSpace);
+	CGGradientRelease(gradient);
+    UIGraphicsEndImageContext();
+    
+    return outputImage;
+}
+
 + (void)saveImage:(UIImage *)image toDocumentsFolderWithPrefix:(NSString *)prefix {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
