@@ -53,6 +53,7 @@
 @property (nonatomic, retain, readonly) AnimatableBrickView *brickView;
 @property (nonatomic, retain, readonly) AnimatableBrickView *markerView;
 
+@property (nonatomic) bool visible;
 @property (nonatomic) bool active;
 @property (nonatomic, readonly) int type;
 

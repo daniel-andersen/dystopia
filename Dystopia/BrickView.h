@@ -36,6 +36,8 @@
 - (void)show;
 - (void)showFromPosition:(cv::Point)p;
 
+- (bool)containsPosition:(cv::Point)p;
+
 @property (nonatomic, readonly) int type;
 
 @property (nonatomic) cv::Point position;

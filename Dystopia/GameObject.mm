@@ -40,6 +40,7 @@
 @synthesize recognizedOnBoard;
 @synthesize brickView;
 @synthesize markerView;
+@synthesize visible;
 @synthesize active;
 @synthesize type;
 
@@ -57,6 +58,8 @@
     [self initializeBrickView];
     [self initializeMarkerView];
     recognizedOnBoard = NO;
+    visible = NO;
+    active = YES;
 }
 
 - (void)initializeBrickView {

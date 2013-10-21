@@ -27,9 +27,9 @@
 
 #import "GameObject.h"
 
-#define MONSTERS_COUNT 5
+#define MONSTERS_COUNT 1
 
-#define MONSTER_SKELOCH 0
+#define MONSTER_GLOBNIC 0
 
 @interface MonsterFigure : MoveableGameObject
 

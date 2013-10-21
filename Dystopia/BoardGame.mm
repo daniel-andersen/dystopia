@@ -161,7 +161,7 @@ BoardGame *boardGameInstance;
 - (void)startMonstersTurn {
     NSLog(@"Starting monsters turn");
     state = BOARD_GAME_STATE_MONSTERS_TURN;
-    [self setObjectsToMove:[Board instance].monsterFigures];
+    [self setObjectsToMove:[[Board instance] activeMonsterFigures]];
 }
 
 - (void)setObjectsToMove:(NSMutableArray *)objects {
@@ -285,18 +285,13 @@ BoardGame *boardGameInstance;
     }
     cv::vector<cv::Point> positions;
     cv::vector<cv::Point> searchPositions;
-    for (HeroFigure *hero in [Board instance].heroFigures) {
-        if (!hero.recognizedOnBoard) {
-            searchPositions.push_back(hero.position);
-        }
+    for (HeroFigure *hero in [[Board instance] unrecognizedHeroFigures]) {
+        searchPositions.push_back(hero.position);
     };
     @synchronized([BoardCalibrator instance].boardImageLock) {
         positions = [[BrickRecognizer instance] positionOfBricksAtLocations:searchPositions inImage:[BoardCalibrator instance].boardImage controlPoints:[[Board instance] randomControlPoints:10]];
     };
-    for (HeroFigure *hero in [Board instance].heroFigures) {
-        if (hero.recognizedOnBoard) {
-            continue;
-        }
+    for (HeroFigure *hero in [[Board instance] unrecognizedHeroFigures]) {
         for (int i = 0; i < positions.size(); i++) {
             if (positions[i] == hero.position) {
                 NSLog(@"Hero %i found at %i, %i", hero.type, hero.position.x, hero.position.y);
@@ -309,6 +304,31 @@ BoardGame *boardGameInstance;
                     [objectsToMoveInTurn addObject:hero];
                 }
                 break;
+            }
+        }
+    }
+}
+
+- (void)recognizeMonsters {
+    NSArray *unrecognizedMonsterFigures = [[Board instance] unrecognizedVisibleMonsterFigures];
+    if (unrecognizedMonsterFigures.count == 0) {
+        return;
+    }
+    cv::vector<cv::Point> positions;
+    cv::vector<cv::Point> searchPositions;
+    for (MonsterFigure *monsterFigure in unrecognizedMonsterFigures) {
+        searchPositions.push_back(monsterFigure.position);
+    };
+    @synchronized([BoardCalibrator instance].boardImageLock) {
+        positions = [[BrickRecognizer instance] positionOfBricksAtLocations:searchPositions inImage:[BoardCalibrator instance].boardImage controlPoints:[[Board instance] randomControlPoints:10]];
+    };
+    for (MonsterFigure *monsterFigure in unrecognizedMonsterFigures) {
+        for (int i = 0; i < positions.size(); i++) {
+            if (positions[i] == monsterFigure.position) {
+                NSLog(@"Monster %i found at %i, %i", monsterFigure.type, monsterFigure.position.x, monsterFigure.position.y);
+                monsterFigure.recognizedOnBoard = YES;
+                [monsterFigure showMarker];
+                [monsterFigure hideBrick];
             }
         }
     }

@@ -25,8 +25,8 @@
 
 #import "MonsterFigure.h"
 
-const int MONSTER_MOVEMENT_LENGTH[MONSTERS_COUNT] = {4, 8, 8, 6, 5};
-const NSArray *MONSTER_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.png", nil];
+const int MONSTER_MOVEMENT_LENGTH[MONSTERS_COUNT] = {10};
+const NSArray *MONSTER_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_globnic.png", nil];
 
 @interface MonsterFigure () {
 }
@@ -44,6 +44,7 @@ const NSArray *MONSTER_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.p
 
 - (void)reset {
     self.movementLength = MONSTER_MOVEMENT_LENGTH[self.type];
+    self.active = NO;
 }
 
 - (bool)canMoveToLocation:(cv::Point)location withMovementCount:(int)movementCount {

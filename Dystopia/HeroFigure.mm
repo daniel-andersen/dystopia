@@ -45,6 +45,7 @@ const NSArray *HERO_MARKER_IMAGE = [NSArray arrayWithObjects:@"marker_dwerf.png"
 
 - (void)reset {
     self.movementLength = HERO_MOVEMENT_LENGTH[self.type];
+    self.visible = YES;
     self.active = NO;
 }
 

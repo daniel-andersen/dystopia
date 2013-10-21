@@ -92,6 +92,7 @@
 		65F8D2EC17F41F7B00FE41DF /* brick_marker.png in Resources */ = {isa = PBXBuildFile; fileRef = 65F8D2EB17F41F7B00FE41DF /* brick_marker.png */; };
 		65FE8C67181154AD00DC6218 /* door1_vertical.png in Resources */ = {isa = PBXBuildFile; fileRef = 65FE8C66181154AD00DC6218 /* door1_vertical.png */; };
 		65FE8C691811585600DC6218 /* door1_horizontal.png in Resources */ = {isa = PBXBuildFile; fileRef = 65FE8C681811585600DC6218 /* door1_horizontal.png */; };
+		65FE8C991815A94E00DC6218 /* marker_globnic.png in Resources */ = {isa = PBXBuildFile; fileRef = 65FE8C981815A94E00DC6218 /* marker_globnic.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -211,6 +212,7 @@
 		65F8D2EB17F41F7B00FE41DF /* brick_marker.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = brick_marker.png; path = markers/brick_marker.png; sourceTree = "<group>"; };
 		65FE8C66181154AD00DC6218 /* door1_vertical.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = door1_vertical.png; sourceTree = "<group>"; };
 		65FE8C681811585600DC6218 /* door1_horizontal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = door1_horizontal.png; sourceTree = "<group>"; };
+		65FE8C981815A94E00DC6218 /* marker_globnic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marker_globnic.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -299,7 +301,7 @@
 			name = Border;
 			sourceTree = "<group>";
 		};
-		656AEC9717FAEA95004CB86B /* heroes */ = {
+		656AEC9717FAEA95004CB86B /* Heroes */ = {
 			isa = PBXGroup;
 			children = (
 				656AEC9817FAEA95004CB86B /* marker_archer.png */,
@@ -308,7 +310,7 @@
 				656AEC9B17FAEA95004CB86B /* marker_warrior.png */,
 				656AEC9C17FAEA95004CB86B /* marker_wizard.png */,
 			);
-			name = heroes;
+			name = Heroes;
 			path = markers/heroes;
 			sourceTree = "<group>";
 		};
@@ -513,7 +515,8 @@
 		65F8D2EA17F41F7200FE41DF /* Markers */ = {
 			isa = PBXGroup;
 			children = (
-				656AEC9717FAEA95004CB86B /* heroes */,
+				656AEC9717FAEA95004CB86B /* Heroes */,
+				65FE8C971815A94E00DC6218 /* Monsters */,
 				65F8D2EB17F41F7B00FE41DF /* brick_marker.png */,
 			);
 			name = Markers;
@@ -527,6 +530,15 @@
 			);
 			name = Doors;
 			path = doors;
+			sourceTree = "<group>";
+		};
+		65FE8C971815A94E00DC6218 /* Monsters */ = {
+			isa = PBXGroup;
+			children = (
+				65FE8C981815A94E00DC6218 /* marker_globnic.png */,
+			);
+			name = Monsters;
+			path = markers/monsters;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -613,6 +625,7 @@
 				656AEC9F17FAEA95004CB86B /* marker_elf.png in Resources */,
 				6552706117B1733F00784CD7 /* border_top_right.png in Resources */,
 				656AECA117FAEA95004CB86B /* marker_wizard.png in Resources */,
+				65FE8C991815A94E00DC6218 /* marker_globnic.png in Resources */,
 				658AF188180694DC00BFF6A4 /* fake_board_6.png in Resources */,
 				656AEC9D17FAEA95004CB86B /* marker_archer.png in Resources */,
 				6552706217B1733F00784CD7 /* border_top.png in Resources */,

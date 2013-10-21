@@ -143,17 +143,29 @@ Board *boardInstance = nil;
         return;
     }
     [brickView show];
+    [self showMonstersInBrickView:brickView];
     for (ConnectionView *connectionView in connectionsViews) {
         if ([connectionView isNextToBrickView:brickView]) {
             [connectionView show];
+            [connectionView reveilConnection];
             if (connectionView.type == CONNECTION_TYPE_VIEW_GLUE) {
                 [self makeBrickViewVisible:connectionView.brickView1];
                 [self makeBrickViewVisible:connectionView.brickView2];
+            } else {
+                [self showMonstersInBrickView:connectionView.brickView1];
+                [self showMonstersInBrickView:connectionView.brickView2];
             }
-            [connectionView reveilConnection];
         }
     }
     [self refreshBrickMap];
+}
+
+- (void)showMonstersInBrickView:(BrickView *)brickView {
+    for (MonsterFigure *monsterFigure in monsterFigures) {
+        if ([brickView containsPosition:monsterFigure.position]) {
+            monsterFigure.visible = YES;
+        }
+    }
 }
 
 - (void)refreshBrickPositions {
@@ -305,6 +317,61 @@ Board *boardInstance = nil;
     NSMutableArray *figures = [NSMutableArray array];
     [figures addObjectsFromArray:heroFigures];
     [figures addObjectsFromArray:monsterFigures];
+    return figures;
+}
+
+- (NSMutableArray *)visibleBoardObjects {
+    NSMutableArray *figures = [NSMutableArray array];
+    for (MoveableGameObject *object in heroFigures) {
+        if (object.visible) {
+            [figures addObject:object];
+        }
+    }
+    for (MoveableGameObject *object in monsterFigures) {
+        if (object.visible) {
+            [figures addObject:object];
+        }
+    }
+    return figures;
+}
+
+- (NSMutableArray *)visibleMonsterFigures {
+    NSMutableArray *figures = [NSMutableArray array];
+    for (MoveableGameObject *object in monsterFigures) {
+        if (object.visible) {
+            [figures addObject:object];
+        }
+    }
+    return figures;
+}
+
+- (NSMutableArray *)activeMonsterFigures {
+    NSMutableArray *figures = [NSMutableArray array];
+    for (MoveableGameObject *object in monsterFigures) {
+        if (object.active) {
+            [figures addObject:object];
+        }
+    }
+    return figures;
+}
+
+- (NSMutableArray *)unrecognizedVisibleMonsterFigures {
+    NSMutableArray *figures = [NSMutableArray array];
+    for (MoveableGameObject *object in monsterFigures) {
+        if (!object.recognizedOnBoard && object.visible) {
+            [figures addObject:object];
+        }
+    }
+    return figures;
+}
+
+- (NSMutableArray *)unrecognizedHeroFigures {
+    NSMutableArray *figures = [NSMutableArray array];
+    for (MoveableGameObject *object in heroFigures) {
+        if (!object.recognizedOnBoard) {
+            [figures addObject:object];
+        }
+    }
     return figures;
 }
 

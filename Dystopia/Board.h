@@ -58,6 +58,11 @@
 - (void)refreshObjectMap;
 
 - (NSMutableArray *)boardObjects;
+- (NSMutableArray *)visibleBoardObjects;
+- (NSMutableArray *)visibleMonsterFigures;
+- (NSMutableArray *)activeMonsterFigures;
+- (NSMutableArray *)unrecognizedVisibleMonsterFigures;
+- (NSMutableArray *)unrecognizedHeroFigures;
 
 - (cv::vector<cv::Point>)randomControlPoints:(int)count;
 

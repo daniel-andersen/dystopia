@@ -108,4 +108,8 @@
     [self show];
 }
 
+- (bool)containsPosition:(cv::Point)p {
+    return p.x >= position.x && p.y >= position.y && p.x < position.x + size.width && p.y < position.y + size.height;
+}
+
 @end
