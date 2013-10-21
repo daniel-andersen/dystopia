@@ -96,8 +96,10 @@ BoardGame *boardGameInstance;
     }
     @try {
         if (state == BOARD_GAME_STATE_INITIALIZING) {
-            state = BOARD_GAME_WAITING_FOR_INITIALIZED;
-            [self performSelector:@selector(startPlaceHeroes) withObject:nil afterDelay:BRICKVIEW_OPEN_DOOR_DURATION];
+            if ([self isBoardReadyForStateUpdate]) {
+                state = BOARD_GAME_WAITING_FOR_INITIALIZED;
+                [self performSelector:@selector(startPlaceHeroes) withObject:nil afterDelay:BRICKVIEW_OPEN_DOOR_DURATION];
+            }
             return;
         }
         if (state == BOARD_GAME_STATE_PLACE_HEROES) {

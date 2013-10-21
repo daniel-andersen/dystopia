@@ -90,8 +90,8 @@ Board *boardInstance = nil;
 
 - (void)loadBoard {
     brickViews = [NSMutableArray array];
-    [self addBrickOfType:2 atPosition:cv::Point(3, 3)];
-    [self addBrickOfType:2 atPosition:cv::Point(6, 3)];
+    [self addBrickOfType:0 atPosition:cv::Point(3, 3)];
+    [self addBrickOfType:0 atPosition:cv::Point(6, 3)];
     [self addBrickOfType:8 atPosition:cv::Point(7, 6)];
     [self addBrickOfType:8 atPosition:cv::Point(7, 9)];
     [self addBrickOfType:8 atPosition:cv::Point(7, 12)];
