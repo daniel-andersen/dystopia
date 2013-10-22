@@ -143,7 +143,7 @@ Board *boardInstance = nil;
         return;
     }
     [brickView show];
-    [self showMonstersInBrickView:brickView];
+    [self activateMonstersInBrickView:brickView];
     for (ConnectionView *connectionView in connectionsViews) {
         if ([connectionView isNextToBrickView:brickView]) {
             [connectionView show];
@@ -162,8 +162,19 @@ Board *boardInstance = nil;
 
 - (void)showMonstersInBrickView:(BrickView *)brickView {
     for (MonsterFigure *monsterFigure in monsterFigures) {
-        if ([brickView containsPosition:monsterFigure.position]) {
+        if (!monsterFigure.visible && [brickView containsPosition:monsterFigure.position]) {
             monsterFigure.visible = YES;
+            [monsterFigure showBrickWithAnimation:NO];
+        }
+    }
+}
+
+- (void)activateMonstersInBrickView:(BrickView *)brickView {
+    for (MonsterFigure *monsterFigure in monsterFigures) {
+        if ([brickView containsPosition:monsterFigure.position]) {
+            monsterFigure.active = YES;
+            monsterFigure.visible = YES;
+            [monsterFigure showBrickWithAnimation:NO];
         }
     }
 }
@@ -288,6 +299,7 @@ Board *boardInstance = nil;
         }
     }
     monsterFigures = [NSMutableArray array];
+    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(7, 10) type:MONSTER_GLOBNIC]];
     for (MonsterFigure *monster in monsterFigures) {
         [self addSubview:monster];
     }

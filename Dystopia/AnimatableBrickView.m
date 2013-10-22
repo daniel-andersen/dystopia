@@ -89,6 +89,25 @@
     });
 }
 
+- (void)showWithAnimation:(bool)animation {
+    @synchronized(self) {
+        if (visible && !animating) {
+            return;
+        }
+        animating = NO;
+        visible = YES;
+        animationEndTransitionState = GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_UNCHANGED;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:GAME_OBJECT_BRICK_ANIMATION_DURATION delay:0.0f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+            self.alpha = animationEndTransitionState != GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_PULSING ? self.viewAlpha : self.pulseAlpha;
+            self.transform = CGAffineTransformIdentity;
+            self.hidden = NO;
+        } completion:^(BOOL finished) {
+        }];
+    });
+}
+
 - (void)hide {
     @synchronized(self) {
         if (!visible) {
@@ -121,7 +140,7 @@
 - (void)updateState {
     if (animationEndTransitionState == GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_VISIBLE) {
         [self show];
-    } else if (animationEndTransitionState == GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_VISIBLE) {
+    } else if (animationEndTransitionState == GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_HIDDEN) {
         [self hide];
     } else if (animationEndTransitionState == GAME_OBJECT_ANIMATION_END_VISIBLE_STATE_PULSING) {
         [self startPulsing];

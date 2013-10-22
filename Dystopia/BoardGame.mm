@@ -41,6 +41,7 @@
     NSMutableArray *heroFigureMoveOrder;
     
     bool isUpdating;
+    bool readyForBrickRecognition;
 }
 
 @end
@@ -72,6 +73,7 @@ BoardGame *boardGameInstance;
 - (void)initialize {
     state = BOARD_GAME_STATE_INITIALIZING;
     isUpdating = NO;
+    readyForBrickRecognition = NO;
     [self addSubview:[Board instance]];
 }
 
@@ -102,6 +104,7 @@ BoardGame *boardGameInstance;
             }
             return;
         }
+        [self recognizeMonsters];
         if (state == BOARD_GAME_STATE_PLACE_HEROES) {
             [self updatePlaceHeroes];
             return;
@@ -125,6 +128,7 @@ BoardGame *boardGameInstance;
 - (void)startPlaceHeroes {
     NSLog(@"Starting place heroes");
     state = BOARD_GAME_STATE_PLACE_HEROES;
+    readyForBrickRecognition = YES;
     heroFigureMoveOrder = [NSMutableArray array];
     for (HeroFigure *hero in [Board instance].heroFigures) {
         [hero showBrick];
@@ -174,8 +178,9 @@ BoardGame *boardGameInstance;
 }
 
 - (void)nextObjectTurnAfterPause {
+    readyForBrickRecognition = NO;
     [self hideMarkers];
-    if ([[Board instance] shouldOpenDoorAtPosition:objectToMove.position]) {
+    if ([objectToMove isKindOfClass:[HeroFigure class]] && [[Board instance] shouldOpenDoorAtPosition:objectToMove.position]) {
         [[Board instance] openDoorAtPosition:objectToMove.position];
         [self performSelector:@selector(nextObjectTurn) withObject:nil afterDelay:(BRICKVIEW_OPEN_DOOR_DURATION + BOARD_GAME_NEXT_OBJECT_PAUSE)];
     } else {
@@ -184,6 +189,7 @@ BoardGame *boardGameInstance;
 }
 
 - (void)nextObjectTurn {
+    readyForBrickRecognition = YES;
     [self hideMarkers];
     if (objectToMove != nil) {
         [objectsToMoveInTurn removeObject:objectToMove];
@@ -192,7 +198,7 @@ BoardGame *boardGameInstance;
     [[Board instance] refreshBrickMap];
     [[Board instance] refreshObjectMap];
     for (MoveableGameObject *object in objectsToMoveInTurn) {
-        if (objectToMove == nil && object.active && object.recognizedOnBoard) {
+        if (objectToMove == nil && object.active) {
             objectToMove = object;
             [self showPulsingMarkerViewForObject:object];
         } else {
@@ -280,7 +286,7 @@ BoardGame *boardGameInstance;
 }
 
 - (void)updateInitialHeroPositions {
-    if (![self isBoardReadyForStateUpdate]) {
+    if (![self isBoardReadyForStateUpdate] || !readyForBrickRecognition) {
         return;
     }
     cv::vector<cv::Point> positions;
@@ -310,6 +316,9 @@ BoardGame *boardGameInstance;
 }
 
 - (void)recognizeMonsters {
+    if (![self isBoardReadyForStateUpdate] || !readyForBrickRecognition) {
+        return;
+    }
     NSArray *unrecognizedMonsterFigures = [[Board instance] unrecognizedVisibleMonsterFigures];
     if (unrecognizedMonsterFigures.count == 0) {
         return;
@@ -327,7 +336,10 @@ BoardGame *boardGameInstance;
             if (positions[i] == monsterFigure.position) {
                 NSLog(@"Monster %i found at %i, %i", monsterFigure.type, monsterFigure.position.x, monsterFigure.position.y);
                 monsterFigure.recognizedOnBoard = YES;
-                [monsterFigure showMarker];
+                if (monsterFigure != objectToMove && !monsterFigure.markerView.visible) {
+                    [monsterFigure showMarker];
+                    [monsterFigure hideMarker];
+                }
                 [monsterFigure hideBrick];
             }
         }

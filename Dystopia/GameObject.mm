@@ -99,6 +99,10 @@
     [brickView show];
 }
 
+- (void)showBrickWithAnimation:(bool)animation {
+    [brickView showWithAnimation:animation];
+}
+
 - (void)hideBrick {
     [brickView hide];
 }

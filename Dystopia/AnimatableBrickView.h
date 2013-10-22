@@ -32,6 +32,7 @@
 @interface AnimatableBrickView : UIImageView
 
 - (void)show;
+- (void)showWithAnimation:(bool)animation;
 - (void)hide;
 
 - (void)startPulsing;

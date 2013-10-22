@@ -36,6 +36,7 @@
 - (void)initialize;
 
 - (void)showBrick;
+- (void)showBrickWithAnimation:(bool)animation;
 - (void)hideBrick;
 
 - (void)showMarker;
