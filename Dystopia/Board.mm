@@ -26,6 +26,7 @@
 #import "Board.h"
 #import "BorderView.h"
 #import "ExternalDisplay.h"
+#import "ConnectorsView.h"
 #import "MoveableLocationsView.h"
 #import "DoorView.h"
 
@@ -35,8 +36,8 @@
     int objectMap[BOARD_HEIGHT][BOARD_WIDTH];
     
     NSMutableArray *brickViews;
-    NSMutableArray *connectionsViews;
 
+    ConnectorsView *connectorsView;
     MoveableLocationsView *moveableLocationsView;
     
     BorderView *borderView;
@@ -72,8 +73,13 @@ Board *boardInstance = nil;
 
 - (void)initialize {
     self.backgroundColor = [UIColor blackColor];
+
     moveableLocationsView = [[MoveableLocationsView alloc] initWithFrame:self.bounds];
     [self addSubview:moveableLocationsView];
+    
+    connectorsView = [[ConnectorsView alloc] initWithFrame:self.bounds];
+    [self addSubview:connectorsView];
+
     NSLog(@"Board initialized");
 }
 
@@ -103,18 +109,14 @@ Board *boardInstance = nil;
         [self addSubview:brickView];
     }
 
-    connectionsViews = [NSMutableArray array];
-    [self addDoorAtPosition1:cv::Point(7, 5) position2:cv::Point(7, 6) type:DOOR_TYPE_NORMAL];
-    [self addDoorAtPosition1:cv::Point(7, 14) position2:cv::Point(7, 15) type:DOOR_TYPE_NORMAL];
-    [self addDoorAtPosition1:cv::Point(13, 10) position2:cv::Point(14, 10) type:DOOR_TYPE_NORMAL];
-    [self addConnectionViewAtPosition1:cv::Point(7, 10) position2:cv::Point(8, 10) type:CONNECTION_TYPE_CORNER];
-    [self addConnectionViewAtPosition1:cv::Point(5, 4) position2:cv::Point(6, 5) type:CONNECTION_TYPE_VIEW_GLUE];
-    [self addConnectionViewAtPosition1:cv::Point(7, 8) position2:cv::Point(7, 9) type:CONNECTION_TYPE_VIEW_GLUE];
-    [self addConnectionViewAtPosition1:cv::Point(7, 11) position2:cv::Point(7, 12) type:CONNECTION_TYPE_VIEW_GLUE];
-    [self addConnectionViewAtPosition1:cv::Point(10, 10) position2:cv::Point(11, 10) type:CONNECTION_TYPE_VIEW_GLUE];
-    for (ConnectionView *connectionView in connectionsViews) {
-        [self addSubview:connectionView];
-    }
+    [connectorsView addDoorAtPosition1:cv::Point(7, 5) position2:cv::Point(7, 6) type:DOOR_TYPE_NORMAL];
+    [connectorsView addDoorAtPosition1:cv::Point(7, 14) position2:cv::Point(7, 15) type:DOOR_TYPE_NORMAL];
+    [connectorsView addDoorAtPosition1:cv::Point(13, 10) position2:cv::Point(14, 10) type:DOOR_TYPE_NORMAL];
+    [connectorsView addConnectionViewAtPosition1:cv::Point(7, 10) position2:cv::Point(8, 10) type:CONNECTION_TYPE_CORNER];
+    [connectorsView addConnectionViewAtPosition1:cv::Point(5, 4) position2:cv::Point(6, 5) type:CONNECTION_TYPE_VIEW_GLUE];
+    [connectorsView addConnectionViewAtPosition1:cv::Point(7, 8) position2:cv::Point(7, 9) type:CONNECTION_TYPE_VIEW_GLUE];
+    [connectorsView addConnectionViewAtPosition1:cv::Point(7, 11) position2:cv::Point(7, 12) type:CONNECTION_TYPE_VIEW_GLUE];
+    [connectorsView addConnectionViewAtPosition1:cv::Point(10, 10) position2:cv::Point(11, 10) type:CONNECTION_TYPE_VIEW_GLUE];
 
     [self makeBrickViewVisible:[brickViews objectAtIndex:0]];
 
@@ -124,14 +126,6 @@ Board *boardInstance = nil;
 - (void)setupBorderView {
     borderView = [[BorderView alloc] initWithFrame:self.bounds];
     [self addSubview:borderView];
-}
-
-- (void)addConnectionViewAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 type:(int)type {
-    [connectionsViews addObject:[[ConnectionView alloc] initWithPosition1:position1 position2:position2 type:type]];
-}
-
-- (void)addDoorAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 type:(int)type {
-    [connectionsViews addObject:[[DoorView alloc] initWithPosition1:position1 position2:position2 doorType:type]];
 }
 
 - (void)addBrickOfType:(int)type atPosition:(cv::Point)position {
@@ -144,7 +138,7 @@ Board *boardInstance = nil;
     }
     [brickView show];
     [self activateMonstersInBrickView:brickView];
-    for (ConnectionView *connectionView in connectionsViews) {
+    for (ConnectionView *connectionView in connectorsView.connectionViews) {
         if ([connectionView isNextToBrickView:brickView]) {
             [connectionView show];
             [connectionView reveilConnection];
@@ -222,16 +216,11 @@ Board *boardInstance = nil;
 }
 
 - (bool)shouldOpenDoorAtPosition:(cv::Point)position {
-    for (ConnectionView *connectionView in connectionsViews) {
-        if ([connectionView canOpen] && [connectionView isAtPosition:position]) {
-            return YES;
-        }
-    }
-    return NO;
+    return [connectorsView shouldOpenDoorAtPosition:position];
 }
 
 - (void)openDoorAtPosition:(cv::Point)position {
-    for (ConnectionView *connectionView in connectionsViews) {
+    for (ConnectionView *connectionView in connectorsView.connectionViews) {
         if ([connectionView canOpen] && [connectionView isAtPosition:position]) {
             [self makeBrickViewVisible:connectionView.brickView1];
             [self makeBrickViewVisible:connectionView.brickView2];

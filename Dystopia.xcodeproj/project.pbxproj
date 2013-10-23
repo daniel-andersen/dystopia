@@ -90,6 +90,8 @@
 		65F8D2E517F363F400FE41DF /* bricks9.png in Resources */ = {isa = PBXBuildFile; fileRef = 65F8D2E417F363F400FE41DF /* bricks9.png */; };
 		65F8D2E817F4184100FE41DF /* GameObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65F8D2E717F4184000FE41DF /* GameObject.mm */; };
 		65F8D2EC17F41F7B00FE41DF /* brick_marker.png in Resources */ = {isa = PBXBuildFile; fileRef = 65F8D2EB17F41F7B00FE41DF /* brick_marker.png */; };
+		65FD15161818193C0071C16C /* hallway.png in Resources */ = {isa = PBXBuildFile; fileRef = 65FD15151818193C0071C16C /* hallway.png */; };
+		65FD1519181819F30071C16C /* ConnectorsView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 65FD1518181819F30071C16C /* ConnectorsView.mm */; };
 		65FE8C67181154AD00DC6218 /* door1_vertical.png in Resources */ = {isa = PBXBuildFile; fileRef = 65FE8C66181154AD00DC6218 /* door1_vertical.png */; };
 		65FE8C691811585600DC6218 /* door1_horizontal.png in Resources */ = {isa = PBXBuildFile; fileRef = 65FE8C681811585600DC6218 /* door1_horizontal.png */; };
 		65FE8C991815A94E00DC6218 /* marker_globnic.png in Resources */ = {isa = PBXBuildFile; fileRef = 65FE8C981815A94E00DC6218 /* marker_globnic.png */; };
@@ -210,6 +212,9 @@
 		65F8D2E617F4184000FE41DF /* GameObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
 		65F8D2E717F4184000FE41DF /* GameObject.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GameObject.mm; sourceTree = "<group>"; };
 		65F8D2EB17F41F7B00FE41DF /* brick_marker.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = brick_marker.png; path = markers/brick_marker.png; sourceTree = "<group>"; };
+		65FD15151818193C0071C16C /* hallway.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hallway.png; sourceTree = "<group>"; };
+		65FD1517181819F30071C16C /* ConnectorsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConnectorsView.h; sourceTree = "<group>"; };
+		65FD1518181819F30071C16C /* ConnectorsView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ConnectorsView.mm; sourceTree = "<group>"; };
 		65FE8C66181154AD00DC6218 /* door1_vertical.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = door1_vertical.png; sourceTree = "<group>"; };
 		65FE8C681811585600DC6218 /* door1_horizontal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = door1_horizontal.png; sourceTree = "<group>"; };
 		65FE8C981815A94E00DC6218 /* marker_globnic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marker_globnic.png; sourceTree = "<group>"; };
@@ -325,6 +330,8 @@
 				656C3F0518100F4800125B65 /* DoorView.mm */,
 				6552706317B177B300784CD7 /* BorderView.h */,
 				6552706417B177B300784CD7 /* BorderView.mm */,
+				65FD1517181819F30071C16C /* ConnectorsView.h */,
+				65FD1518181819F30071C16C /* ConnectorsView.mm */,
 				658AF18D18083D7E00BFF6A4 /* MoveableLocationsView.h */,
 				658AF18E18083D7E00BFF6A4 /* MoveableLocationsView.mm */,
 			);
@@ -402,6 +409,7 @@
 		65B930AD17806BE800312B88 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				65FD15141818193C0071C16C /* Connections */,
 				65FE8C65181154AD00DC6218 /* Doors */,
 				65DCC50B180427490082785F /* Simulator */,
 				6552705117B1733000784CD7 /* Board */,
@@ -522,6 +530,15 @@
 			name = Markers;
 			sourceTree = "<group>";
 		};
+		65FD15141818193C0071C16C /* Connections */ = {
+			isa = PBXGroup;
+			children = (
+				65FD15151818193C0071C16C /* hallway.png */,
+			);
+			name = Connections;
+			path = connections;
+			sourceTree = "<group>";
+		};
 		65FE8C65181154AD00DC6218 /* Doors */ = {
 			isa = PBXGroup;
 			children = (
@@ -622,6 +639,7 @@
 				6552705E17B1733F00784CD7 /* border_left.png in Resources */,
 				6552705F17B1733F00784CD7 /* border_right.png in Resources */,
 				6552706017B1733F00784CD7 /* border_top_left.png in Resources */,
+				65FD15161818193C0071C16C /* hallway.png in Resources */,
 				656AEC9F17FAEA95004CB86B /* marker_elf.png in Resources */,
 				6552706117B1733F00784CD7 /* border_top_right.png in Resources */,
 				656AECA117FAEA95004CB86B /* marker_wizard.png in Resources */,
@@ -671,6 +689,7 @@
 				650D429B178F40DE00D89CEB /* BrickView.mm in Sources */,
 				650D429E178F41B400D89CEB /* BoardUtil.mm in Sources */,
 				6552706517B177B300784CD7 /* BorderView.mm in Sources */,
+				65FD1519181819F30071C16C /* ConnectorsView.mm in Sources */,
 				656C3F0C18101DED00125B65 /* ConnectionView.mm in Sources */,
 				65F5E2B817C1460F00303009 /* ExternalDislayCalibrationBorderView.m in Sources */,
 				65F6109417E2074700D8C0DF /* Util.mm in Sources */,
