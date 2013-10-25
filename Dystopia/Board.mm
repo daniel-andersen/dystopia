@@ -117,7 +117,7 @@ Board *boardInstance = nil;
     [connectorsView addDoorAtPosition1:cv::Point(7, 5) position2:cv::Point(7, 6) type:DOOR_TYPE_NORMAL];
     [connectorsView addDoorAtPosition1:cv::Point(7, 14) position2:cv::Point(7, 15) type:DOOR_TYPE_NORMAL];
     [connectorsView addDoorAtPosition1:cv::Point(13, 10) position2:cv::Point(14, 10) type:DOOR_TYPE_NORMAL];
-    [connectorsView addConnectionViewAtPosition1:cv::Point(7, 10) position2:cv::Point(8, 10) type:CONNECTION_TYPE_CORNER];
+    [connectorsView addHallwayConnectionAtPosition1:cv::Point(7, 10) position2:cv::Point(8, 10)];
     [connectorsView addConnectionViewAtPosition1:cv::Point(5, 4) position2:cv::Point(6, 5) type:CONNECTION_TYPE_VIEW_GLUE];
     [connectorsView addConnectionViewAtPosition1:cv::Point(7, 8) position2:cv::Point(7, 9) type:CONNECTION_TYPE_VIEW_GLUE];
     [connectorsView addConnectionViewAtPosition1:cv::Point(7, 11) position2:cv::Point(7, 12) type:CONNECTION_TYPE_VIEW_GLUE];
@@ -364,10 +364,10 @@ Board *boardInstance = nil;
     return figures;
 }
 
-- (NSMutableArray *)unrecognizedVisibleMonsterFigures {
+- (NSMutableArray *)unrecognizedActiveMonsterFigures {
     NSMutableArray *figures = [NSMutableArray array];
     for (MoveableGameObject *object in monsterFigures) {
-        if (!object.recognizedOnBoard && object.visible) {
+        if (!object.recognizedOnBoard && object.active) {
             [figures addObject:object];
         }
     }

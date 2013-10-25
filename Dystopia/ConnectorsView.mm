@@ -26,6 +26,7 @@
 #import "ConnectorsView.h"
 #import "ConnectionView.h"
 #import "DoorView.h"
+#import "HallwayConnectionView.h"
 
 @interface ConnectorsView ()
 
@@ -56,6 +57,12 @@
     DoorView *doorView = [[DoorView alloc] initWithPosition1:position1 position2:position2 doorType:type];
     [connectionViews addObject:doorView];
     [self addSubview:doorView];
+}
+
+- (void)addHallwayConnectionAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 {
+    HallwayConnectionView *hallwayConnectionView = [[HallwayConnectionView alloc] initWithPosition1:position1 position2:position2];
+    [connectionViews addObject:hallwayConnectionView];
+    [self addSubview:hallwayConnectionView];
 }
 
 - (bool)shouldOpenDoorAtPosition:(cv::Point)position {

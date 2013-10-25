@@ -23,45 +23,28 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <UIKit/UIKit.h>
+#import "HallwayConnectionView.h"
+#import "BoardUtil.h"
 
-#import "BrickView.h"
+#define HALLWAY_CONNECTION_EXTENT 1
 
-#define CONNECTION_TYPE_VIEW_GLUE 0
-#define CONNECTION_TYPE_DOOR      1
-#define CONNECTION_TYPE_HALLWAY   2
+@interface HallwayConnectionView () {
+    UIImageView *hallwayGradientView;
+}
 
-@interface ConnectionView : UIView
+@end
 
-- (id)initWithPosition1:(cv::Point)p1 position2:(cv::Point)p2 type:(int)t;
+@implementation HallwayConnectionView
 
-- (void)show;
-- (void)openConnection;
-- (void)reveilConnectionForBrickView:(BrickView *)brickView withConnectedViews:(NSArray *)connectedViews;
+- (id)initWithPosition1:(cv::Point)p1 position2:(cv::Point)p2 {
+    if (self = [super initWithPosition1:p1 position2:p2 type:CONNECTION_TYPE_HALLWAY]) {
+        [self initializeHallway];
+    }
+    return self;
+}
 
-- (bool)isNextToBrickView:(BrickView *)brickView;
-- (bool)isAtPosition:(cv::Point)p;
-
-- (bool)canOpen;
-
-- (void)addGradientViewWithImage:(UIImage *)image extent:(int)extent;
-
-- (cv::Point)topLeftWithExtent:(int)extent;
-- (cv::Point)bottomRightWithExtent:(int)extent;
-
-@property (nonatomic, readonly) cv::Point position1;
-@property (nonatomic, readonly) cv::Point position2;
-
-@property (nonatomic, readonly) BrickView *brickView1;
-@property (nonatomic, readonly) BrickView *brickView2;
-
-@property (nonatomic, readonly) int type;
-
-@property (nonatomic, readonly) bool visible;
-
-@property (nonatomic, readonly) bool open;
-
-@property (nonatomic, readonly) CALayer *connectionMaskLayer;
-@property (nonatomic, readonly) UIImageView *connectionGradientView;
+- (void)initializeHallway {
+    [self addGradientViewWithImage:[UIImage imageNamed:@"connection_hallway.png"] extent:HALLWAY_CONNECTION_EXTENT];
+}
 
 @end

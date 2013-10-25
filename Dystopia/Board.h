@@ -62,7 +62,7 @@
 - (NSMutableArray *)visibleMonsterFigures;
 - (NSMutableArray *)invisibleMonsterFigures;
 - (NSMutableArray *)activeMonsterFigures;
-- (NSMutableArray *)unrecognizedVisibleMonsterFigures;
+- (NSMutableArray *)unrecognizedActiveMonsterFigures;
 - (NSMutableArray *)unrecognizedHeroFigures;
 
 - (cv::vector<cv::Point>)randomControlPoints:(int)count;

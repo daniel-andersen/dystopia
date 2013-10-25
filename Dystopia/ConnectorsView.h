@@ -31,6 +31,7 @@
 
 - (void)addConnectionViewAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 type:(int)type;
 - (void)addDoorAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 type:(int)type;
+- (void)addHallwayConnectionAtPosition1:(cv::Point)position1 position2:(cv::Point)position2;
 
 - (bool)shouldOpenDoorAtPosition:(cv::Point)position;
 

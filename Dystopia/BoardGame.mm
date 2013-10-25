@@ -319,7 +319,7 @@ BoardGame *boardGameInstance;
     if (![self isBoardReadyForStateUpdate] || !readyForBrickRecognition) {
         return;
     }
-    NSArray *unrecognizedMonsterFigures = [[Board instance] unrecognizedVisibleMonsterFigures];
+    NSArray *unrecognizedMonsterFigures = [[Board instance] unrecognizedActiveMonsterFigures];
     if (unrecognizedMonsterFigures.count == 0) {
         return;
     }

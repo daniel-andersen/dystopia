@@ -25,6 +25,15 @@
 
 #import "DoorView.h"
 #import "Board.h"
+#import "Util.h"
+
+#define DOOR_CONNECTION_EXTENT 5
+
+@interface DoorView () {
+    UIImageView *doorImageView;
+}
+
+@end
 
 @implementation DoorView
 
@@ -39,7 +48,10 @@
 }
 
 - (void)initializeDoor {
-    self.layer.contents = (id)[self doorImage].CGImage;
+    [self addGradientViewWithImage:[UIImage imageNamed:@"connection_hallway.png"] extent:DOOR_CONNECTION_EXTENT];
+    doorImageView = [[UIImageView alloc] initWithFrame:[[BoardUtil instance] bricksScreenRectPosition1:self.position1 position2:self.position2]];
+    doorImageView.image = [self doorImage];
+    [self addSubview:doorImageView];
 }
 
 - (UIImage *)doorImage {
