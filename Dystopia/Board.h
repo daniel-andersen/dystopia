@@ -60,6 +60,7 @@
 - (NSMutableArray *)boardObjects;
 - (NSMutableArray *)visibleBoardObjects;
 - (NSMutableArray *)visibleMonsterFigures;
+- (NSMutableArray *)invisibleMonsterFigures;
 - (NSMutableArray *)activeMonsterFigures;
 - (NSMutableArray *)unrecognizedVisibleMonsterFigures;
 - (NSMutableArray *)unrecognizedHeroFigures;

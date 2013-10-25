@@ -31,10 +31,8 @@
 
 - (id)initWithPosition:(cv::Point)p type:(int)t;
 
-- (void)reveilConnectionFromPosition:(cv::Point)p1 toPosition:(cv::Point)p2;
-
 - (void)show;
-- (void)showFromPosition:(cv::Point)p;
+- (void)reveil;
 
 - (bool)containsPosition:(cv::Point)p;
 

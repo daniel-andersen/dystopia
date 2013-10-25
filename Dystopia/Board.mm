@@ -85,6 +85,7 @@ Board *boardInstance = nil;
 
 - (void)layoutSubviews {
     [self bringSubviewToFront:moveableLocationsView];
+    [self bringSubviewToFront:connectorsView];
 }
 
 - (void)loadLevel:(int)l {
@@ -92,6 +93,7 @@ Board *boardInstance = nil;
     [self loadBoard];
     [self setupBorderView];
     [self initializeFigures];
+    [self makeBrickViewVisible:[brickViews objectAtIndex:0]];
 }
 
 - (void)loadBoard {
@@ -102,9 +104,12 @@ Board *boardInstance = nil;
     [self addBrickOfType:8 atPosition:cv::Point(7, 9)];
     [self addBrickOfType:8 atPosition:cv::Point(7, 12)];
     [self addBrickOfType:2 atPosition:cv::Point(6, 15)];
+    [self addBrickOfType:2 atPosition:cv::Point(9, 15)];
     [self addBrickOfType:5 atPosition:cv::Point(8, 10)];
     [self addBrickOfType:5 atPosition:cv::Point(11, 10)];
     [self addBrickOfType:1 atPosition:cv::Point(14, 9)];
+    [self addBrickOfType:1 atPosition:cv::Point(14, 6)];
+    [self addBrickOfType:1 atPosition:cv::Point(14, 12)];
     for (BrickView *brickView in brickViews) {
         [self addSubview:brickView];
     }
@@ -116,11 +121,10 @@ Board *boardInstance = nil;
     [connectorsView addConnectionViewAtPosition1:cv::Point(5, 4) position2:cv::Point(6, 5) type:CONNECTION_TYPE_VIEW_GLUE];
     [connectorsView addConnectionViewAtPosition1:cv::Point(7, 8) position2:cv::Point(7, 9) type:CONNECTION_TYPE_VIEW_GLUE];
     [connectorsView addConnectionViewAtPosition1:cv::Point(7, 11) position2:cv::Point(7, 12) type:CONNECTION_TYPE_VIEW_GLUE];
+    [connectorsView addConnectionViewAtPosition1:cv::Point(8, 16) position2:cv::Point(9, 16) type:CONNECTION_TYPE_VIEW_GLUE];
     [connectorsView addConnectionViewAtPosition1:cv::Point(10, 10) position2:cv::Point(11, 10) type:CONNECTION_TYPE_VIEW_GLUE];
-
-    [self makeBrickViewVisible:[brickViews objectAtIndex:0]];
-
-    [self refreshBrickMap];
+    [connectorsView addConnectionViewAtPosition1:cv::Point(15, 8) position2:cv::Point(15, 9) type:CONNECTION_TYPE_VIEW_GLUE];
+    [connectorsView addConnectionViewAtPosition1:cv::Point(15, 11) position2:cv::Point(15, 12) type:CONNECTION_TYPE_VIEW_GLUE];
 }
 
 - (void)setupBorderView {
@@ -136,27 +140,20 @@ Board *boardInstance = nil;
     if (brickView.visible) {
         return;
     }
-    [brickView show];
-    [self activateMonstersInBrickView:brickView];
-    for (ConnectionView *connectionView in connectorsView.connectionViews) {
-        if ([connectionView isNextToBrickView:brickView]) {
-            [connectionView show];
-            [connectionView reveilConnection];
-            if (connectionView.type == CONNECTION_TYPE_VIEW_GLUE) {
-                [self makeBrickViewVisible:connectionView.brickView1];
-                [self makeBrickViewVisible:connectionView.brickView2];
-            } else {
-                [self showMonstersInBrickView:connectionView.brickView1];
-                [self showMonstersInBrickView:connectionView.brickView2];
-            }
-        }
+    NSMutableArray *connectedBrickViews = [connectorsView reveilConnectedBrickViewsForBrickView:brickView];
+    for (BrickView *connectedBrickView in connectedBrickViews) {
+        [self activateMonstersInBrickView:connectedBrickView];
+    }
+    NSMutableArray *closedConnectedBrickViews = [connectorsView reveilClosedConnectedBrickViewsForBrickViews:connectedBrickViews];
+    for (BrickView *connectedBrickView in closedConnectedBrickViews) {
+        [self showMonstersInBrickView:connectedBrickView];
     }
     [self refreshBrickMap];
 }
 
 - (void)showMonstersInBrickView:(BrickView *)brickView {
-    for (MonsterFigure *monsterFigure in monsterFigures) {
-        if (!monsterFigure.visible && [brickView containsPosition:monsterFigure.position]) {
+    for (MonsterFigure *monsterFigure in [self invisibleMonsterFigures]) {
+        if ([brickView containsPosition:monsterFigure.position]) {
             monsterFigure.visible = YES;
             [monsterFigure showBrickWithAnimation:NO];
         }
@@ -289,6 +286,7 @@ Board *boardInstance = nil;
     }
     monsterFigures = [NSMutableArray array];
     [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(7, 10) type:MONSTER_GLOBNIC]];
+    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(10, 10) type:MONSTER_GLOBNIC]];
     for (MonsterFigure *monster in monsterFigures) {
         [self addSubview:monster];
     }
@@ -340,6 +338,16 @@ Board *boardInstance = nil;
     NSMutableArray *figures = [NSMutableArray array];
     for (MoveableGameObject *object in monsterFigures) {
         if (object.visible) {
+            [figures addObject:object];
+        }
+    }
+    return figures;
+}
+
+- (NSMutableArray *)invisibleMonsterFigures {
+    NSMutableArray *figures = [NSMutableArray array];
+    for (MoveableGameObject *object in monsterFigures) {
+        if (!object.visible) {
             [figures addObject:object];
         }
     }

@@ -34,6 +34,10 @@
 
 - (bool)shouldOpenDoorAtPosition:(cv::Point)position;
 
+- (NSMutableArray *)reveilConnection:(ConnectionView *)connectionView;
+- (NSMutableArray *)reveilConnectedBrickViewsForBrickView:(BrickView *)brickView;
+- (NSMutableArray *)reveilClosedConnectedBrickViewsForBrickViews:(NSMutableArray *)brickViews;
+
 @property (nonatomic, retain) NSMutableArray *connectionViews;
 
 @end

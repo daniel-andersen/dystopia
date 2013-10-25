@@ -67,4 +67,72 @@
     return NO;
 }
 
+- (NSMutableArray *)reveilConnection:(ConnectionView *)connectionView {
+    NSMutableArray *connectedBrickViews = [NSMutableArray array];
+    if (!connectionView.brickView1.visible) {
+        [connectedBrickViews addObjectsFromArray:[self reveilConnection:connectionView forBrickView:connectionView.brickView1]];
+    }
+    if (!connectionView.brickView2.visible) {
+        [connectedBrickViews addObjectsFromArray:[self reveilConnection:connectionView forBrickView:connectionView.brickView2]];
+    }
+    return connectedBrickViews;
+}
+
+- (NSMutableArray *)reveilConnection:(ConnectionView *)connectionView forBrickView:(BrickView *)brickView {
+    NSMutableArray *connectedBrickViews = [self connectedBrickViewsForView:brickView];
+    [connectionView reveilConnectionForBrickView:brickView withConnectedViews:connectedBrickViews];
+    return connectedBrickViews;
+}
+
+- (NSMutableArray *)reveilConnectedBrickViewsForBrickView:(BrickView *)brickView {
+    NSMutableArray *connectedBrickViews = [self connectedBrickViewsForView:brickView];
+    for (BrickView *connectedBrickView in connectedBrickViews) {
+        [connectedBrickView show];
+    }
+    return connectedBrickViews;
+}
+
+- (NSMutableArray *)reveilClosedConnectedBrickViewsForBrickViews:(NSMutableArray *)brickViews {
+    NSMutableArray *viewsToReveil = [NSMutableArray array];
+    for (BrickView *brickView in brickViews) {
+        for (ConnectionView *connectionView in connectionViews) {
+            if (![connectionView isNextToBrickView:brickView] || connectionView.type == CONNECTION_TYPE_VIEW_GLUE) {
+                continue;
+            }
+            if (![brickViews containsObject:connectionView.brickView1]) {
+                NSMutableArray *connectedBrickViews = [self connectedBrickViewsForView:connectionView.brickView1];
+                [connectionView reveilConnectionForBrickView:connectionView.brickView1 withConnectedViews:connectedBrickViews];
+                [viewsToReveil addObjectsFromArray:connectedBrickViews];
+            }
+            if (![brickViews containsObject:connectionView.brickView2]) {
+                NSMutableArray *connectedBrickViews = [self connectedBrickViewsForView:connectionView.brickView2];
+                [connectionView reveilConnectionForBrickView:connectionView.brickView2 withConnectedViews:connectedBrickViews];
+                [viewsToReveil addObjectsFromArray:connectedBrickViews];
+            }
+        }
+    }
+    return viewsToReveil;
+}
+
+- (NSMutableArray *)connectedBrickViewsForView:(BrickView *)brickView {
+    NSMutableArray *views = [NSMutableArray array];
+    [self addConnectedBrickViewsForView:brickView toViews:views];
+    return views;
+}
+
+- (void)addConnectedBrickViewsForView:(BrickView *)brickView toViews:(NSMutableArray *)views {
+    [views addObject:brickView];
+    for (ConnectionView *connectionView in connectionViews) {
+        if (![connectionView isNextToBrickView:brickView] || connectionView.type != CONNECTION_TYPE_VIEW_GLUE) {
+            continue;
+        }
+        if (![views containsObject:connectionView.brickView1]) {
+            [self addConnectedBrickViewsForView:connectionView.brickView1 toViews:views];
+        }
+        if (![views containsObject:connectionView.brickView2]) {
+            [self addConnectedBrickViewsForView:connectionView.brickView2 toViews:views];
+        }
+    }
+}
+
 @end

@@ -54,13 +54,11 @@
 - (void)initialize {
     self.size = [[BoardUtil instance] brickTypeBoardSize:type];
     self.layer.contents = (id)[[BoardUtil instance] brickImageOfType:type].CGImage;
-    self.alpha = 1.0f;
     self.hidden = YES;
     visible = NO;
-    [self createConnectionOverlay];
 }
 
-- (void)createConnectionOverlay {
+/*- (void)createConnectionOverlay {
     connectionMaskLayer = [CALayer layer];
     connectionMaskLayer.backgroundColor = [UIColor clearColor].CGColor;
     connectionMaskLayer.frame = self.layer.bounds;
@@ -85,10 +83,17 @@
     CGPoint p = [[BoardUtil instance] brickScreenPosition:cv::Point(p2.x - self.position.x, p2.y - self.position.y)];
     connectionMaskLayer.backgroundColor = [UIColor clearColor].CGColor;
     connectionMaskLayer.contents = (id)[Util radialGradientWithSize:self.bounds.size centerPosition:p radius:MAX(self.bounds.size.width, self.bounds.size.height)].CGImage;
+}*/
+
+- (void)reveil {
+    self.hidden = NO;
 }
 
 - (void)show {
-    if (visible) {
+    self.hidden = NO;
+    visible = YES;
+    
+    /*if (visible) {
         return;
     }
     visible = YES;
@@ -101,11 +106,7 @@
             connectionMaskLayer.backgroundColor = [UIColor blackColor].CGColor;
             [CATransaction commit];
         }];
-    });
-}
-
-- (void)showFromPosition:(cv::Point)p {
-    [self show];
+    });*/
 }
 
 - (bool)containsPosition:(cv::Point)p {

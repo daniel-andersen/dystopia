@@ -53,7 +53,6 @@
     brickView1 = [[Board instance] brickViewAtPosition:position1];
     brickView2 = [[Board instance] brickViewAtPosition:position2];
     self.backgroundColor = [UIColor clearColor];
-    self.alpha = 0.0f;
     self.hidden = YES;
     visible = NO;
     open = NO;
@@ -64,22 +63,22 @@
     if (type != CONNECTION_TYPE_DOOR) {
         return;
     }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.hidden = NO;
-        [UIView animateWithDuration:BRICKVIEW_OPEN_DOOR_DURATION animations:^{
-            self.alpha = 1.0f;
-        }];
-    });
+    self.hidden = NO;
 }
 
 - (void)openConnection {
     open = YES;
 }
 
-- (void)reveilConnection {
+- (void)reveilConnectionForBrickView:(BrickView *)brickView withConnectedViews:(NSArray *)connectedViews {
+    [self show];
+    
+    for (BrickView *brickView in connectedViews) {
+        [brickView reveil];
+    }
     if (type == CONNECTION_TYPE_CORNER) {
-        [brickView1 reveilConnectionFromPosition:position2 toPosition:position1];
-        [brickView2 reveilConnectionFromPosition:position1 toPosition:position2];
+        //[brickView1 reveilConnectionFromPosition:position2 toPosition:position1];
+        //[brickView2 reveilConnectionFromPosition:position1 toPosition:position2];
     }
 }
 

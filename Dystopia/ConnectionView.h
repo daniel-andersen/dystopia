@@ -37,7 +37,7 @@
 
 - (void)show;
 - (void)openConnection;
-- (void)reveilConnection;
+- (void)reveilConnectionForBrickView:(BrickView *)brickView withConnectedViews:(NSArray *)connectedViews;
 
 - (bool)isNextToBrickView:(BrickView *)brickView;
 - (bool)isAtPosition:(cv::Point)p;
