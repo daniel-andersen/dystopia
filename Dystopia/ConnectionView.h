@@ -49,11 +49,15 @@
 - (cv::Point)topLeftWithExtent:(int)extent;
 - (cv::Point)bottomRightWithExtent:(int)extent;
 
+- (CGRect)brickMaskRectPosition1:(cv::Point)p1 position2:(cv::Point)p2;
+
 @property (nonatomic, readonly) cv::Point position1;
 @property (nonatomic, readonly) cv::Point position2;
 
 @property (nonatomic, readonly) BrickView *brickView1;
 @property (nonatomic, readonly) BrickView *brickView2;
+
+@property (nonatomic, readonly) UIView *maskView;
 
 @property (nonatomic, readonly) int type;
 

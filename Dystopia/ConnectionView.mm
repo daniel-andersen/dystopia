@@ -25,13 +25,13 @@
 
 #import "ConnectionView.h"
 #import "Board.h"
+#import "BoardUtil.h"
 #import "ExternalDisplay.h"
 
 @interface ConnectionView () {
-    UIView *topBlackView;
-    UIView *bottomBlackView;
-    UIView *leftBlackView;
-    UIView *rightBlackView;
+    UIImage *gradientImage;
+    int gradientExtent;
+    UIView *blackOverlayView;
 }
 
 @end
@@ -52,8 +52,10 @@
 @synthesize connectionMaskLayer;
 @synthesize connectionGradientView;
 
+@synthesize maskView;
+
 - (id)initWithPosition1:(cv::Point)p1 position2:(cv::Point)p2 type:(int)t {
-    if (self = [super init]) {
+    if (self = [super initWithFrame:[[BoardUtil instance] bricksScreenRectPosition1:p1 position2:p2]]) {
         position1 = p1;
         position2 = p2;
         type = t;
@@ -65,14 +67,19 @@
 - (void)initialize {
     brickView1 = [[Board instance] brickViewAtPosition:position1];
     brickView2 = [[Board instance] brickViewAtPosition:position2];
-    self.frame = CGRectMake(0.0f, 0.0f, [ExternalDisplay instance].widescreenBounds.size.width, [ExternalDisplay instance].widescreenBounds.size.height);
+    maskView = [[UIView alloc] init];
+    maskView.hidden = YES;
     self.backgroundColor = [UIColor clearColor];
     self.hidden = YES;
+    self.alpha = 0.0f;
     visible = NO;
     open = NO;
 }
 
 - (void)show {
+    if (visible) {
+        return;
+    }
     visible = YES;
     if (type == CONNECTION_TYPE_VIEW_GLUE) {
         return;
@@ -80,13 +87,10 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self.hidden = NO;
         [UIView animateWithDuration:BRICKVIEW_OPEN_DOOR_DURATION animations:^{
-            [CATransaction begin];
-            [CATransaction setAnimationDuration:BRICKVIEW_OPEN_DOOR_DURATION];
             self.alpha = 1.0f;
-            [CATransaction commit];
+            blackOverlayView.alpha = 0.0f;
         }];
     });
-    self.hidden = NO;
 }
 
 - (void)openConnection {
@@ -98,46 +102,22 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self.hidden = NO;
         [UIView animateWithDuration:BRICKVIEW_OPEN_DOOR_DURATION animations:^{
-            [CATransaction begin];
-            [CATransaction setAnimationDuration:BRICKVIEW_OPEN_DOOR_DURATION];
-            connectionMaskLayer.opacity = 0.0f;
-            [CATransaction commit];
+            maskView.alpha = 0.0f;
         } completion:^(BOOL finished) {
-            self.hidden = YES;
+            maskView.hidden = YES;
         }];
     });
 }
 
 - (void)reveilConnectionForBrickView:(BrickView *)brickView withConnectedViews:(NSArray *)connectedViews {
-    [self createOverlayMaskWithViews:connectedViews];
+    if (visible) {
+        return;
+    }
+    [self createMaskViewWithView:brickView connectedViews:connectedViews];
     for (BrickView *brickView in connectedViews) {
         [brickView reveil];
     }
     [self show];
-}
-
-- (void)createOverlayMaskWithViews:(NSArray *)brickViews {
-    connectionMaskLayer = [CALayer layer];
-    connectionMaskLayer.frame = self.layer.bounds;
-    connectionMaskLayer.backgroundColor = [UIColor clearColor].CGColor;
-    connectionMaskLayer.contents = (id)[self maskOutBrickViews:brickViews].CGImage;
-    self.layer.mask = connectionMaskLayer;
-}
-
-- (UIImage *)maskOutBrickViews:(NSArray *)brickViews {
-    UIGraphicsBeginImageContextWithOptions(self.bounds.size, NO, 1.0f);
-    
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, [UIColor colorWithWhite:0.0f alpha:1.0f].CGColor);
-    
-    for (BrickView *brickView in brickViews) {
-        CGContextFillRect(context, [[BoardUtil instance] brickTypeFrame:brickView.type position:brickView.position]);
-    }
-    
-    UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return outputImage;
 }
 
 - (bool)isNextToBrickView:(BrickView *)brickView {
@@ -153,27 +133,91 @@
 }
 
 - (void)addGradientViewWithImage:(UIImage *)image extent:(int)extent {
-    connectionGradientView = [[UIImageView alloc] initWithFrame:[[BoardUtil instance] bricksScreenRectPosition1:[self topLeftWithExtent:extent] position2:[self bottomRightWithExtent:extent]]];
-    connectionGradientView.backgroundColor = [UIColor clearColor];
-    connectionGradientView.image = image;
-    connectionGradientView.contentMode = UIViewContentModeScaleToFill;
-    [self addSubview:connectionGradientView];
-    [self addBlackOutsideGradient];
+    gradientImage = image;
+    gradientExtent = extent;
 }
 
-- (void)addBlackOutsideGradient {
+- (void)createMaskViewWithView:(BrickView *)brickView connectedViews:(NSArray *)brickViews {
+    maskView.frame = [[BoardUtil instance] brickViewsBoundingRect:brickViews];
+    maskView.backgroundColor = [UIColor clearColor];
+    maskView.clipsToBounds = YES;
+    
+    [self setupMaskLayerWithViews:brickViews];
+    [self setupGradientViewForPosition:(brickView == brickView1 ? brickView1.position : brickView2.position)];
+    [self setupBlackOverlayViews];
+
+    maskView.hidden = NO;
+}
+
+- (void)setupMaskLayerWithViews:(NSArray *)brickViews {
+    connectionMaskLayer = [CALayer layer];
+    connectionMaskLayer.frame = maskView.bounds;
+    connectionMaskLayer.backgroundColor = [UIColor clearColor].CGColor;
+    connectionMaskLayer.contents = (id)[self maskOutBrickViews:brickViews].CGImage;
+    maskView.layer.mask = connectionMaskLayer;
+}
+
+- (void)setupGradientViewForPosition:(cv::Point)p {
+    if (gradientImage == nil) {
+        return;
+    }
+    CGRect rect = [self brickMaskRectPosition1:[self topLeftWithExtent:gradientExtent] position2:[self bottomRightWithExtent:gradientExtent]];
+    if (p.x > MIN(self.position1.x, self.position2.x)) {
+        rect.origin.x -= [BoardUtil instance].singleBrickScreenSize.width;
+    }
+    if (p.x < MAX(self.position1.x, self.position2.x)) {
+        rect.origin.x += [BoardUtil instance].singleBrickScreenSize.width;
+    }
+    if (p.y > MIN(self.position1.y, self.position2.y)) {
+        rect.origin.y -= [BoardUtil instance].singleBrickScreenSize.height;
+    }
+    if (p.y < MAX(self.position1.y, self.position2.y)) {
+        rect.origin.y += [BoardUtil instance].singleBrickScreenSize.height;
+    }
+    connectionGradientView = [[UIImageView alloc] initWithFrame:rect];
+    connectionGradientView.backgroundColor = [UIColor clearColor];
+    connectionGradientView.image = gradientImage;
+    connectionGradientView.contentMode = UIViewContentModeScaleToFill;
+    [maskView addSubview:connectionGradientView];
+}
+
+- (void)setupBlackOverlayViews {
     CGPoint p1 = CGPointMake(connectionGradientView.frame.origin.x, connectionGradientView.frame.origin.y);
     CGPoint p2 = CGPointMake(connectionGradientView.frame.origin.x + connectionGradientView.frame.size.width, connectionGradientView.frame.origin.y + connectionGradientView.frame.size.height);
-    topBlackView = [self addBlackViewWithFrame:CGRectMake(0.0f, 0.0f, self.bounds.size.width, p1.y)];
-    bottomBlackView = [self addBlackViewWithFrame:CGRectMake(0.0f, p2.y, self.bounds.size.width, self.bounds.size.height - p2.y)];
-    leftBlackView = [self addBlackViewWithFrame:CGRectMake(0.0f, p1.y, p1.x, p2.y - p1.y)];
-    rightBlackView = [self addBlackViewWithFrame:CGRectMake(p2.x, p1.y, self.bounds.size.width - p2.x, p2.y - p1.y)];
+
+    blackOverlayView = [self addBlackViewWithP1:CGPointMake(0.0f, 0.0f) p2:CGPointMake(maskView.bounds.size.width, maskView.bounds.size.height)];
+    
+    [self addBlackViewWithP1:CGPointMake(0.0f, 0.0f) p2:CGPointMake(maskView.bounds.size.width, p1.y)];
+    [self addBlackViewWithP1:CGPointMake(0.0f, p2.y) p2:CGPointMake(maskView.bounds.size.width, maskView.bounds.size.height)];
+    [self addBlackViewWithP1:CGPointMake(0.0f, p1.y) p2:CGPointMake(p1.x, p2.y)];
+    [self addBlackViewWithP1:CGPointMake(p2.x, p1.y) p2:CGPointMake(maskView.bounds.size.width, p2.y)];
 }
 
-- (UIView *)addBlackViewWithFrame:(CGRect)frame {
-    UIView *view = [[UIView alloc] initWithFrame:frame];
+- (UIImage *)maskOutBrickViews:(NSArray *)brickViews {
+    UIGraphicsBeginImageContextWithOptions(self.bounds.size, NO, 1.0f);
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [UIColor colorWithWhite:0.0f alpha:1.0f].CGColor);
+    
+    for (BrickView *brickView in brickViews) {
+        CGContextFillRect(context, [self brickMaskRect:brickView]);
+    }
+    
+    UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return outputImage;
+}
+
+- (UIView *)addBlackViewWithP1:(CGPoint)p1 p2:(CGPoint)p2 {
+    float width = p2.x - p1.x;
+    float height = p2.y - p1.y;
+    if (width <= 0 || height <= 0) {
+        return nil;
+    }
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(p1.x, p1.y, width, height)];
     view.backgroundColor = [UIColor blackColor];
-    [self addSubview:view];
+    [maskView addSubview:view];
     return view;
 }
 
@@ -183,6 +227,20 @@
 
 - (cv::Point)bottomRightWithExtent:(int)extent {
     return cv::Point(MIN(MAX(self.position1.x, self.position2.x) + extent, BOARD_WIDTH - 2), MIN(MAX(self.position1.y, self.position2.y) + extent, BOARD_HEIGHT - 2));
+}
+
+- (CGRect)brickMaskRect:(BrickView *)brickView {
+    CGRect brickRect = [[BoardUtil instance] brickTypeFrame:brickView.type position:brickView.position];
+    brickRect.origin.x -= maskView.frame.origin.x;
+    brickRect.origin.y -= maskView.frame.origin.y;
+    return brickRect;
+}
+
+- (CGRect)brickMaskRectPosition1:(cv::Point)p1 position2:(cv::Point)p2 {
+    CGRect screenRect = [[BoardUtil instance] bricksScreenRectPosition1:p1 position2:p2];
+    screenRect.origin.x -= maskView.frame.origin.x;
+    screenRect.origin.y -= maskView.frame.origin.y;
+    return screenRect;
 }
 
 @end

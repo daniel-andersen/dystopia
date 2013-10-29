@@ -25,6 +25,7 @@
 
 #import "BoardUtil.h"
 #import "ExternalDisplay.h"
+#import "BrickView.h"
 
 BoardUtil *boardUtilInstance = nil;
 
@@ -114,6 +115,19 @@ BoardUtil *boardUtilInstance = nil;
                       [self brickScreenPosition:position].y,
                       [self brickTypeScreenSize:brickType].width,
                       [self brickTypeScreenSize:brickType].height);
+}
+
+- (CGRect)brickViewsBoundingRect:(NSArray *)brickViews {
+    CGPoint p1 = CGPointMake(100000.0f, 100000.0f);
+    CGPoint p2 = CGPointMake(-1.0f, -1.0f);
+    for (BrickView *brickView in brickViews) {
+        CGRect brickRect = [self brickTypeFrame:brickView.type position:brickView.position];
+        p1.x = MIN(p1.x, brickRect.origin.x);
+        p1.y = MIN(p1.y, brickRect.origin.y);
+        p2.x = MAX(p2.x, brickRect.origin.x + brickRect.size.width);
+        p2.y = MAX(p2.y, brickRect.origin.y + brickRect.size.height);
+    }
+    return CGRectMake(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
 }
 
 - (CGSize)borderSizeFromBoardSize:(CGSize)size {

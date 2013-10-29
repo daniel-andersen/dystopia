@@ -29,6 +29,8 @@
 
 @interface ConnectorsView : UIView
 
++ (ConnectorsView *)instance;
+
 - (void)addConnectionViewAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 type:(int)type;
 - (void)addDoorAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 type:(int)type;
 - (void)addHallwayConnectionAtPosition1:(cv::Point)position1 position2:(cv::Point)position2;
@@ -39,6 +41,9 @@
 - (NSMutableArray *)reveilConnectedBrickViewsForBrickView:(BrickView *)brickView;
 - (NSMutableArray *)reveilClosedConnectedBrickViewsForBrickViews:(NSMutableArray *)brickViews;
 
+- (NSMutableArray *)connectedBrickViewsForView:(BrickView *)brickView;
+
 @property (nonatomic, retain) NSMutableArray *connectionViews;
+@property (nonatomic, retain) NSMutableArray *connectionMaskViews;
 
 @end

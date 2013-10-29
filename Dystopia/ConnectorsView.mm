@@ -28,6 +28,8 @@
 #import "DoorView.h"
 #import "HallwayConnectionView.h"
 
+ConnectorsView *connectorsViewInstance = nil;
+
 @interface ConnectorsView ()
 
 @end
@@ -35,9 +37,19 @@
 @implementation ConnectorsView
 
 @synthesize connectionViews;
+@synthesize connectionMaskViews;
 
-- (id)initWithFrame:(CGRect)frame {
-    if (self = [super initWithFrame:frame]) {
++ (ConnectorsView *)instance {
+    @synchronized (self) {
+        if (connectorsViewInstance == nil) {
+            connectorsViewInstance = [[ConnectorsView alloc] init];
+        }
+        return connectorsViewInstance;
+    }
+}
+
+- (id)init {
+    if (self = [super init]) {
         [self initialize];
     }
     return self;
@@ -45,24 +57,35 @@
 
 - (void)initialize {
     connectionViews = [NSMutableArray array];
+    connectionMaskViews = [NSMutableArray array];
 }
 
 - (void)addConnectionViewAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 type:(int)type {
-    ConnectionView *connectionView = [[ConnectionView alloc] initWithPosition1:position1 position2:position2 type:type];
-    [connectionViews addObject:connectionView];
-    [self addSubview:connectionView];
+    [self addConnectionView:[[ConnectionView alloc] initWithPosition1:position1 position2:position2 type:type]];
 }
 
 - (void)addDoorAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 type:(int)type {
-    DoorView *doorView = [[DoorView alloc] initWithPosition1:position1 position2:position2 doorType:type];
-    [connectionViews addObject:doorView];
-    [self addSubview:doorView];
+    [self addConnectionView:[[DoorView alloc] initWithPosition1:position1 position2:position2 doorType:type]];
 }
 
 - (void)addHallwayConnectionAtPosition1:(cv::Point)position1 position2:(cv::Point)position2 {
-    HallwayConnectionView *hallwayConnectionView = [[HallwayConnectionView alloc] initWithPosition1:position1 position2:position2];
-    [connectionViews addObject:hallwayConnectionView];
-    [self addSubview:hallwayConnectionView];
+    [self addConnectionView:[[HallwayConnectionView alloc] initWithPosition1:position1 position2:position2]];
+}
+
+- (void)addConnectionView:(ConnectionView *)connectionView {
+    [connectionViews addObject:connectionView];
+    [self addSubview:connectionView];
+    
+    [connectionMaskViews addObject:connectionView.maskView];
+    [self addSubview:connectionView.maskView];
+    
+    [self sortViews];
+}
+
+- (void)sortViews {
+    for (UIView *view in connectionViews) {
+        [self bringSubviewToFront:view];
+    }
 }
 
 - (bool)shouldOpenDoorAtPosition:(cv::Point)position {

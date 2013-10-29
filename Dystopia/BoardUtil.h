@@ -62,6 +62,8 @@
 
 - (CGRect)brickTypeFrame:(int)brickType position:(cv::Point)position;
 
+- (CGRect)brickViewsBoundingRect:(NSArray *)brickViews;
+
 - (CGSize)borderSizeFromBoardSize:(CGSize)size;
 
 - (CGPoint)cvPointToCGPoint:(cv::Point)p;

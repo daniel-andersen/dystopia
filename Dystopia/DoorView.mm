@@ -49,7 +49,7 @@
 
 - (void)initializeDoor {
     [self addGradientViewWithImage:[UIImage imageNamed:@"connection_hallway.png"] extent:DOOR_CONNECTION_EXTENT];
-    doorImageView = [[UIImageView alloc] initWithFrame:[[BoardUtil instance] bricksScreenRectPosition1:self.position1 position2:self.position2]];
+    doorImageView = [[UIImageView alloc] initWithFrame:self.bounds];
     doorImageView.image = [self doorImage];
     [self addSubview:doorImageView];
 }
