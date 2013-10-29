@@ -27,7 +27,7 @@
 #import "Board.h"
 #import "Util.h"
 
-#define DOOR_CONNECTION_EXTENT 5
+#define DOOR_CONNECTION_EXTENT 0
 
 @interface DoorView () {
     UIImageView *doorImageView;
@@ -48,7 +48,9 @@
 }
 
 - (void)initializeDoor {
+    //[self addGradientViewWithImage:[UIImage imageNamed:@"connection_door.png"] extent:DOOR_CONNECTION_EXTENT];
     [self addGradientViewWithImage:[UIImage imageNamed:@"connection_hallway.png"] extent:DOOR_CONNECTION_EXTENT];
+
     doorImageView = [[UIImageView alloc] initWithFrame:self.bounds];
     doorImageView.image = [self doorImage];
     [self addSubview:doorImageView];

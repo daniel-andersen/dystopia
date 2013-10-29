@@ -46,9 +46,6 @@
 
 - (void)addGradientViewWithImage:(UIImage *)image extent:(int)extent;
 
-- (cv::Point)topLeftWithExtent:(int)extent;
-- (cv::Point)bottomRightWithExtent:(int)extent;
-
 - (CGRect)brickMaskRectPosition1:(cv::Point)p1 position2:(cv::Point)p2;
 
 @property (nonatomic, readonly) cv::Point position1;

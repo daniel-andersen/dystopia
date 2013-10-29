@@ -290,8 +290,8 @@ Board *boardInstance = nil;
         }
     }
     monsterFigures = [NSMutableArray array];
-    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(7, 10) type:MONSTER_GLOBNIC]];
-    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(10, 10) type:MONSTER_GLOBNIC]];
+    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(7, 12) type:MONSTER_GLOBNIC]];
+    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(6, 10) type:MONSTER_GLOBNIC]];
     for (MonsterFigure *monster in monsterFigures) {
         [self addSubview:monster];
     }

@@ -103,6 +103,7 @@
         self.hidden = NO;
         [UIView animateWithDuration:BRICKVIEW_OPEN_DOOR_DURATION animations:^{
             maskView.alpha = 0.0f;
+            //connectionGradientView.transform = CGAffineTransformRotate(connectionGradientView.transform, M_PI_2);
         } completion:^(BOOL finished) {
             maskView.hidden = YES;
         }];
@@ -143,7 +144,7 @@
     maskView.clipsToBounds = YES;
     
     [self setupMaskLayerWithViews:brickViews];
-    [self setupGradientViewForPosition:(brickView == brickView1 ? brickView1.position : brickView2.position)];
+    [self setupGradientViewForPosition:(brickView == brickView1 ? position1 : position2)];
     [self setupBlackOverlayViews];
 
     maskView.hidden = NO;
@@ -161,30 +162,49 @@
     if (gradientImage == nil) {
         return;
     }
-    CGRect rect = [self brickMaskRectPosition1:[self topLeftWithExtent:gradientExtent] position2:[self bottomRightWithExtent:gradientExtent]];
+    CGRect rect = [self brickMaskRectPosition1:[self topLeftWithPosition:p extent:gradientExtent] position2:[self bottomRightWithPosition:p extent:gradientExtent]];
     if (p.x > MIN(self.position1.x, self.position2.x)) {
-        rect.origin.x -= [BoardUtil instance].singleBrickScreenSize.width;
+        rect.origin.x -= [BoardUtil instance].singleBrickScreenSize.width / 2.0f;
     }
     if (p.x < MAX(self.position1.x, self.position2.x)) {
-        rect.origin.x += [BoardUtil instance].singleBrickScreenSize.width;
+        rect.origin.x += [BoardUtil instance].singleBrickScreenSize.width / 2.0f;
     }
     if (p.y > MIN(self.position1.y, self.position2.y)) {
-        rect.origin.y -= [BoardUtil instance].singleBrickScreenSize.height;
+        rect.origin.y -= [BoardUtil instance].singleBrickScreenSize.height / 2.0f;
     }
     if (p.y < MAX(self.position1.y, self.position2.y)) {
-        rect.origin.y += [BoardUtil instance].singleBrickScreenSize.height;
+        rect.origin.y += [BoardUtil instance].singleBrickScreenSize.height / 2.0f;
     }
+    rect.origin.x -= [BoardUtil instance].singleBrickScreenSize.width / 2.0f;
+    rect.origin.y -= [BoardUtil instance].singleBrickScreenSize.height / 2.0f;
+
     connectionGradientView = [[UIImageView alloc] initWithFrame:rect];
     connectionGradientView.backgroundColor = [UIColor clearColor];
     connectionGradientView.image = gradientImage;
     connectionGradientView.contentMode = UIViewContentModeScaleToFill;
+    [self rotateGradientViewForPosition:p];
     [maskView addSubview:connectionGradientView];
+}
+
+- (void)rotateGradientViewForPosition:(cv::Point)p {
+    /*if (p.x > MIN(self.position1.x, self.position2.x)) {
+        connectionGradientView.transform = CGAffineTransformMakeRotation(0.0f);
+    }
+    if (p.x < MAX(self.position1.x, self.position2.x)) {
+        connectionGradientView.transform = CGAffineTransformMakeRotation(M_PI);
+    }
+    if (p.y > MIN(self.position1.y, self.position2.y)) {
+        connectionGradientView.transform = CGAffineTransformMakeRotation(M_PI_2);
+    }
+    if (p.y < MAX(self.position1.y, self.position2.y)) {
+        connectionGradientView.transform = CGAffineTransformMakeRotation(M_PI + M_PI_2);
+    }*/
 }
 
 - (void)setupBlackOverlayViews {
     CGPoint p1 = CGPointMake(connectionGradientView.frame.origin.x, connectionGradientView.frame.origin.y);
     CGPoint p2 = CGPointMake(connectionGradientView.frame.origin.x + connectionGradientView.frame.size.width, connectionGradientView.frame.origin.y + connectionGradientView.frame.size.height);
-
+    
     blackOverlayView = [self addBlackViewWithP1:CGPointMake(0.0f, 0.0f) p2:CGPointMake(maskView.bounds.size.width, maskView.bounds.size.height)];
     
     [self addBlackViewWithP1:CGPointMake(0.0f, 0.0f) p2:CGPointMake(maskView.bounds.size.width, p1.y)];
@@ -221,12 +241,12 @@
     return view;
 }
 
-- (cv::Point)topLeftWithExtent:(int)extent {
-    return cv::Point(MAX(MIN(self.position1.x, self.position2.x) - extent, 1), MAX(MIN(self.position1.y, self.position2.y) - extent, 1));
+- (cv::Point)topLeftWithPosition:(cv::Point)p extent:(int)extent {
+    return cv::Point(MAX(p.x - extent, 1), MAX(p.y - extent, 1));
 }
 
-- (cv::Point)bottomRightWithExtent:(int)extent {
-    return cv::Point(MIN(MAX(self.position1.x, self.position2.x) + extent, BOARD_WIDTH - 2), MIN(MAX(self.position1.y, self.position2.y) + extent, BOARD_HEIGHT - 2));
+- (cv::Point)bottomRightWithPosition:(cv::Point)p extent:(int)extent {
+    return cv::Point(MIN(p.x + 1 + extent, BOARD_WIDTH - 2), MIN(p.y + 1 + extent, BOARD_HEIGHT - 2));
 }
 
 - (CGRect)brickMaskRect:(BrickView *)brickView {

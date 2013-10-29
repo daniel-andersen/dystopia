@@ -26,7 +26,7 @@
 #import "HallwayConnectionView.h"
 #import "BoardUtil.h"
 
-#define HALLWAY_CONNECTION_EXTENT 2
+#define HALLWAY_CONNECTION_EXTENT 1
 
 @interface HallwayConnectionView () {
     UIImageView *hallwayGradientView;
