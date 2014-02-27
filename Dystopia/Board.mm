@@ -105,14 +105,21 @@ Board *boardInstance = nil;
     [self addBrickOfType:8 atPosition:cv::Point(7, 6)];
     [self addBrickOfType:8 atPosition:cv::Point(7, 9)];
     [self addBrickOfType:8 atPosition:cv::Point(7, 12)];
+
     [self addBrickOfType:2 atPosition:cv::Point(6, 15)];
     [self addBrickOfType:2 atPosition:cv::Point(9, 15)];
+
     [self addBrickOfType:5 atPosition:cv::Point(4, 10)];
     [self addBrickOfType:5 atPosition:cv::Point(8, 10)];
     [self addBrickOfType:5 atPosition:cv::Point(11, 10)];
-    [self addBrickOfType:1 atPosition:cv::Point(14, 9)];
-    [self addBrickOfType:1 atPosition:cv::Point(14, 6)];
-    [self addBrickOfType:1 atPosition:cv::Point(14, 12)];
+    [self addBrickOfType:1 atPosition:cv::Point(14, 8)];
+    [self addBrickOfType:1 atPosition:cv::Point(14, 11)];
+
+    [self addBrickOfType:3 atPosition:cv::Point(1, 9)];
+    [self addBrickOfType:8 atPosition:cv::Point(2, 12)];
+
+    [self addBrickOfType:4 atPosition:cv::Point(2, 15)];
+
     for (BrickView *brickView in brickViews) {
         [self addSubview:brickView];
     }
@@ -120,8 +127,13 @@ Board *boardInstance = nil;
     [[ConnectorsView instance] addDoorAtPosition1:cv::Point(7, 5) position2:cv::Point(7, 6) type:DOOR_TYPE_NORMAL];
     [[ConnectorsView instance] addDoorAtPosition1:cv::Point(7, 14) position2:cv::Point(7, 15) type:DOOR_TYPE_NORMAL];
     [[ConnectorsView instance] addDoorAtPosition1:cv::Point(13, 10) position2:cv::Point(14, 10) type:DOOR_TYPE_NORMAL];
+    [[ConnectorsView instance] addDoorAtPosition1:cv::Point(3, 10) position2:cv::Point(4, 10) type:DOOR_TYPE_NORMAL];
+    [[ConnectorsView instance] addDoorAtPosition1:cv::Point(2, 11) position2:cv::Point(2, 12) type:DOOR_TYPE_NORMAL];
+    [[ConnectorsView instance] addDoorAtPosition1:cv::Point(2, 14) position2:cv::Point(2, 15) type:DOOR_TYPE_NORMAL];
+
     [[ConnectorsView instance] addHallwayConnectionAtPosition1:cv::Point(6, 10) position2:cv::Point(7, 10)];
     [[ConnectorsView instance] addHallwayConnectionAtPosition1:cv::Point(7, 10) position2:cv::Point(8, 10)];
+    
     [[ConnectorsView instance] addConnectionViewAtPosition1:cv::Point(5, 4) position2:cv::Point(6, 5) type:CONNECTION_TYPE_VIEW_GLUE];
     [[ConnectorsView instance] addConnectionViewAtPosition1:cv::Point(7, 8) position2:cv::Point(7, 9) type:CONNECTION_TYPE_VIEW_GLUE];
     [[ConnectorsView instance] addConnectionViewAtPosition1:cv::Point(7, 11) position2:cv::Point(7, 12) type:CONNECTION_TYPE_VIEW_GLUE];
@@ -290,8 +302,10 @@ Board *boardInstance = nil;
         }
     }
     monsterFigures = [NSMutableArray array];
-    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(7, 12) type:MONSTER_GLOBNIC]];
-    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(6, 10) type:MONSTER_GLOBNIC]];
+    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(12, 10) type:MONSTER_GLOBNIC]];
+    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(1, 9) type:MONSTER_GLOBNIC]];
+    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(15, 8) type:MONSTER_GLOBNIC]];
+    [monsterFigures addObject:[[MonsterFigure alloc] initWithPosition:cv::Point(10, 16) type:MONSTER_GLOBNIC]];
     for (MonsterFigure *monster in monsterFigures) {
         [self addSubview:monster];
     }
