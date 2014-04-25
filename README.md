@@ -6,7 +6,9 @@ Dystopia is an interactive, digital tabletop board game based on the board game 
 Description
 -----------
 
-Dystopia itself is an iPhone app which - when run on an iPhone connected to a simple projector setup - creates an interactive, digital tabletop board game playable on any table. By monitoring the projected board game from the camera of the iPhone, the app recognizes the board state by detecting the positions of the physical bricks. By interacting with the bricks, the state changes and the board game evolves (eg. new rooms are reveiled, monsters appear, etc.). The app thereby also functions as Game Master by being able to mark the movements of the monsters.
+Dystopia itself is an iPhone app which - when run on an iPhone connected to a simple projector setup - creates an interactive, digital tabletop board game playable on any table.
+
+By monitoring the projected board game from the camera of the iPhone, the app recognizes the board state by detecting the positions of the physical bricks. By interacting with the bricks, the state changes and the board game evolves (eg. new rooms are reveiled, monsters appear, etc.). The app thereby also functions as Game Master by being able to mark the movements of the monsters.
 
 The setup
 ---------
