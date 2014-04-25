@@ -55,6 +55,8 @@ What's up next?
 * More advanced game mechanics, like fights
 * Methods for players to make descisions not only by moving bricks
 
+See the issue list for further info.
+
 Articles
 --------
 
