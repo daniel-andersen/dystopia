@@ -24,8 +24,18 @@ What you need in order to getting started:
 * An iPhone (>= 5?)
 * A mini projector (not pico, as the resolution should be at least 1280x800, and depending on the setup, not full size because of the weight)
 * A Lightning to VGA adapter to connect the iPhone to the projector
-* A camera stand with a cross bar capable of fitting a projector and an iPhone above a table. (I did my own from an unused clothing rack; see photos below.)
-* A table :)
+* A camera stand with a cross bar capable of fitting a projector and an iPhone above a table. (I did my own from an unused clothing rack; see photos below)
+* Bricks with black feet (see photos below)
+* A table :-)
+
+Getting started
+---------------
+
+Simple enough:
+
+Install the app, plug in the projector and the iPhone in the stand; connect the iPhone to the connector and start the app. As soon as the app recognizes the board on the table it will place markers for the heroes in the starting room. Now place a brick on a hero marker. A red circle will appear as soon as the brick has been recognized.
+
+Or, you can simply run the app from the iPhone simulator and click any piece on the board to simulate a brick placement.
 
 Current state
 -------------
