@@ -8,6 +8,17 @@ Description
 
 Dystopia itself is an iPhone app which - when run on an iPhone connected to a simple projector setup - creates an interactive, digital tabletop board game playable on any table. By monitoring the projected board game from the camera of the iPhone, the app recognizes the board state by detecting the positions of the physical bricks. By interacting with the bricks, the state changes and the board game evolves (eg. new rooms are reveiled, monsters appear, etc.). The app thereby also functions as Game Master by being able to mark the movements of the monsters.
 
+The setup
+---------
+
+What you need in order to getting started:
+
+* An iPhone (>= 5?)
+* A mini projector (not pico, as the resolution should be at least 1280x800, and depending on the setup, not full size because of the weight)
+* A Lightning to VGA adapter to connect the iPhone to the projector
+* A camera stand with a cross bar capable of fitting a projector and an iPhone above a table. (I did my own from an unused clothing rack; see photos below.)
+* A table :)
+
 Current state
 -------------
 
