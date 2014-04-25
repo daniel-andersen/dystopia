@@ -45,7 +45,7 @@ The following features have been implemented:
 * Board recognition
 * Brick recognition
 * Detection of brick movements
-* Reveiling of new rooms
+* Revealing of new rooms
 * Simple turn based game engine
 
 What's up next?
