@@ -1,7 +1,23 @@
 Dystopia
 ========
 
-An interactive board game based on the board game "Kampen mod Dystopia".
+Dystopia is an interactive, digital tabletop board game based on the board game [Kampen mod Dystopia (Danish)](http://trollsahead.dk/dystopia/index.html). It combines interaction between physical bricks and a digital board projected from a mini projector connected to an iPhone. See photos and videos below.
+
+Description
+-----------
+
+Dystopia itself is an iPhone app which - when run on an iPhone connected to a simple projector setup - creates an interactive, digital tabletop board game playable on any table. By monitoring the projected board game from the camera of the iPhone, the app recognizes the board state by detecting the positions of the physical bricks. By interacting with the bricks, the state changes and the board game evolves (eg. new rooms are reveiled, monsters appear, etc.). The app thereby also functions as Game Master by being able to mark the movements of the monsters.
+
+Current state
+-------------
+
+The following features have been implemented:
+
+* Board recognition
+* Brick recognition
+* Detection of brick movements
+* Reveiling of new rooms
+* Simple turn based game engine
 
 Articles
 --------
