@@ -3,7 +3,7 @@ Dystopia
 
 Dystopia is an interactive, digital tabletop board game based on the board game [Kampen mod Dystopia (Danish)](http://trollsahead.dk/dystopia/index.html). It combines interaction between physical bricks and a digital board projected from a mini projector connected to an iPhone.
 
-The project combines several interesting techniques, including computer vision (CV), artificial intelligence (AI) and computer game engine.
+The project combines several interesting techniques, including computer vision, artificial intelligence and game engine design.
 
 See photos and videos below.
 
@@ -37,6 +37,13 @@ The following features have been implemented:
 * Detection of brick movements
 * Reveiling of new rooms
 * Simple turn based game engine
+
+What's up next?
+---------------
+
+* Simple AI to control monsters
+* More advanced game mechanics, like fights
+* Methods for players to make descisions not only by moving bricks
 
 Articles
 --------
