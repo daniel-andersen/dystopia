@@ -602,6 +602,11 @@
 			attributes = {
 				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = "Daniel Andersen";
+				TargetAttributes = {
+					65B9306E17806B4500312B88 = {
+						DevelopmentTeam = XWJHXX6TC4;
+					};
+				};
 			};
 			buildConfigurationList = 65B9306A17806B4500312B88 /* Build configuration list for PBXProject "Dystopia" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -807,7 +812,8 @@
 		65B9309E17806B4500312B88 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Daniel Andersen (8SCSB3NDBE)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -816,6 +822,7 @@
 				GCC_PREFIX_HEADER = "Dystopia/Dystopia-Prefix.pch";
 				INFOPLIST_FILE = "Dystopia/Dystopia-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -823,6 +830,8 @@
 		65B9309F17806B4500312B88 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -831,6 +840,7 @@
 				GCC_PREFIX_HEADER = "Dystopia/Dystopia-Prefix.pch";
 				INFOPLIST_FILE = "Dystopia/Dystopia-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

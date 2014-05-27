@@ -354,7 +354,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     borderSize.width *= 1.2f;
     borderSize.height *= 1.2f;
     
-    lineGroupPointDistanceAcceptMax = MAX(borderSize.width, borderSize.height) * 1.5f;
+    lineGroupPointDistanceAcceptMax = MAX(borderSize.width, borderSize.height) * 1.2f;
     
     if ([ExternalDisplay instance].externalDisplayFound) {
         boardAspectRatio = [ExternalDisplay instance].widescreenBounds.size.width / [ExternalDisplay instance].widescreenBounds.size.height;
@@ -506,7 +506,7 @@ BoardRecognizer *boardRecognizerInstance = nil;
     
     // Find best square points
     cv::vector<cv::Point> bestSquarePoints = [self findBestSquareFromPoints:intersectionPoints scoreFunction:^float(cv::vector<cv::Point> hull) {
-        return cv::contourArea(hull);
+        return [self areContourConditionsSatisfied:hull] ? cv::contourArea(hull) : -1.0f;
     }];
     if (bestSquarePoints.size() < 4) {
         return undefinedPoints;
